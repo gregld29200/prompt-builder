@@ -1,0 +1,5 @@
+{
+  "name": "Teachinspire Prompt Builder",
+  "description": "An application to transform ideas into structured, effective AI prompts using Gemini. Features analysis, approach selection, variable refinement, and prompt generation with MVP and Agentic modes. Includes a library for saved prompts and multi-language support.",
+  "requestFramePermissions": []
+}

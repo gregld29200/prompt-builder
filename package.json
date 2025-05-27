@@ -1,0 +1,41 @@
+
+{
+  "name": "teachinspire-prompt-builder",
+  "version": "1.0.0",
+  "description": "An application to transform ideas into structured, effective AI prompts using Gemini. Features analysis, approach selection, variable refinement, and prompt generation with MVP and Agentic modes. Includes a library for saved prompts and multi-language support.",
+  "private": true,
+  "scripts": {
+    "start": "echo \"To run this application, open index.html in your browser or use a simple HTTP server (e.g., 'npx serve .') from the project root.\"",
+    "check-types": "echo \"TypeScript checking would typically be configured here (e.g., tsc --noEmit)\"",
+    "lint": "echo \"Linting (e.g., ESLint) would typically be configured here\""
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "gemini-api",
+    "prompt-engineering",
+    "teachinspire",
+    "ai",
+    "cloudflare-worker",
+    "cloudflare-pages"
+  ],
+  "author": "Teachinspire",
+  "license": "MIT",
+  "info": {
+    "dependencies_source": "Client-side dependencies are loaded via CDN using an importmap in index.html. The @google/genai dependency is for the Cloudflare Worker.",
+    "conceptual_dependencies": {
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0",
+      "lucide-react": "^0.511.0",
+      "tailwindcss": "CDN"
+    }
+  },
+  "dependencies": {
+    "@google/genai": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.0.0"
+  }
+}
