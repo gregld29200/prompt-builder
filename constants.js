@@ -80,7 +80,8 @@ export const translations = {
       copiedSuccess: "Copié!",
       copyError: "Erreur de copie",
       savedSuccess: "Sauvegardé!",
-      usePrompt: "Utiliser"
+      usePrompt: "Utiliser",
+      delete: "Supprimer"
     },
     library: {
       title: "Bibliothèque de prompts",
@@ -103,7 +104,8 @@ export const translations = {
       copied: "Prompt copié dans le presse-papiers!",
       copyFailed: "Échec de la copie du prompt.",
       saved: "Prompt sauvegardé dans la bibliothèque!",
-      apiError: "Erreur de l'API Gemini. Veuillez vérifier votre clé API et réessayer."
+      apiError: "Erreur de l'API Gemini. Veuillez vérifier votre clé API et réessayer.",
+      deleted: "Prompt supprimé !"
     }
   },
   en: {
@@ -166,7 +168,8 @@ export const translations = {
       copiedSuccess: "Copied!",
       copyError: "Copy failed",
       savedSuccess: "Saved!",
-      usePrompt: "Use"
+      usePrompt: "Use",
+      delete: "Delete"
     },
     library: {
       title: "Prompt Library",
@@ -189,7 +192,8 @@ export const translations = {
       copied: "Prompt copied to clipboard!",
       copyFailed: "Failed to copy prompt.",
       saved: "Prompt saved to library!",
-      apiError: "Gemini API error. Please check your API key and try again."
+      apiError: "Gemini API error. Please check your API key and try again.",
+      deleted: "Prompt deleted!"
     }
   }
 };
