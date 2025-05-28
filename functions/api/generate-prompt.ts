@@ -1,4 +1,3 @@
-
 // File: functions/api/generate-prompt.ts
 
 import { GoogleGenAI } from "@google/genai";
@@ -31,11 +30,11 @@ interface EventContext {
   functionPath: string;
 }
 
-
-// Re-define metaPromptTranslations here, as this logic is now server-side
+// Enhanced metaPromptTranslations with detailed methodology for both approaches
 const metaPromptTranslations = {
   en: {
-    systemInstructionBase: "You are an expert prompt engineering assistant. Your task is to generate a highly effective, structured prompt based on the user's specifications. The final prompt you generate MUST be in English. Do not add any explanatory text before or after the generated prompt. Only output the prompt itself, adhering strictly to the provided template structure.",
+    systemInstructionBase: "You are an expert prompt engineering assistant. Your task is to generate a highly effective, structured prompt that guides toward professional-quality results. The final prompt you generate MUST be in {TARGET_LANGUAGE}. Do not add any explanatory text before or after the generated prompt. Only output the prompt itself, adhering strictly to the provided template structure.",
+    
     userQueryHeader: "Please generate a structured prompt. Here are the details:",
     rawRequestLabel: "User's Goal / Raw Request:",
     promptTypeLabel: "Chosen Prompt Structure Type:",
@@ -45,45 +44,91 @@ const metaPromptTranslations = {
     missionLabel: "Main Mission for the AI using the generated prompt:",
     constraintsLabel: "Constraints for the AI using the generated prompt (one per line):",
     noneSpecified: "None specified",
-    finalPromptLangLabel: "The language for the final prompt itself MUST be: English.",
+    finalPromptLangLabel: "The language for the final prompt itself MUST be: {TARGET_LANGUAGE}.",
     constructPromptInstruction: "Now, based on whether the type is MVP or AGENTIC, construct the prompt using the following templates and information.",
+    
+    // Enhanced MVP Section
     mvpTemplateHeader: "For an \"MVP\" type prompt, use this template:",
     mvpSystemRole: "You are an excellent {expertRolePlaceholder}: knowledgeable, precise, pedagogical. Your mission is to {missionPlaceholder}.",
     mvpExpertPlaceholder: "Expert",
     mvpMissionPlaceholder: "help effectively",
-    mvpMainTasksInstruction: "[From the User's Goal / Raw Request above, please extract and list the primary actionable task(s) the AI should perform, stated clearly. If the request is broad, summarize it into a core objective. Ensure this is concise and directly actionable.]",
+    
+    // Enhanced Methodology for MVP
+    mvpMethodologyHeader: "DETAILED METHODOLOGY - Follow this structured approach:",
+    mvpAnalysisHeader: "1. IN-DEPTH ANALYSIS:",
+    mvpAnalysisTasks: [
+      "Meticulously analyze all elements provided in the request above",
+      "Identify explicit and implicit objectives, quality criteria, and success metrics",
+      "Note technical, creative, and logistical constraints to be respected", 
+      "Evaluate context, underlying challenges, and optimization opportunities",
+      "Determine the most appropriate resources, tools, and approaches"
+    ],
+    mvpPlanningHeader: "2. STRATEGIC PLANNING:",
+    mvpPlanningTasks: [
+      "Consider multiple methodological approaches to address the request optimally",
+      "Rigorously evaluate advantages, disadvantages, and implications of each strategy",
+      "Select the most appropriate approach and formulate clear justification for this choice",
+      "Plan logical structure, progression, and optimal organization of the deliverable",
+      "Anticipate execution challenges and prepare adaptation strategies if necessary"
+    ],
+    mvpExecutionHeader: "3. PROFESSIONAL EXECUTION:",
+    mvpExecutionTasks: [
+      "Produce a deliverable organized according to clear professional architecture",
+      "Use premium formatting with appropriate sections, subsections, and structural elements",
+      "Integrate concrete examples, evidence, data, and relevant references to support quality",
+      "Scrupulously respect all constraints, specifications, and formulated requirements",
+      "Systematically aim for professional-level quality that exceeds standard expectations",
+      "Personalize content to maximize its specific relevance and added value"
+    ],
+    
     mvpExpectedOutputFormat: "Expected output format:",
     mvpLength: "Length:",
     mvpStyle: "Style: Clear and structured",
-    mvpLanguage: "Language: English",
-    mvpExampleInstruction: "(Generate a concise, highly relevant example snippet (typically 1-2 sentences) demonstrating the *beginning* of how an AI might respond when fulfilling the generated prompt. This example should be directly related to the user's raw request and specified domain, hinting at the initial steps or tone. For instance, if the request is 'analyze a company report', an example could be 'To begin the analysis of this company report, I will first examine its executive summary and financial statements...' or if the request is 'create a lesson plan on photosynthesis', an example might be 'Okay, I will start by outlining the key learning objectives for a lesson on photosynthesis for [target audience if specified, otherwise general].'. Ensure this example is distinct and illustrative of the AI's starting point.)",
+    mvpLanguage: "Language: {TARGET_LANGUAGE}",
+    
+    // Fixed Example Instruction  
+    mvpExampleInstruction: "(Generate a concrete example showing the EXACT format of the expected output beginning. Do NOT describe the process or explain what the AI will do. Show the direct start of the final deliverable. Examples: For podcast → actual dialogue lines ('Voice 1: Welcome everyone to today's show...'), for lesson plan → actual lesson structure ('LESSON: [Title] | OBJECTIVES: Students will be able to... | MODULE 1: [Content]...'), for analysis → actual analysis format ('EXECUTIVE SUMMARY: This analysis reveals... | KEY FINDINGS: 1. [Primary insight]...'). The example must be a direct sample of the deliverable, not a process description.)",
+    
     mvpFooter: "Ensure the entire output is *only* the prompt text, starting with \"<System>:\" and ending appropriately based on the template. Do not add any other commentary.",
+    
+    // Enhanced AGENTIC Section
     agenticTemplateHeader: "For an \"AGENTIC\" type prompt, use this template. This prompt is for an AI capable of autonomous action, thinking, and iteration. It MUST include self-assessment capabilities.",
     agenticTitleInstruction: "[Generate a concise and descriptive title (max 5-7 words) derived from the user's raw request.]",
     agenticRole: "{expertRolePlaceholder} (Agentic AI)",
-    agenticExpertPlaceholder: "Expert Analyst",
+    agenticExpertPlaceholder: "Expert Analyst", 
     agenticNote: "*Note: \"Agentic AI\" means an AI capable of acting autonomously, thinking, and iterating on its work.*",
     agenticContext: "Context:",
     agenticInstructionsHeader: "Instructions:",
-    agenticAnalysisHeader: "1.  Analysis of Provided Information:",
+    
+    // Same detailed methodology for AGENTIC (reusing MVP tasks)
+    agenticAnalysisHeader: "1. IN-DEPTH ANALYSIS:",
     agenticAnalysisTasks: [
-        "Thoroughly analyze all provided elements related to the Context.",
-        "Identify key points, implications, and any underlying assumptions.",
-        "Note any gaps or ambiguities that might require clarification or assumptions."
+      "Meticulously analyze all elements provided related to the Context above",
+      "Identify explicit and implicit objectives, quality criteria, and success metrics",
+      "Note technical, creative, and logistical constraints to be respected",
+      "Evaluate context, underlying challenges, and optimization opportunities", 
+      "Determine the most appropriate resources, tools, and approaches"
     ],
-    agenticThinkingHeader: "2.  Deliberate Thinking & Planning:",
+    agenticThinkingHeader: "2. STRATEGIC PLANNING:",
     agenticThinkingTasks: [
-        "Consider multiple perspectives or approaches to address the Context.",
-        "Evaluate the pros and cons of different strategies.",
-        "Formulate a clear plan or methodology for execution. Justify the chosen approach."
+      "Consider multiple methodological approaches to address the Context optimally",
+      "Rigorously evaluate advantages, disadvantages, and implications of each strategy",
+      "Select the most appropriate approach and formulate clear justification for this choice",
+      "Plan logical structure, progression, and optimal organization of the deliverable",
+      "Anticipate execution challenges and prepare adaptation strategies if necessary"
     ],
-    agenticDevelopmentHeader: "3.  Structured Development & Execution:",
+    agenticDevelopmentHeader: "3. PROFESSIONAL EXECUTION:",
     agenticDevelopmentTasks: [
-        "Present findings, solutions, or creations in a logical, well-organized order.",
-        "Use clear sections, subsections, and formatting (e.g., bullet points, tables) as appropriate.",
-        "Provide concrete examples, evidence, or code snippets where applicable to support the output."
+      "Produce a deliverable organized according to clear professional architecture",
+      "Use premium formatting with appropriate sections, subsections, and structural elements", 
+      "Integrate concrete examples, evidence, data, and relevant references to support quality",
+      "Scrupulously respect all constraints, specifications, and formulated requirements",
+      "Systematically aim for professional-level quality that exceeds standard expectations",
+      "Personalize content to maximize its specific relevance and added value"
     ],
-    agenticSelfAssessmentHeader: "4.  Self-Assessment and Continuous Improvement:",
+    
+    // Self-Assessment (AGENTIC only)
+    agenticSelfAssessmentHeader: "4. SELF-ASSESSMENT AND CONTINUOUS IMPROVEMENT:",
     agenticSelfAssessmentQuestion1: "At the end of its work, the AI executing this prompt **must always ask the user verbatim**:\n    \"🤔 Would you like me to evaluate this result against key criteria and provide suggestions for improvement? (Yes/No)\"",
     agenticSelfAssessmentInstruction: "If the user responds \"Yes\" (or similar affirmative), the AI should then perform a self-assessment using the following evaluation method, presenting it in a table:",
     agenticEvaluationCriteria: {
@@ -95,8 +140,10 @@ const metaPromptTranslations = {
     agenticSelfAssessmentQuestion2: "After presenting the evaluation, the AI **must also ask the user verbatim**:\n    \"Based on the evaluation above, would you like me to attempt to improve the draft? (Yes/No)\"",
     agenticFooter: "Ensure the entire output is *only* the prompt text, starting with \"Title:\" and ending appropriately based on the template. Do not add any other commentary.",
   },
+  
   fr: {
-    systemInstructionBase: "Vous êtes un assistant expert en ingénierie de prompts. Votre tâche est de générer un prompt structuré, hautement efficace, basé sur les spécifications de l'utilisateur. Le prompt final que vous générez DOIT être en Français. N'ajoutez aucun texte explicatif avant ou après le prompt généré. Ne retournez que le prompt lui-même, en respectant strictement la structure du modèle fourni.",
+    systemInstructionBase: "Vous êtes un assistant expert en ingénierie de prompts. Votre tâche est de générer un prompt structuré, hautement efficace, qui guide vers des résultats de qualité professionnelle. Le prompt final que vous générez DOIT être en {TARGET_LANGUAGE}. N'ajoutez aucun texte explicatif avant ou après le prompt généré. Ne retournez que le prompt lui-même, en respectant strictement la structure du modèle fourni.",
+    
     userQueryHeader: "Veuillez générer un prompt structuré. Voici les détails :",
     rawRequestLabel: "Objectif / Demande brute de l'utilisateur :",
     promptTypeLabel: "Type de structure de prompt choisi :",
@@ -106,19 +153,54 @@ const metaPromptTranslations = {
     missionLabel: "Mission principale pour l'IA utilisant le prompt généré :",
     constraintsLabel: "Contraintes pour l'IA utilisant le prompt généré (une par ligne) :",
     noneSpecified: "Aucune spécifiée",
-    finalPromptLangLabel: "La langue du prompt final lui-même DOIT être : Français.",
+    finalPromptLangLabel: "La langue du prompt final lui-même DOIT être : {TARGET_LANGUAGE}.",
     constructPromptInstruction: "Maintenant, selon que le type est MVP ou AGENTIQUE, construisez le prompt en utilisant les modèles et informations suivants.",
+    
+    // Enhanced MVP Section - French
     mvpTemplateHeader: "Pour un prompt de type \"MVP\", utilisez ce modèle :",
     mvpSystemRole: "Vous êtes un excellent {expertRolePlaceholder} : compétent, précis, pédagogue. Votre mission est d'{missionPlaceholder}.",
     mvpExpertPlaceholder: "Expert",
     mvpMissionPlaceholder: "aider efficacement",
-    mvpMainTasksInstruction: "[À partir de l'Objectif / Demande brute de l'utilisateur ci-dessus, veuillez extraire et lister la ou les tâches principales actionnables que l'IA doit effectuer, énoncées clairement. Si la demande est large, résumez-la en un objectif principal. Assurez-vous que cela soit concis et directement actionnable.]",
+    
+    // Enhanced Methodology for MVP - French
+    mvpMethodologyHeader: "MÉTHODOLOGIE DÉTAILLÉE - Suivez cette approche structurée :",
+    mvpAnalysisHeader: "1. ANALYSE APPROFONDIE :",
+    mvpAnalysisTasks: [
+      "Analysez méticuleusement tous les éléments fournis dans la demande ci-dessus",
+      "Identifiez les objectifs explicites et implicites, critères de qualité et métriques de réussite",
+      "Notez les contraintes techniques, créatives et logistiques à respecter",
+      "Évaluez le contexte, les défis sous-jacents et les opportunités d'optimisation",
+      "Déterminez les ressources, outils et approches les plus appropriés"
+    ],
+    mvpPlanningHeader: "2. PLANIFICATION STRATÉGIQUE :",
+    mvpPlanningTasks: [
+      "Considérez de multiples approches méthodologiques pour aborder la demande de manière optimale",
+      "Évaluez rigoureusement les avantages, inconvénients et implications de chaque stratégie",
+      "Sélectionnez l'approche la plus appropriée et formulez une justification claire de ce choix",
+      "Planifiez la structure logique, la progression et l'organisation optimale du livrable",
+      "Anticipez les défis d'exécution et préparez des stratégies d'adaptation si nécessaire"
+    ],
+    mvpExecutionHeader: "3. EXÉCUTION PROFESSIONNELLE :",
+    mvpExecutionTasks: [
+      "Produisez un livrable organisé selon une architecture professionnelle claire",
+      "Utilisez un formatage premium avec sections, sous-sections et éléments de structuration appropriés",
+      "Intégrez des exemples concrets, preuves, données et références pertinentes pour étayer la qualité",
+      "Respectez scrupuleusement toutes les contraintes, spécifications et exigences formulées",
+      "Visez systématiquement un niveau de qualité professionnel qui dépasse les attentes standard",
+      "Personnalisez le contenu pour maximiser sa pertinence et sa valeur ajoutée spécifique"
+    ],
+    
     mvpExpectedOutputFormat: "Format de sortie attendu :",
     mvpLength: "Longueur :",
     mvpStyle: "Style : Clair et structuré",
-    mvpLanguage: "Langue : Français",
-    mvpExampleInstruction: "(Générez un exemple concis et très pertinent (typiquement 1-2 phrases) démontrant le *début* de la manière dont une IA pourrait répondre en exécutant le prompt généré. Cet exemple doit être directement lié à la demande brute de l'utilisateur et au domaine spécifié, suggérant les étapes initiales ou le ton. Par exemple, si la demande est 'analyser un rapport d'entreprise', un exemple pourrait être 'Pour commencer l'analyse de ce rapport d'entreprise, j'examinerai d'abord son résumé analytique et ses états financiers...' ou si la demande est 'créer un plan de cours sur la photosynthèse', un exemple pourrait être 'Bien, je vais commencer par définir les objectifs d'apprentissage clés pour une leçon sur la photosynthèse pour [public cible si spécifié, sinon général].'. Assurez-vous que cet exemple soit distinct et illustratif du point de départ de l'IA.)",
+    mvpLanguage: "Langue : {TARGET_LANGUAGE}",
+    
+    // Fixed Example Instruction - French
+    mvpExampleInstruction: "(Générez un exemple concret montrant le FORMAT EXACT du début du livrable attendu. NE PAS décrire le processus ou expliquer ce que l'IA va faire. Montrez directement le début du résultat final. Exemples : Pour podcast → lignes de dialogue réelles ('Voix 1: Bienvenue dans cette émission...'), pour plan de cours → structure de cours réelle ('COURS: [Titre] | OBJECTIFS: Les apprenants seront capables de... | MODULE 1: [Contenu]...'), pour analyse → format d'analyse réel ('SYNTHÈSE EXÉCUTIVE: Cette analyse révèle... | POINTS CLÉS: 1. [Insight principal]...'). L'exemple doit être un échantillon direct du livrable, pas une description du processus.)",
+    
     mvpFooter: "Assurez-vous que l'ensemble de la sortie soit *uniquement* le texte du prompt, commençant par \"<System>:\" et se terminant de manière appropriée selon le modèle. N'ajoutez aucun autre commentaire.",
+    
+    // Enhanced AGENTIC Section - French (same structure, with self-assessment)
     agenticTemplateHeader: "Pour un prompt de type \"AGENTIQUE\", utilisez ce modèle. Ce prompt est destiné à une IA capable d'action autonome, de réflexion et d'itération. Il DOIT inclure des capacités d'auto-évaluation.",
     agenticTitleInstruction: "[Générez un titre concis et descriptif (max 5-7 mots) dérivé de la demande brute de l'utilisateur.]",
     agenticRole: "{expertRolePlaceholder} (IA Agentique)",
@@ -126,25 +208,36 @@ const metaPromptTranslations = {
     agenticNote: "*Note : \"IA Agentique\" signifie une IA capable d'agir de manière autonome, de réfléchir et d'itérer sur son travail.*",
     agenticContext: "Contexte :",
     agenticInstructionsHeader: "Instructions :",
-    agenticAnalysisHeader: "1.  Analyse des Informations Fournies :",
+    
+    // Same detailed methodology for AGENTIC - French
+    agenticAnalysisHeader: "1. ANALYSE APPROFONDIE DES INFORMATIONS FOURNIES :",
     agenticAnalysisTasks: [
-        "Analyser en profondeur tous les éléments fournis relatifs au Contexte.",
-        "Identifier les points clés, les implications et toutes les hypothèses sous-jacentes.",
-        "Noter les lacunes ou ambiguïtés qui pourraient nécessiter des éclaircissements ou des suppositions."
+      "Analysez méticuleusement tous les éléments fournis relatifs au Contexte ci-dessus",
+      "Identifiez les objectifs explicites et implicites, critères de qualité et métriques de réussite",
+      "Notez les contraintes techniques, créatives et logistiques à respecter",
+      "Évaluez le contexte, les défis sous-jacents et les opportunités d'optimisation",
+      "Déterminez les ressources, outils et approches les plus appropriés"
     ],
-    agenticThinkingHeader: "2.  Réflexion Approfondie & Planification :",
+    agenticThinkingHeader: "2. RÉFLEXION APPROFONDIE & PLANIFICATION :",
     agenticThinkingTasks: [
-        "Considérer de multiples perspectives ou approches pour aborder le Contexte.",
-        "Évaluer les avantages et inconvénients des différentes stratégies.",
-        "Formuler un plan ou une méthodologie claire pour l'exécution. Justifier l'approche choisie."
+      "Considérez de multiples approches méthodologiques pour aborder le Contexte de manière optimale",
+      "Évaluez rigoureusement les avantages, inconvénients et implications de chaque stratégie",
+      "Sélectionnez l'approche la plus appropriée et formulez une justification claire de ce choix",
+      "Planifiez la structure logique, la progression et l'organisation optimale du livrable",
+      "Anticipez les défis d'exécution et préparez des stratégies d'adaptation si nécessaire"
     ],
-    agenticDevelopmentHeader: "3.  Développement Structuré & Exécution :",
+    agenticDevelopmentHeader: "3. DÉVELOPPEMENT STRUCTURÉ & EXÉCUTION :",
     agenticDevelopmentTasks: [
-        "Présenter les résultats, solutions ou créations dans un ordre logique et bien organisé.",
-        "Utiliser des sections, sous-sections et mises en forme claires (par ex., listes à puces, tableaux) selon les besoins.",
-        "Fournir des exemples concrets, des preuves ou des extraits de code le cas échéant pour étayer la sortie."
+      "Produisez un livrable organisé selon une architecture professionnelle claire",
+      "Utilisez un formatage premium avec sections, sous-sections et éléments de structuration appropriés",
+      "Intégrez des exemples concrets, preuves, données et références pertinentes pour étayer la qualité",
+      "Respectez scrupuleusement toutes les contraintes, spécifications et exigences formulées",
+      "Visez systématiquement un niveau de qualité professionnel qui dépasse les attentes standard",
+      "Personnalisez le contenu pour maximiser sa pertinence et sa valeur ajoutée spécifique"
     ],
-    agenticSelfAssessmentHeader: "4.  Auto-évaluation et Amélioration Continue :",
+    
+    // Self-Assessment (AGENTIC only) - French
+    agenticSelfAssessmentHeader: "4. AUTO-ÉVALUATION ET AMÉLIORATION CONTINUE :",
     agenticSelfAssessmentQuestion1: "À la fin de son travail, l'IA exécutant ce prompt **doit toujours demander à l'utilisateur textuellement** :\n    \"🤔 Souhaitez-vous que j'évalue ce résultat par rapport à des critères clés et que je fournisse des suggestions d'amélioration ? (Oui/Non)\"",
     agenticSelfAssessmentInstruction: "Si l'utilisateur répond \"Oui\" (ou une affirmation similaire), l'IA doit alors effectuer une auto-évaluation en utilisant la méthode d'évaluation suivante, en la présentant dans un tableau :",
     agenticEvaluationCriteria: {
@@ -184,7 +277,6 @@ export const onRequestPost: (context: EventContext) => Promise<Response> = async
   const tMeta = metaPromptTranslations[params.language] || metaPromptTranslations.en;
   const tApp = appTranslations[params.language] || appTranslations.en;
 
-
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   const {
@@ -201,7 +293,8 @@ export const onRequestPost: (context: EventContext) => Promise<Response> = async
   const finalPromptTargetLanguageString = language === 'fr' ? 'Français' : 'English';
   const formattedConstraints = constraints.split('\n').filter(c => c.trim()).map(c => `- ${c.trim()}`).join('\n');
   
-  let systemInstruction = tMeta.systemInstructionBase.replace(language === 'fr' ? 'English' : 'Français', finalPromptTargetLanguageString);
+  // Enhanced system instruction with language replacement
+  let systemInstruction = tMeta.systemInstructionBase.replace('{TARGET_LANGUAGE}', finalPromptTargetLanguageString);
   
   let userQuery = `
 ${tMeta.userQueryHeader}
@@ -216,7 +309,7 @@ ${tMeta.expertRoleLabel} ${expertRole || (promptType === 'MVP' ? tMeta.mvpExpert
 ${tMeta.missionLabel} ${mission || tMeta.mvpMissionPlaceholder}
 ${tMeta.constraintsLabel}
 ${constraints ? formattedConstraints : tMeta.noneSpecified}
-${language === 'fr' ? tMeta.finalPromptLangLabel.replace('English', 'Français') : tMeta.finalPromptLangLabel.replace('Français', 'English')}
+${tMeta.finalPromptLangLabel.replace('{TARGET_LANGUAGE}', finalPromptTargetLanguageString)}
 
 ${tMeta.constructPromptInstruction}
 `;
@@ -233,16 +326,29 @@ ${tMeta.mvpSystemRole
 <User>:
 ${rawRequest}
 
-Main tasks:
-${formattedConstraints ? formattedConstraints : tMeta.mvpMainTasksInstruction}
+${tMeta.mvpMethodologyHeader}
+
+${tMeta.mvpAnalysisHeader}
+${tMeta.mvpAnalysisTasks.map(task => `   • ${task}`).join('\n')}
+
+${tMeta.mvpPlanningHeader}
+${tMeta.mvpPlanningTasks.map(task => `   • ${task}`).join('\n')}
+
+${tMeta.mvpExecutionHeader}
+${tMeta.mvpExecutionTasks.map(task => `   • ${task}`).join('\n')}
+
+Contraintes spécifiques :
+${constraints ? formattedConstraints : tMeta.noneSpecified}
 
 ${tMeta.mvpExpectedOutputFormat}
 - ${tMeta.mvpLength} ${outputLength}
 - ${tMeta.mvpStyle}
-- ${tMeta.mvpLanguage.replace(language === 'fr' ? 'English' : 'Français', finalPromptTargetLanguageString)}
+- ${tMeta.mvpLanguage.replace('{TARGET_LANGUAGE}', finalPromptTargetLanguageString)}
 
 <Example>:
 ${tMeta.mvpExampleInstruction}
+
+IMPORTANT: L'exemple ci-dessus doit montrer le format de sortie réel - les premières lignes de ce que l'IA devrait produire. NE PAS générer une description de ce que l'IA va faire. Montrer le début concret du livrable.
 
 ${tMeta.mvpFooter}
 `;
@@ -252,11 +358,10 @@ ${tMeta.mvpFooter}
     
     const criteriaTableMarkdown = evaluationCriteriaList.map(c => `| ${c.padEnd(29)} |              |                          |                                      |`).join('\n');
 
-
     userQuery += `
 ${tMeta.agenticTemplateHeader}
 
-Title: Advanced Prompt - ${tMeta.agenticTitleInstruction}
+Title: ${tMeta.agenticTitleInstruction}
 
 Role: ${tMeta.agenticRole.replace('{expertRolePlaceholder}', expertRole || tMeta.agenticExpertPlaceholder)}
 ${tMeta.agenticNote}
@@ -264,16 +369,21 @@ ${tMeta.agenticNote}
 ${tMeta.agenticContext}
 ${rawRequest}
 
+Contraintes spécifiques :
+${constraints ? formattedConstraints : tMeta.noneSpecified}
+
 ${tMeta.agenticInstructionsHeader}
 
 ${tMeta.agenticAnalysisHeader}
-${tMeta.agenticAnalysisTasks.map(task => `    -   ${task}`).join('\n')}
+${tMeta.agenticAnalysisTasks.map(task => `    • ${task}`).join('\n')}
 
 ${tMeta.agenticThinkingHeader}
-${tMeta.agenticThinkingTasks.map(task => `    -   ${task}`).join('\n')}
+${tMeta.agenticThinkingTasks.map(task => `    • ${task}`).join('\n')}
 
 ${tMeta.agenticDevelopmentHeader}
-${tMeta.agenticDevelopmentTasks.map(task => `    -   ${task}`).join('\n')}
+${tMeta.agenticDevelopmentTasks.map(task => `    • ${task}`).join('\n')}
+
+EXIGENCE DE QUALITÉ: Produisez un livrable de niveau professionnel qui dépasse les attentes standard en termes de structure, personnalisation et valeur ajoutée.
 
 ${tMeta.agenticSelfAssessmentHeader}
     ${tMeta.agenticSelfAssessmentQuestion1}
@@ -330,4 +440,3 @@ ${tMeta.agenticFooter}
     });
   }
 };
-
