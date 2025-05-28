@@ -104,9 +104,6 @@ const App = () => {
 
   const showNotification = (message, type = 'success') => {
     setNotification(message);
-    // Add logic for different notification types if styling changes based on type
-    // For example, changing the icon or background color of the notification toast
-    // For now, 'type' is available if we enhance this later.
     setTimeout(() => setNotification(''), 3000);
   };
 
@@ -182,8 +179,38 @@ const App = () => {
     const updatedPrompts = savedPrompts.filter(prompt => prompt.id !== promptIdToDelete);
     setSavedPrompts(updatedPrompts);
     localStorage.setItem('teachinspire-prompts', JSON.stringify(updatedPrompts));
-    showNotification(t.notifications.deleted, 'success');
+    showNotification(t.notifications.deleted, 'success'); 
   };
+
+
+  const variableFormFields = [
+    { 
+      id: 'expertRole',
+      labelToken: 'expertRole', 
+      value: expertRole, 
+      onChange: (e) => setExpertRole(e.target.value), 
+      placeholderToken: 'expertRolePlaceholder', 
+      descriptionToken: 'expertRoleDescription', // New field for description
+      type: 'input' 
+    },
+    { 
+      id: 'mission',
+      labelToken: 'mission', 
+      value: mission, 
+      onChange: (e) => setMission(e.target.value), 
+      placeholderToken: 'missionPlaceholder',
+      descriptionToken: 'missionDescription', // New field for description
+      type: 'input' 
+    },
+    { 
+      id: 'constraints',
+      labelToken: 'constraints', 
+      value: constraints, 
+      onChange: (e) => setConstraints(e.target.value), 
+      placeholderToken: 'constraintsPlaceholder', 
+      type: 'textarea' 
+    }
+  ];
 
 
   return React.createElement("div", { className: "min-h-screen bg-brand-bg text-brand-text font-inter" },
@@ -292,23 +319,40 @@ const App = () => {
       step === 3 && React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand p-6 md:p-8" },
         React.createElement("h2", { className: "text-xl font-semibold text-brand-text mb-5 pb-2 border-b-2 border-brand-primary-accent/50" }, t.variables.title),
         React.createElement("div", { className: "space-y-5" },
-          [
-            { label: t.variables.domain, value: selectedDomain, onChange: (e) => setSelectedDomain(e.target.value), options: DOMAIN_OPTIONS.map(opt => ({ value: opt.value, label: t.domains[opt.labelToken] })) },
-            { label: t.variables.outputLength, value: outputLength, onChange: (e) => setOutputLength(e.target.value), options: OUTPUT_LENGTH_OPTIONS.map(opt => ({ value: opt.value, label: t.lengths[opt.labelToken] })) }
-          ].map(item => React.createElement("div", { key: item.label },
-            React.createElement("label", { className: "block text-sm font-medium text-brand-text mb-1.5" }, item.label),
-            React.createElement("select", { value: item.value, onChange: item.onChange, className: "w-full p-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none text-base" },
-              item.options.map(opt => React.createElement("option", { key: opt.value, value: opt.value }, opt.label))
+          [ // Dropdowns
+            { labelToken: 'domain', value: selectedDomain, onChange: (e) => setSelectedDomain(e.target.value), optionsSource: DOMAIN_OPTIONS, optionsLabelNamespace: 'domains' },
+            { labelToken: 'outputLength', value: outputLength, onChange: (e) => setOutputLength(e.target.value), optionsSource: OUTPUT_LENGTH_OPTIONS, optionsLabelNamespace: 'lengths' }
+          ].map(item => React.createElement("div", { key: item.labelToken },
+            React.createElement("label", { className: "block text-sm font-medium text-brand-text mb-1.5" }, t.variables[item.labelToken]),
+            React.createElement("select", { 
+              value: item.value, 
+              onChange: item.onChange, 
+              className: "w-full p-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none text-base" 
+            },
+              item.optionsSource.map(opt => React.createElement("option", { key: opt.value, value: opt.value }, t[item.optionsLabelNamespace][opt.labelToken]))
             )
           )),
-          [
-            { label: t.variables.expertRole, value: expertRole, onChange: (e) => setExpertRole(e.target.value), placeholder: t.variables.expertRolePlaceholder, type: 'input' },
-            { label: t.variables.mission, value: mission, onChange: (e) => setMission(e.target.value), placeholder: t.variables.missionPlaceholder, type: 'input' },
-            { label: t.variables.constraints, value: constraints, onChange: (e) => setConstraints(e.target.value), placeholder: t.variables.constraintsPlaceholder, type: 'textarea' }
-          ].map(item => React.createElement("div", { key: item.label },
-            React.createElement("label", { className: "block text-sm font-medium text-brand-text mb-1.5" }, item.label),
-            item.type === 'input' ? React.createElement("input", { type: "text", value: item.value, onChange: item.onChange, placeholder: item.placeholder, className: "w-full p-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none text-base" })
-                                  : React.createElement("textarea", { value: item.value, onChange: item.onChange, placeholder: item.placeholder, className: "w-full h-32 p-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none resize-none text-base" })
+          variableFormFields.map(item => React.createElement("div", { key: item.id },
+            React.createElement("label", { htmlFor: item.id, className: "block text-sm font-medium text-brand-text mb-1.5" }, t.variables[item.labelToken]),
+            item.descriptionToken && React.createElement("p", { 
+              className: "text-sm text-brand-info italic -mt-1 mb-1.5" // Blue, italic, adjusted margin
+            }, t.variables[item.descriptionToken]),
+            item.type === 'input' 
+              ? React.createElement("input", { 
+                  id: item.id,
+                  type: "text", 
+                  value: item.value, 
+                  onChange: item.onChange, 
+                  placeholder: t.variables[item.placeholderToken], 
+                  className: "w-full p-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none text-base" 
+                })
+              : React.createElement("textarea", { 
+                  id: item.id,
+                  value: item.value, 
+                  onChange: item.onChange, 
+                  placeholder: t.variables[item.placeholderToken], 
+                  className: "w-full h-32 p-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none resize-none text-base" 
+                })
           ))
         ),
         React.createElement("div", { className: "flex justify-between items-center mt-6" },
@@ -334,52 +378,54 @@ const App = () => {
           ),
           React.createElement("button", { onClick: resetForm, className: "w-full mt-4 px-5 py-3 bg-brand-secondary-accent text-brand-text rounded-lg font-semibold hover:bg-opacity-80 transition-all text-base" }, t.actions.newPrompt)
         )
-      ),
-      showLibrary && React.createElement("div", { className: "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm" },
-        React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand-lg max-w-2xl w-full max-h-[85vh] flex flex-col" },
-          React.createElement("div", { className: "p-5 border-b border-gray-200 flex justify-between items-center" },
-            React.createElement("h2", { className: "text-xl font-semibold text-brand-text" }, t.library.title),
-            React.createElement("button", { onClick: () => setShowLibrary(false), className: "p-2 hover:bg-gray-100 rounded-full text-brand-muted-text hover:text-brand-text" }, React.createElement(X, { className: "w-5 h-5" }))
-          ),
-          React.createElement("div", { className: "p-5 overflow-y-auto flex-grow" },
-            savedPrompts.length === 0 ? React.createElement("p", { className: "text-center text-brand-muted-text py-10" }, t.library.empty)
-            : React.createElement("div", { className: "space-y-3" },
-              savedPrompts.map((prompt) => React.createElement("div", { key: prompt.id, className: "border border-gray-200 rounded-lg p-4 hover:bg-brand-bg/50 transition-colors" },
-                React.createElement("div", { className: "flex justify-between items-start mb-1.5" },
-                  React.createElement("p", { className: "font-semibold text-brand-text text-sm break-all mr-2" }, prompt.rawRequest.substring(0, 70), prompt.rawRequest.length > 70 ? '...' : ''),
-                  React.createElement("div", { className: "flex-shrink-0 flex items-center gap-2" },
-                     React.createElement("button", { 
-                        onClick: () => loadPromptFromLibrary(prompt), 
-                        className: "px-3 py-1.5 bg-brand-primary-accent text-white rounded-md text-xs hover:bg-opacity-80 whitespace-nowrap flex items-center gap-1",
-                        title: t.actions.usePrompt
-                      }, 
-                      React.createElement(FileText, {className: "w-3 h-3"}),
-                      t.actions.usePrompt
-                    ),
-                    React.createElement("button", { 
-                        onClick: () => handleDeletePrompt(prompt.id), 
-                        className: "px-3 py-1.5 bg-brand-error/10 text-brand-error rounded-md text-xs hover:bg-brand-error hover:text-white whitespace-nowrap flex items-center gap-1",
-                        title: t.actions.delete
-                      }, 
-                      React.createElement(Trash2, {className: "w-3 h-3"}),
-                      t.actions.delete
-                    )
+      )
+    ), // End of main element
+    showLibrary && React.createElement("div", { className: "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm" },
+      React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand-lg max-w-2xl w-full max-h-[85vh] flex flex-col" },
+        React.createElement("div", { className: "p-5 border-b border-gray-200 flex justify-between items-center" },
+          React.createElement("h2", { className: "text-xl font-semibold text-brand-text" }, t.library.title),
+          React.createElement("button", { onClick: () => setShowLibrary(false), className: "p-2 hover:bg-gray-100 rounded-full text-brand-muted-text hover:text-brand-text" }, React.createElement(X, { className: "w-5 h-5" }))
+        ),
+        React.createElement("div", { className: "p-5 overflow-y-auto flex-grow" },
+          savedPrompts.length === 0 ? React.createElement("p", { className: "text-center text-brand-muted-text py-10" }, t.library.empty)
+          : React.createElement("div", { className: "space-y-3" },
+            savedPrompts.map((prompt) => React.createElement("div", { key: prompt.id, className: "border border-gray-200 rounded-lg p-4 hover:bg-brand-bg/50 transition-colors" },
+              React.createElement("div", { className: "flex justify-between items-start mb-1.5" },
+                React.createElement("p", { className: "font-semibold text-brand-text text-sm break-all mr-2 flex-grow" }, prompt.rawRequest.substring(0, 70), prompt.rawRequest.length > 70 ? '...' : ''),
+                React.createElement("div", { className: "flex-shrink-0 flex items-center gap-2 ml-2" },
+                   React.createElement("button", { 
+                      onClick: () => loadPromptFromLibrary(prompt), 
+                      className: "px-3 py-1.5 bg-brand-primary-accent text-white rounded-md text-xs hover:bg-opacity-80 whitespace-nowrap flex items-center gap-1",
+                      title: t.actions.usePrompt,
+                      "aria-label": t.actions.usePrompt
+                    }, 
+                    React.createElement(FileText, {className: "w-3 h-3"}),
+                    t.actions.usePrompt
+                  ),
+                  React.createElement("button", { 
+                      onClick: () => handleDeletePrompt(prompt.id), 
+                      className: "px-3 py-1.5 bg-brand-error/10 text-brand-error rounded-md text-xs hover:bg-brand-error hover:text-white whitespace-nowrap flex items-center gap-1",
+                      title: t.actions.delete,
+                      "aria-label": t.actions.delete
+                    }, 
+                    React.createElement(Trash2, {className: "w-3 h-3"}),
+                    t.actions.delete
                   )
-                ),
-                React.createElement("p", { className: "text-xs text-brand-muted-text" },
-                  new Date(prompt.timestamp).toLocaleDateString(language), " • ", prompt.type, " • ", t.domains[prompt.domain]
                 )
-              ))
-            )
+              ),
+              React.createElement("p", { className: "text-xs text-brand-muted-text" },
+                new Date(prompt.timestamp).toLocaleDateString(language), " • ", prompt.type, " • ", t.domains[prompt.domain]
+              )
+            ))
           )
         )
-      ),
-      notification && React.createElement("div", { className: "fixed bottom-6 right-6 bg-brand-text text-white px-5 py-3 rounded-lg shadow-brand-lg flex items-center gap-3 z-[100]" },
-        React.createElement(Check, { className: "w-5 h-5 text-brand-success" }), // Consider changing icon based on notification type
-        React.createElement("span", null, notification)
       )
-    )
-  );
+    ), // End of library modal element
+    notification && React.createElement("div", { className: "fixed bottom-6 right-6 bg-brand-text text-white px-5 py-3 rounded-lg shadow-brand-lg flex items-center gap-3 z-[100]" },
+      React.createElement(Check, { className: "w-5 h-5 text-brand-success" }),
+      React.createElement("span", null, notification)
+    ) // End of notification element
+  ); // End of outermost div's React.createElement call
 }
 
 export default App;
