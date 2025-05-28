@@ -1,4 +1,3 @@
-
 // import type { Language, Domain, OutputLength, Translations } from './types'; // TS types removed
 
 export const DEFAULT_LANGUAGE = 'fr';
@@ -61,8 +60,8 @@ export const translations = {
       constraints: "Contraintes (une par ligne)",
       next: "Suivant",
       back: "Retour",
-      expertRolePlaceholder: "Ex: Concepteur pédagogique",
-      missionPlaceholder: "Ex: créer des cours engageants",
+      expertRolePlaceholder: "Ex: Concepteur pédagogique (préciser le rôle que vous voulez donner à l'IA pour cette tâche - sa fonction)",
+      missionPlaceholder: "Ex: créer des cours engageants (préciser les tâches que vous voulez que l'IA exécute - sa mission)",
       constraintsPlaceholder: "Ex:\nDurée: 50 minutes\nNiveau: B1\nGroupe: 12 élèves"
     },
     generation: {
@@ -149,8 +148,8 @@ export const translations = {
       constraints: "Constraints (one per line)",
       next: "Next",
       back: "Back",
-      expertRolePlaceholder: "Ex: Instructional Designer",
-      missionPlaceholder: "Ex: create engaging courses",
+      expertRolePlaceholder: "Ex: Instructional Designer (specify the role you want the AI to play for this task - its function)",
+      missionPlaceholder: "Ex: create engaging courses (specify the tasks you want the AI to perform - its mission)",
       constraintsPlaceholder: "Ex:\nDuration: 50 minutes\nLevel: B1\nGroup: 12 students"
     },
     generation: {
