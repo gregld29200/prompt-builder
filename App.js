@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronRight, Copy, Save, Download, Languages, Sparkles, Brain, Check, X, AlertCircle, FileText, Clock, Star, Loader2 } from 'lucide-react';
+import { ChevronRight, Copy, Save, Download, Languages, Sparkles, Brain, Check, X, AlertCircle, FileText, Clock, Star, Loader2, Trash2 } from 'lucide-react'; // Added Trash2
 // Removed type imports: PromptType, Language, Domain, Complexity, OutputLength, SavedPrompt, Translations
 import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS } from './constants.js';
 import { generateStructuredPromptWithGemini } from './services/geminiService.js';
@@ -104,6 +104,9 @@ const App = () => {
 
   const showNotification = (message, type = 'success') => {
     setNotification(message);
+    // Add logic for different notification types if styling changes based on type
+    // For example, changing the icon or background color of the notification toast
+    // For now, 'type' is available if we enhance this later.
     setTimeout(() => setNotification(''), 3000);
   };
 
@@ -174,6 +177,14 @@ const App = () => {
     setStep(4);
     setIsGenerating(false);
   };
+
+  const handleDeletePrompt = (promptIdToDelete) => {
+    const updatedPrompts = savedPrompts.filter(prompt => prompt.id !== promptIdToDelete);
+    setSavedPrompts(updatedPrompts);
+    localStorage.setItem('teachinspire-prompts', JSON.stringify(updatedPrompts));
+    showNotification(t.notifications.deleted, 'success');
+  };
+
 
   return React.createElement("div", { className: "min-h-screen bg-brand-bg text-brand-text font-inter" },
     React.createElement("header", { className: "bg-brand-card-bg shadow-brand" },
@@ -335,8 +346,25 @@ const App = () => {
             : React.createElement("div", { className: "space-y-3" },
               savedPrompts.map((prompt) => React.createElement("div", { key: prompt.id, className: "border border-gray-200 rounded-lg p-4 hover:bg-brand-bg/50 transition-colors" },
                 React.createElement("div", { className: "flex justify-between items-start mb-1.5" },
-                  React.createElement("p", { className: "font-semibold text-brand-text text-sm break-all" }, prompt.rawRequest.substring(0, 70), prompt.rawRequest.length > 70 ? '...' : ''),
-                  React.createElement("button", { onClick: () => loadPromptFromLibrary(prompt), className: "ml-3 px-3 py-1.5 bg-brand-primary-accent text-white rounded-md text-xs hover:bg-opacity-80 whitespace-nowrap" }, t.actions.usePrompt)
+                  React.createElement("p", { className: "font-semibold text-brand-text text-sm break-all mr-2" }, prompt.rawRequest.substring(0, 70), prompt.rawRequest.length > 70 ? '...' : ''),
+                  React.createElement("div", { className: "flex-shrink-0 flex items-center gap-2" },
+                     React.createElement("button", { 
+                        onClick: () => loadPromptFromLibrary(prompt), 
+                        className: "px-3 py-1.5 bg-brand-primary-accent text-white rounded-md text-xs hover:bg-opacity-80 whitespace-nowrap flex items-center gap-1",
+                        title: t.actions.usePrompt
+                      }, 
+                      React.createElement(FileText, {className: "w-3 h-3"}),
+                      t.actions.usePrompt
+                    ),
+                    React.createElement("button", { 
+                        onClick: () => handleDeletePrompt(prompt.id), 
+                        className: "px-3 py-1.5 bg-brand-error/10 text-brand-error rounded-md text-xs hover:bg-brand-error hover:text-white whitespace-nowrap flex items-center gap-1",
+                        title: t.actions.delete
+                      }, 
+                      React.createElement(Trash2, {className: "w-3 h-3"}),
+                      t.actions.delete
+                    )
+                  )
                 ),
                 React.createElement("p", { className: "text-xs text-brand-muted-text" },
                   new Date(prompt.timestamp).toLocaleDateString(language), " • ", prompt.type, " • ", t.domains[prompt.domain]
@@ -347,7 +375,7 @@ const App = () => {
         )
       ),
       notification && React.createElement("div", { className: "fixed bottom-6 right-6 bg-brand-text text-white px-5 py-3 rounded-lg shadow-brand-lg flex items-center gap-3 z-[100]" },
-        React.createElement(Check, { className: "w-5 h-5 text-brand-success" }),
+        React.createElement(Check, { className: "w-5 h-5 text-brand-success" }), // Consider changing icon based on notification type
         React.createElement("span", null, notification)
       )
     )
