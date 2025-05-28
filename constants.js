@@ -56,12 +56,14 @@ export const translations = {
       domain: "Domaine",
       outputLength: "Longueur de sortie",
       expertRole: "Rôle de l'expert",
+      expertRoleDescription: "Préciser le rôle que vous voulez donner à l'IA pour cette tâche - sa fonction.",
+      expertRolePlaceholder: "Ex: Concepteur pédagogique",
       mission: "Mission principale",
+      missionDescription: "Préciser les tâches que vous voulez que l'IA exécute - sa mission.",
+      missionPlaceholder: "Ex: créer des cours engageants",
       constraints: "Contraintes (une par ligne)",
       next: "Suivant",
       back: "Retour",
-      expertRolePlaceholder: "Ex: Concepteur pédagogique (préciser le rôle que vous voulez donner à l'IA pour cette tâche - sa fonction)",
-      missionPlaceholder: "Ex: créer des cours engageants (préciser les tâches que vous voulez que l'IA exécute - sa mission)",
       constraintsPlaceholder: "Ex:\nDurée: 50 minutes\nNiveau: B1\nGroupe: 12 élèves"
     },
     generation: {
@@ -144,12 +146,14 @@ export const translations = {
       domain: "Domain",
       outputLength: "Output length",
       expertRole: "Expert role",
+      expertRoleDescription: "Specify the role you want the AI to play for this task - its function.",
+      expertRolePlaceholder: "Ex: Instructional Designer",
       mission: "Main mission",
+      missionDescription: "Specify the tasks you want the AI to perform - its mission.",
+      missionPlaceholder: "Ex: create engaging courses",
       constraints: "Constraints (one per line)",
       next: "Next",
       back: "Back",
-      expertRolePlaceholder: "Ex: Instructional Designer (specify the role you want the AI to play for this task - its function)",
-      missionPlaceholder: "Ex: create engaging courses (specify the tasks you want the AI to perform - its mission)",
       constraintsPlaceholder: "Ex:\nDuration: 50 minutes\nLevel: B1\nGroup: 12 students"
     },
     generation: {
