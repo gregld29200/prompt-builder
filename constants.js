@@ -1,11 +1,11 @@
 
-import type { Language, Domain, OutputLength, Translations } from './types';
+// import type { Language, Domain, OutputLength, Translations } from './types'; // TS types removed
 
-export const DEFAULT_LANGUAGE: Language = 'fr';
+export const DEFAULT_LANGUAGE = 'fr';
 export const MIN_RAW_REQUEST_LENGTH = 10;
 export const MAX_RAW_REQUEST_LENGTH = 2000;
 
-export const DOMAIN_OPTIONS: { value: Domain; labelToken: keyof Translations['en']['domains'] }[] = [
+export const DOMAIN_OPTIONS = [
   { value: 'education', labelToken: 'education' },
   { value: 'technical', labelToken: 'technical' },
   { value: 'creative', labelToken: 'creative' },
@@ -13,13 +13,13 @@ export const DOMAIN_OPTIONS: { value: Domain; labelToken: keyof Translations['en
   { value: 'other', labelToken: 'other' },
 ];
 
-export const OUTPUT_LENGTH_OPTIONS: { value: OutputLength; labelToken: keyof Translations['en']['lengths'] }[] = [
+export const OUTPUT_LENGTH_OPTIONS = [
   { value: 'short', labelToken: 'short' },
   { value: 'medium', labelToken: 'medium' },
   { value: 'long', labelToken: 'long' },
 ];
 
-export const translations: Translations = {
+export const translations = {
   fr: {
     app: {
       title: "Prompt Builder Teachinspire",
