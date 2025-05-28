@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronRight, Copy, Save, Download, Languages, Sparkles, Brain, Check, X, AlertCircle, FileText, Clock, Star, Loader2 } from 'lucide-react';
 // Removed type imports: PromptType, Language, Domain, Complexity, OutputLength, SavedPrompt, Translations
-import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS } from './constants';
-import { generateStructuredPromptWithGemini } from './services/geminiService';
+import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS } from './constants.js';
+import { generateStructuredPromptWithGemini } from './services/geminiService.js';
 
 const App = () => {
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
