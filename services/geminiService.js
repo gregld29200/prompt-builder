@@ -1,24 +1,15 @@
 
-// File: services/geminiService.ts
+// File: services/geminiService.js
 
-// Removed: import { GoogleGenAI } from "@google/genai";
-import type { Language, Domain, OutputLength, PromptType } from '../types';
-import { translations } from '../constants'; // Keep for client-side error messages if needed
+// Removed: import type { Language, Domain, OutputLength, PromptType } from '../types';
+import { translations } from '../constants.js'; // Keep for client-side error messages if needed, ensure .js extension
 
 // Removed: API_KEY, ai initialization, GEMINI_MODEL_NAME, and metaPromptTranslations (this logic is now in the Cloudflare Worker)
 
-interface GeneratePromptParams {
-  rawRequest: string;
-  promptType: PromptType;
-  domain: Domain;
-  language: Language;
-  outputLength: OutputLength;
-  expertRole: string;
-  mission: string;
-  constraints: string;
-}
+// Interface GeneratePromptParams removed as it's a TypeScript feature.
+// The function will still expect an object with these properties.
 
-export const generateStructuredPromptWithGemini = async (params: GeneratePromptParams): Promise<string> => {
+export const generateStructuredPromptWithGemini = async (params) => {
   const t = translations[params.language] || translations.en;
 
   try {
@@ -63,11 +54,11 @@ export const generateStructuredPromptWithGemini = async (params: GeneratePromptP
       throw new Error(t.generation.error); // Use a generic generation error message
     }
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error calling /api/generate-prompt or processing response:", error);
     // error.message should now contain the error string thrown from the blocks above
     // or a network error message.
-    // The App.tsx component will catch this and display it.
+    // The App.js component will catch this and display it.
     // We re-throw to ensure the calling code knows an error occurred.
     // If error.message is already user-friendly (e.g., from backend), it will be used.
     // Otherwise, a more generic message will be formed by the caller.
