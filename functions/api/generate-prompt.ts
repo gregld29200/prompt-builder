@@ -33,7 +33,7 @@ interface EventContext {
 // Enhanced metaPromptTranslations with detailed methodology for both approaches
 const metaPromptTranslations = {
   en: {
-    systemInstructionBase: "You are an expert prompt engineering assistant. Your task is to generate a highly effective, structured prompt that guides toward professional-quality results. The final prompt you generate MUST be in {TARGET_LANGUAGE}. Do not add any explanatory text before or after the generated prompt. Only output the prompt itself, adhering strictly to the provided template structure.",
+    systemInstructionBase: "You are an expert prompt engineer. Generate a complete, executable prompt following the exact format: <System>, <User>, <Example>. The final prompt must be in {TARGET_LANGUAGE} and ready for immediate use by an AI. Include detailed methodology in the User section and compelling examples. Output ONLY the prompt text - no meta-commentary or explanations outside the prompt structure.",
     
     userQueryHeader: "Please generate a structured prompt. Here are the details:",
     rawRequestLabel: "User's Goal / Raw Request:",
@@ -87,9 +87,9 @@ const metaPromptTranslations = {
     mvpLanguage: "Language: {TARGET_LANGUAGE}",
     
     // Fixed Example Instruction  
-    mvpExampleInstruction: "(Generate a concrete example showing the EXACT format of the expected output beginning. Do NOT describe the process or explain what the AI will do. Show the direct start of the final deliverable. Examples: For podcast → actual dialogue lines ('Voice 1: Welcome everyone to today's show...'), for lesson plan → actual lesson structure ('LESSON: [Title] | OBJECTIVES: Students will be able to... | MODULE 1: [Content]...'), for analysis → actual analysis format ('EXECUTIVE SUMMARY: This analysis reveals... | KEY FINDINGS: 1. [Primary insight]...'). The example must be a direct sample of the deliverable, not a process description.)",
+    mvpExampleInstruction: "Show the exact beginning of the expected deliverable - first 3-5 lines of actual output, not process description. Examples: For podcast → 'Voice 1: Welcome everyone to today's show...', for lesson plan → 'LESSON: [Title] | OBJECTIVES: Students will be able to...', for analysis → 'EXECUTIVE SUMMARY: This analysis reveals...'. The example must be a direct sample of the deliverable.",
     
-    mvpFooter: "Ensure the entire output is *only* the prompt text, starting with \"<System>:\" and ending appropriately based on the template. Do not add any other commentary.",
+    mvpFooter: "CRITICAL: Generate ONLY the complete prompt above with <System>, <User>, and <Example> sections. Do not add meta-commentary or explanations outside the prompt structure.",
     
     // Enhanced AGENTIC Section
     agenticTemplateHeader: "For an \"AGENTIC\" type prompt, use this template. This prompt is for an AI capable of autonomous action, thinking, and iteration. It MUST include self-assessment capabilities.",
@@ -142,7 +142,7 @@ const metaPromptTranslations = {
   },
   
   fr: {
-    systemInstructionBase: "Vous êtes un assistant expert en ingénierie de prompts. Votre tâche est de générer un prompt structuré, hautement efficace, qui guide vers des résultats de qualité professionnelle. Le prompt final que vous générez DOIT être en {TARGET_LANGUAGE}. N'ajoutez aucun texte explicatif avant ou après le prompt généré. Ne retournez que le prompt lui-même, en respectant strictement la structure du modèle fourni.",
+    systemInstructionBase: "Vous êtes un ingénieur de prompts expert. Générez un prompt complet et exécutable suivant exactement le format : <System>, <User>, <Example>. Le prompt final doit être en {TARGET_LANGUAGE} et prêt à être utilisé immédiatement par une IA. Incluez une méthodologie détaillée dans la section User et des exemples convaincants. Ne générez QUE le texte du prompt - aucun méta-commentaire ou explication en dehors de la structure du prompt.",
     
     userQueryHeader: "Veuillez générer un prompt structuré. Voici les détails :",
     rawRequestLabel: "Objectif / Demande brute de l'utilisateur :",
@@ -196,9 +196,9 @@ const metaPromptTranslations = {
     mvpLanguage: "Langue : {TARGET_LANGUAGE}",
     
     // Fixed Example Instruction - French
-    mvpExampleInstruction: "(Générez un exemple concret montrant le FORMAT EXACT du début du livrable attendu. NE PAS décrire le processus ou expliquer ce que l'IA va faire. Montrez directement le début du résultat final. Exemples : Pour podcast → lignes de dialogue réelles ('Voix 1: Bienvenue dans cette émission...'), pour plan de cours → structure de cours réelle ('COURS: [Titre] | OBJECTIFS: Les apprenants seront capables de... | MODULE 1: [Contenu]...'), pour analyse → format d'analyse réel ('SYNTHÈSE EXÉCUTIVE: Cette analyse révèle... | POINTS CLÉS: 1. [Insight principal]...'). L'exemple doit être un échantillon direct du livrable, pas une description du processus.)",
+    mvpExampleInstruction: "Montrez le début exact du livrable attendu - les 3-5 premières lignes de sortie réelle, pas une description de processus. Exemples : Pour podcast → 'Voix 1: Bienvenue dans cette émission...', pour plan de cours → 'COURS: [Titre] | OBJECTIFS: Les apprenants seront capables de...', pour analyse → 'SYNTHÈSE EXÉCUTIVE: Cette analyse révèle...'. L'exemple doit être un échantillon direct du livrable.",
     
-    mvpFooter: "Assurez-vous que l'ensemble de la sortie soit *uniquement* le texte du prompt, commençant par \"<System>:\" et se terminant de manière appropriée selon le modèle. N'ajoutez aucun autre commentaire.",
+    mvpFooter: "CRITIQUE: Générez UNIQUEMENT le prompt complet ci-dessus avec les sections <System>, <User>, et <Example>. N'ajoutez aucun méta-commentaire ou explication en dehors de la structure du prompt.",
     
     // Enhanced AGENTIC Section - French (same structure, with self-assessment)
     agenticTemplateHeader: "Pour un prompt de type \"AGENTIQUE\", utilisez ce modèle. Ce prompt est destiné à une IA capable d'action autonome, de réflexion et d'itération. Il DOIT inclure des capacités d'auto-évaluation.",
