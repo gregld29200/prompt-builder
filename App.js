@@ -149,6 +149,15 @@ const App = () => {
     URL.revokeObjectURL(url);
   };
 
+  // Function to handle navigation to step 3 with auto-fill
+  const goToStep3WithAutoFill = () => {
+    // Auto-fill mission with rawRequest if mission is empty
+    if (!mission.trim() && rawRequest.trim()) {
+      setMission(rawRequest);
+    }
+    setStep(3);
+  };
+
   const resetForm = () => {
     setStep(1);
     setRawRequest('');
@@ -307,7 +316,7 @@ const App = () => {
               className: "px-5 py-2.5 border-2 border-gray-300 text-brand-muted-text rounded-lg font-semibold hover:bg-gray-100 hover:border-gray-400 transition-colors text-sm"
             }, t.variables.back),
             React.createElement("button", {
-              onClick: () => setStep(3),
+              onClick: goToStep3WithAutoFill,
               className: "px-5 py-2.5 bg-brand-primary-accent text-white rounded-lg font-semibold hover:bg-opacity-80 transition-all flex items-center gap-2 text-sm"
             },
               t.variables.next,
