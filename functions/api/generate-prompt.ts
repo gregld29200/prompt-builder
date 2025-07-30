@@ -48,7 +48,8 @@ const metaPromptTranslations = {
     constructPromptInstruction: "Now, based on whether the type is MVP or AGENTIC, construct the prompt using the following templates and information.",
     
     // Enhanced MVP Section
-    mvpTemplateHeader: "For an \"MVP\" type prompt, use this template:",
+    mvpTemplateHeader: "For an \"MVP\" type prompt, generate a complete executable prompt:",
+    mvpGenerateInstruction: "Generate a complete, executable prompt using this exact structure:",
     mvpSystemRole: "You are an excellent {expertRolePlaceholder}: knowledgeable, precise, pedagogical. Your mission is to {missionPlaceholder}.",
     mvpExpertPlaceholder: "Expert",
     mvpMissionPlaceholder: "help effectively",
@@ -92,7 +93,8 @@ const metaPromptTranslations = {
     mvpFooter: "CRITICAL: Generate ONLY the complete prompt above with <System>, <User>, and <Example> sections. Do not add meta-commentary or explanations outside the prompt structure.",
     
     // Enhanced AGENTIC Section
-    agenticTemplateHeader: "For an \"AGENTIC\" type prompt, use this template. This prompt is for an AI capable of autonomous action, thinking, and iteration. It MUST include self-assessment capabilities.",
+    agenticTemplateHeader: "For an \"AGENTIC\" type prompt, generate a complete executable prompt with self-assessment capabilities:",
+    agenticGenerateInstruction: "Generate a complete, executable AGENTIC prompt using this exact structure:",
     agenticTitleInstruction: "[Generate a concise and descriptive title (max 5-7 words) derived from the user's raw request.]",
     agenticRole: "{expertRolePlaceholder} (Agentic AI)",
     agenticExpertPlaceholder: "Expert Analyst", 
@@ -138,7 +140,7 @@ const metaPromptTranslations = {
     },
     agenticEvalTableHeader: "| Criterion                     | Rating (/10) | Justification for Rating | Concrete Suggestions for Improvement |\n    |-------------------------------|--------------|--------------------------|--------------------------------------|",
     agenticSelfAssessmentQuestion2: "After presenting the evaluation, the AI **must also ask the user verbatim**:\n    \"Based on the evaluation above, would you like me to attempt to improve the draft? (Yes/No)\"",
-    agenticFooter: "Ensure the entire output is *only* the prompt text, starting with \"Title:\" and ending appropriately based on the template. Do not add any other commentary.",
+    agenticFooter: "CRITICAL: Generate ONLY the complete prompt above with Title, <System>, <User>, and <Example> sections. Do not add meta-commentary or explanations outside the prompt structure.",
   },
   
   fr: {
@@ -154,10 +156,11 @@ const metaPromptTranslations = {
     constraintsLabel: "Contraintes pour l'IA utilisant le prompt généré (une par ligne) :",
     noneSpecified: "Aucune spécifiée",
     finalPromptLangLabel: "La langue du prompt final lui-même DOIT être : {TARGET_LANGUAGE}.",
-    constructPromptInstruction: "Maintenant, selon que le type est MVP ou AGENTIQUE, construisez le prompt en utilisant les modèles et informations suivants.",
+    constructPromptInstruction: "Maintenant, selon que le type est MVP ou AGENTIQUE, générez le prompt en utilisant les modèles et informations suivants.",
     
     // Enhanced MVP Section - French
-    mvpTemplateHeader: "Pour un prompt de type \"MVP\", utilisez ce modèle :",
+    mvpTemplateHeader: "Pour un prompt de type \"MVP\", générez un prompt exécutable complet :",
+    mvpGenerateInstruction: "Générez un prompt complet et exécutable en utilisant exactement cette structure :",
     mvpSystemRole: "Vous êtes un excellent {expertRolePlaceholder} : compétent, précis, pédagogue. Votre mission est d'{missionPlaceholder}.",
     mvpExpertPlaceholder: "Expert",
     mvpMissionPlaceholder: "aider efficacement",
@@ -201,7 +204,8 @@ const metaPromptTranslations = {
     mvpFooter: "CRITIQUE: Générez UNIQUEMENT le prompt complet ci-dessus avec les sections <System>, <User>, et <Example>. N'ajoutez aucun méta-commentaire ou explication en dehors de la structure du prompt.",
     
     // Enhanced AGENTIC Section - French (same structure, with self-assessment)
-    agenticTemplateHeader: "Pour un prompt de type \"AGENTIQUE\", utilisez ce modèle. Ce prompt est destiné à une IA capable d'action autonome, de réflexion et d'itération. Il DOIT inclure des capacités d'auto-évaluation.",
+    agenticTemplateHeader: "Pour un prompt de type \"AGENTIQUE\", générez un prompt exécutable complet avec capacités d'auto-évaluation :",
+    agenticGenerateInstruction: "Générez un prompt AGENTIQUE complet et exécutable en utilisant exactement cette structure :",
     agenticTitleInstruction: "[Générez un titre concis et descriptif (max 5-7 mots) dérivé de la demande brute de l'utilisateur.]",
     agenticRole: "{expertRolePlaceholder} (IA Agentique)",
     agenticExpertPlaceholder: "Analyste Expert",
@@ -247,7 +251,7 @@ const metaPromptTranslations = {
     },
     agenticEvalTableHeader: "| Critère                       | Note (/10)   | Justification de la Note | Suggestions Concrètes d'Amélioration |\n    |-------------------------------|--------------|--------------------------|--------------------------------------|",
     agenticSelfAssessmentQuestion2: "Après avoir présenté l'évaluation, l'IA **doit également demander à l'utilisateur textuellement** :\n    \"Sur la base de l'évaluation ci-dessus, souhaitez-vous que j'essaie d'améliorer le brouillon ? (Oui/Non)\"",
-    agenticFooter: "Assurez-vous que l'ensemble de la sortie soit *uniquement* le texte du prompt, commençant par \"Titre:\" et se terminant de manière appropriée selon le modèle. N'ajoutez aucun autre commentaire.",
+    agenticFooter: "CRITIQUE: Générez UNIQUEMENT le prompt complet ci-dessus avec les sections Titre, <System>, <User>, et <Example>. N'ajoutez aucun méta-commentaire ou explication en dehors de la structure du prompt.",
   }
 };
 
@@ -318,6 +322,8 @@ ${tMeta.constructPromptInstruction}
     userQuery += `
 ${tMeta.mvpTemplateHeader}
 
+${tMeta.mvpGenerateInstruction}
+
 <System>:
 ${tMeta.mvpSystemRole
     .replace('{expertRolePlaceholder}', expertRole || tMeta.mvpExpertPlaceholder)
@@ -329,26 +335,21 @@ ${rawRequest}
 ${tMeta.mvpMethodologyHeader}
 
 ${tMeta.mvpAnalysisHeader}
-${tMeta.mvpAnalysisTasks.map(task => `   • ${task}`).join('\n')}
+${tMeta.mvpAnalysisTasks.map(task => `• ${task}`).join('\n')}
 
 ${tMeta.mvpPlanningHeader}
-${tMeta.mvpPlanningTasks.map(task => `   • ${task}`).join('\n')}
+${tMeta.mvpPlanningTasks.map(task => `• ${task}`).join('\n')}
 
 ${tMeta.mvpExecutionHeader}
-${tMeta.mvpExecutionTasks.map(task => `   • ${task}`).join('\n')}
+${tMeta.mvpExecutionTasks.map(task => `• ${task}`).join('\n')}
 
 Contraintes spécifiques :
 ${constraints ? formattedConstraints : tMeta.noneSpecified}
 
-${tMeta.mvpExpectedOutputFormat}
-- ${tMeta.mvpLength} ${outputLength}
-- ${tMeta.mvpStyle}
-- ${tMeta.mvpLanguage.replace('{TARGET_LANGUAGE}', finalPromptTargetLanguageString)}
+Format attendu : ${outputLength}, ${tMeta.mvpStyle.toLowerCase()}, ${tMeta.mvpLanguage.replace('{TARGET_LANGUAGE}', finalPromptTargetLanguageString)}
 
 <Example>:
 ${tMeta.mvpExampleInstruction}
-
-IMPORTANT: L'exemple ci-dessus doit montrer le format de sortie réel - les premières lignes de ce que l'IA devrait produire. NE PAS générer une description de ce que l'IA va faire. Montrer le début concret du livrable.
 
 ${tMeta.mvpFooter}
 `;
@@ -361,38 +362,43 @@ ${tMeta.mvpFooter}
     userQuery += `
 ${tMeta.agenticTemplateHeader}
 
+${tMeta.agenticGenerateInstruction}
+
 Title: ${tMeta.agenticTitleInstruction}
 
-Role: ${tMeta.agenticRole.replace('{expertRolePlaceholder}', expertRole || tMeta.agenticExpertPlaceholder)}
-${tMeta.agenticNote}
+<System>:
+${tMeta.agenticRole.replace('{expertRolePlaceholder}', expertRole || tMeta.agenticExpertPlaceholder)} ${tMeta.agenticNote} ${language === 'fr' ? 'Votre mission est d\'' : 'Your mission is to '}${mission || tMeta.mvpMissionPlaceholder}.
 
-${tMeta.agenticContext}
+<User>:
 ${rawRequest}
-
-Contraintes spécifiques :
-${constraints ? formattedConstraints : tMeta.noneSpecified}
 
 ${tMeta.agenticInstructionsHeader}
 
 ${tMeta.agenticAnalysisHeader}
-${tMeta.agenticAnalysisTasks.map(task => `    • ${task}`).join('\n')}
+${tMeta.agenticAnalysisTasks.map(task => `• ${task}`).join('\n')}
 
 ${tMeta.agenticThinkingHeader}
-${tMeta.agenticThinkingTasks.map(task => `    • ${task}`).join('\n')}
+${tMeta.agenticThinkingTasks.map(task => `• ${task}`).join('\n')}
 
 ${tMeta.agenticDevelopmentHeader}
-${tMeta.agenticDevelopmentTasks.map(task => `    • ${task}`).join('\n')}
-
-EXIGENCE DE QUALITÉ: Produisez un livrable de niveau professionnel qui dépasse les attentes standard en termes de structure, personnalisation et valeur ajoutée.
+${tMeta.agenticDevelopmentTasks.map(task => `• ${task}`).join('\n')}
 
 ${tMeta.agenticSelfAssessmentHeader}
-    ${tMeta.agenticSelfAssessmentQuestion1}
+${tMeta.agenticSelfAssessmentQuestion1}
 
-    ${tMeta.agenticSelfAssessmentInstruction}
-    ${tMeta.agenticEvalTableHeader}
+${tMeta.agenticSelfAssessmentInstruction}
+${tMeta.agenticEvalTableHeader}
 ${criteriaTableMarkdown}
 
-    ${tMeta.agenticSelfAssessmentQuestion2}
+${tMeta.agenticSelfAssessmentQuestion2}
+
+Contraintes spécifiques :
+${constraints ? formattedConstraints : tMeta.noneSpecified}
+
+Format attendu : ${outputLength}, ${tMeta.mvpStyle.toLowerCase()}, ${tMeta.mvpLanguage.replace('{TARGET_LANGUAGE}', finalPromptTargetLanguageString)}
+
+<Example>:
+${language === 'fr' ? '[Montrez le début exact du livrable attendu avec le format du titre et les premières lignes de contenu réel]' : '[Show the exact beginning of the expected deliverable with the title format and first few lines of actual content]'}
 
 ${tMeta.agenticFooter}
 `;
