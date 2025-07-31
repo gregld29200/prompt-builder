@@ -4,6 +4,19 @@ import { GoogleGenAI } from "@google/genai";
 import type { Language, Domain, OutputLength, PromptType } from '../../types'; // Adjust path as needed
 import { translations as appTranslations } from '../../constants'; // Renamed to avoid conflict
 
+// Import security utilities
+import { 
+  SecurityMiddleware, 
+  RATE_LIMIT_CONFIGS, 
+  SecurityHelpers, 
+  SecurityLogger 
+} from '../../lib/security';
+
+import { 
+  InputValidator, 
+  AuthUtils 
+} from '../../lib/auth-utils';
+
 // This is the structure of the incoming request body from the client
 interface GeneratePromptParams {
   rawRequest: string;
@@ -21,7 +34,12 @@ interface GeneratePromptParams {
 interface EventContext {
   request: Request;
   env: {
-    API_KEY?: string; // Environment variable for the API key
+    DB: D1Database; // D1 database for user and session management
+    KV?: KVNamespace; // KV namespace for rate limiting
+    API_KEY?: string; // Gemini API key
+    JWT_SECRET: string; // JWT signing secret
+    ENVIRONMENT?: string; // Environment (development/production)
+    ALLOWED_ORIGINS?: string; // Comma-separated allowed origins for CORS
     [key: string]: any; // Allows for other environment variables
   };
   params: any; // For route parameters, not used here
@@ -257,37 +275,70 @@ const metaPromptTranslations = {
 
 const GEMINI_MODEL_NAME = 'gemini-2.5-pro-preview-05-06'; // As per user request
 
-export const onRequestPost: (context: EventContext) => Promise<Response> = async (context) => {
-  const { request, env } = context;
-  const API_KEY = env.API_KEY;
+/**
+ * Database Operations for Prompt Generation
+ */
+class PromptDatabase {
+  constructor(private db: D1Database) {}
 
-  if (!API_KEY) {
-    return new Response(JSON.stringify({ error: "API_KEY is not configured in the server environment." }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  /**
+   * Save generated prompt to user's library
+   */
+  async savePrompt(userId: string, promptData: {
+    rawRequest: string;
+    generatedPrompt: string;
+    promptType: PromptType;
+    domain: Domain;
+    language: Language;
+    outputLength: OutputLength;
+    expertRole?: string;
+    mission?: string;
+    constraints?: string;
+  }): Promise<string> {
+    const promptId = AuthUtils.generateSecureRandom(16);
+    
+    const stmt = this.db.prepare(`
+      INSERT INTO prompts (
+        id, user_id, title, raw_request, generated_prompt,
+        prompt_type, domain, language, output_length,
+        expert_role, mission, constraints, is_favorite,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+    `);
+    
+    // Generate title from raw request (first 100 chars)
+    const title = promptData.rawRequest.substring(0, 97) + 
+                  (promptData.rawRequest.length > 97 ? '...' : '');
+    
+    await stmt.bind(
+      promptId,
+      userId,
+      title,
+      promptData.rawRequest,
+      promptData.generatedPrompt,
+      promptData.promptType,
+      promptData.domain,
+      promptData.language,
+      promptData.outputLength,
+      promptData.expertRole || null,
+      promptData.mission || null,
+      promptData.constraints || null,
+      0 // is_favorite - false by default
+    ).run();
+    
+    return promptId;
   }
+}
 
-  let params: GeneratePromptParams;
-  try {
-    params = await request.json();
-  } catch (e) {
-    return new Response(JSON.stringify({ error: "Invalid JSON in request body." }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-  
-  const tMeta = metaPromptTranslations[params.language] || metaPromptTranslations.en;
-  const tApp = appTranslations[params.language] || appTranslations.en;
-
-  const ai = new GoogleGenAI({ apiKey: API_KEY });
-
+/**
+ * Build prompt query based on parameters
+ */
+function buildPromptQuery(params: GeneratePromptParams, tMeta: any): { systemInstruction: string; userQuery: string } {
   const {
     rawRequest,
     promptType,
     domain,
-    language, // language of the UI, and thus the meta-prompt
+    language,
     outputLength,
     expertRole,
     mission,
@@ -295,10 +346,11 @@ export const onRequestPost: (context: EventContext) => Promise<Response> = async
   } = params;
 
   const finalPromptTargetLanguageString = language === 'fr' ? 'Français' : 'English';
-  const formattedConstraints = constraints.split('\n').filter(c => c.trim()).map(c => `- ${c.trim()}`).join('\n');
+  const formattedConstraints = constraints ? 
+    constraints.split('\n').filter(c => c.trim()).map(c => `- ${c.trim()}`).join('\n') : '';
   
   // Enhanced system instruction with language replacement
-  let systemInstruction = tMeta.systemInstructionBase.replace('{TARGET_LANGUAGE}', finalPromptTargetLanguageString);
+  const systemInstruction = tMeta.systemInstructionBase.replace('{TARGET_LANGUAGE}', finalPromptTargetLanguageString);
   
   let userQuery = `
 ${tMeta.userQueryHeader}
@@ -335,13 +387,13 @@ ${rawRequest}
 ${tMeta.mvpMethodologyHeader}
 
 ${tMeta.mvpAnalysisHeader}
-${tMeta.mvpAnalysisTasks.map(task => `• ${task}`).join('\n')}
+${tMeta.mvpAnalysisTasks.map((task: string) => `• ${task}`).join('\n')}
 
 ${tMeta.mvpPlanningHeader}
-${tMeta.mvpPlanningTasks.map(task => `• ${task}`).join('\n')}
+${tMeta.mvpPlanningTasks.map((task: string) => `• ${task}`).join('\n')}
 
 ${tMeta.mvpExecutionHeader}
-${tMeta.mvpExecutionTasks.map(task => `• ${task}`).join('\n')}
+${tMeta.mvpExecutionTasks.map((task: string) => `• ${task}`).join('\n')}
 
 Contraintes spécifiques :
 ${constraints ? formattedConstraints : tMeta.noneSpecified}
@@ -357,7 +409,9 @@ ${tMeta.mvpFooter}
     const criteriaDomain = (domain === 'education' || domain === 'technical') ? domain : 'other';
     const evaluationCriteriaList = tMeta.agenticEvaluationCriteria[criteriaDomain];
     
-    const criteriaTableMarkdown = evaluationCriteriaList.map(c => `| ${c.padEnd(29)} |              |                          |                                      |`).join('\n');
+    const criteriaTableMarkdown = evaluationCriteriaList.map((c: string) => 
+      `| ${c.padEnd(29)} |              |                          |                                      |`
+    ).join('\n');
 
     userQuery += `
 ${tMeta.agenticTemplateHeader}
@@ -375,13 +429,13 @@ ${rawRequest}
 ${tMeta.agenticInstructionsHeader}
 
 ${tMeta.agenticAnalysisHeader}
-${tMeta.agenticAnalysisTasks.map(task => `• ${task}`).join('\n')}
+${tMeta.agenticAnalysisTasks.map((task: string) => `• ${task}`).join('\n')}
 
 ${tMeta.agenticThinkingHeader}
-${tMeta.agenticThinkingTasks.map(task => `• ${task}`).join('\n')}
+${tMeta.agenticThinkingTasks.map((task: string) => `• ${task}`).join('\n')}
 
 ${tMeta.agenticDevelopmentHeader}
-${tMeta.agenticDevelopmentTasks.map(task => `• ${task}`).join('\n')}
+${tMeta.agenticDevelopmentTasks.map((task: string) => `• ${task}`).join('\n')}
 
 ${tMeta.agenticSelfAssessmentHeader}
 ${tMeta.agenticSelfAssessmentQuestion1}
@@ -404,45 +458,198 @@ ${tMeta.agenticFooter}
 `;
   }
 
-  try {
-     const result = await ai.models.generateContent({
-        model: GEMINI_MODEL_NAME,
-        contents: userQuery,
-        config: {
-            systemInstruction: systemInstruction,
-        }
-     });
-     
-     if (result && typeof result.text === 'string') {
-        return new Response(JSON.stringify({ prompt: result.text }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
-     } else {
-        console.error("Gemini API returned an invalid response structure or no text:", result);
-        return new Response(JSON.stringify({ error: tApp.generation.error }), { // Use appTranslations for user
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
-     }
-  } catch (error: any) {
-    console.error("Error generating prompt with Gemini in Worker:", error);
-    let userFriendlyError = tApp.generation.error; // Default from app translations
+  return { systemInstruction, userQuery };
+}
+
+/**
+ * SECURE Main generate-prompt handler with comprehensive security measures
+ */
+export const onRequestPost: (context: EventContext) => Promise<Response> = async (context) => {
+  const { request, env } = context;
+  
+  // Validate environment configuration - CRITICAL SECURITY CHECK
+  if (!env.JWT_SECRET || !env.DB || !env.API_KEY) {
+    SecurityLogger.logSecurityEvent('api_error', {
+      endpoint: 'generate-prompt',
+      reason: 'Missing environment configuration',
+      severity: 'critical'
+    });
     
-    // It's better to use specific error codes if Gemini API provides them,
-    // but for now, we'll use the error message if it exists.
-    if (error?.message) {
-        if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID')) {
-             userFriendlyError = appTranslations[params.language]?.notifications?.apiError || "Gemini API Error: API key not valid. Please check your configuration.";
-        } else if (error.message.toLowerCase().includes('quota')) {
-            userFriendlyError = appTranslations[params.language]?.notifications?.apiError || "Gemini API Error: Quota exceeded. Please try again later.";
-        } else {
-            userFriendlyError = `${tApp.generation.error} - ${error.message}`;
-        }
+    return AuthUtils.createErrorResponse({
+      code: 'CONFIG_ERROR',
+      message: 'Service temporarily unavailable',
+      statusCode: 503
+    });
+  }
+
+  try {
+    const db = new PromptDatabase(env.DB);
+    
+    // Initialize security middleware with full configuration
+    const security = new SecurityMiddleware(env.KV, env.JWT_SECRET, {
+      origins: env.ALLOWED_ORIGINS?.split(',') || ['https://yourdomain.com'],
+      credentials: true
+    });
+    
+    // Apply comprehensive security checks - THIS IS THE CRITICAL FIX
+    const securityResult = await security.applySecurityChecks(request, {
+      rateLimitConfig: RATE_LIMIT_CONFIGS.API,
+      requireAuth: true, // CRITICAL: Require authentication
+      allowedMethods: ['POST'],
+      endpoint: 'generate-prompt'
+    });
+    
+    if (!securityResult.allowed) {
+      SecurityLogger.logSecurityEvent('api_access_denied', {
+        endpoint: 'generate-prompt',
+        ipAddress: AuthUtils.getClientIP(request),
+        reason: 'Security check failed',
+        severity: 'medium'
+      });
+      
+      return security.wrapResponse(securityResult.response!, request);
     }
-    return new Response(JSON.stringify({ error: userFriendlyError, details: error?.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
+
+    // Extract client information for security tracking
+    const clientIP = AuthUtils.getClientIP(request);
+    const userAgent = AuthUtils.getUserAgent(request);
+    const authenticatedUserId = securityResult.userId!; // Now guaranteed to exist
+    
+    // Log successful authentication
+    SecurityLogger.logSecurityEvent('api_access', {
+      endpoint: 'generate-prompt',
+      userId: authenticatedUserId,
+      ipAddress: clientIP,
+      severity: 'low'
+    });
+    
+    // Validate and sanitize input using our secure validation
+    const validationResult = await SecurityHelpers.validateRequest<GeneratePromptParams>(
+      request,
+      InputValidator.validateGeneratePromptRequest
+    );
+    
+    if (!validationResult.valid) {
+      SecurityLogger.logSecurityEvent('input_validation_failed', {
+        endpoint: 'generate-prompt',
+        userId: authenticatedUserId,
+        ipAddress: clientIP,
+        reason: 'Invalid input data'
+      });
+      
+      return security.wrapResponse(validationResult.response!, request);
+    }
+    
+    const params = validationResult.data as GeneratePromptParams;
+    
+    // Get translations
+    const tMeta = metaPromptTranslations[params.language] || metaPromptTranslations.en;
+    const tApp = appTranslations[params.language] || appTranslations.en;
+
+    // Build secure prompt query
+    const { systemInstruction, userQuery } = buildPromptQuery(params, tMeta);
+
+    // Initialize Gemini AI with secure configuration
+    const ai = new GoogleGenAI({ apiKey: env.API_KEY });
+
+    // Call Gemini API with proper error handling
+    const result = await ai.models.generateContent({
+      model: GEMINI_MODEL_NAME,
+      contents: userQuery,
+      config: {
+        systemInstruction: systemInstruction,
+      }
+    });
+     
+    if (!result || typeof result.text !== 'string') {
+      SecurityLogger.logSecurityEvent('gemini_api_error', {
+        endpoint: 'generate-prompt',
+        userId: authenticatedUserId,
+        reason: 'Invalid Gemini API response',
+        severity: 'medium'
+      });
+      
+      throw new Error('Invalid response from Gemini API');
+    }
+
+    // Save prompt to user's library (async operation)
+    context.waitUntil(
+      db.savePrompt(authenticatedUserId, {
+        rawRequest: params.rawRequest,
+        generatedPrompt: result.text,
+        promptType: params.promptType,
+        domain: params.domain,
+        language: params.language,
+        outputLength: params.outputLength,
+        expertRole: params.expertRole,
+        mission: params.mission,
+        constraints: params.constraints
+      }).catch(error => {
+        SecurityLogger.logSecurityEvent('database_error', {
+          endpoint: 'generate-prompt',
+          userId: authenticatedUserId,
+          reason: `Failed to save prompt: ${error.message}`,
+          severity: 'low'
+        });
+      })
+    );
+
+    // Log successful prompt generation
+    SecurityLogger.logSecurityEvent('prompt_generated', {
+      endpoint: 'generate-prompt',
+      userId: authenticatedUserId,
+      ipAddress: clientIP,
+      severity: 'low'
+    });
+
+    // Return secure success response
+    return security.wrapResponse(
+      SecurityHelpers.createSecureResponse({
+        success: true,
+        prompt: result.text
+      }),
+      request
+    );
+
+  } catch (error: any) {
+    // Secure error handling with comprehensive logging
+    SecurityLogger.logSecurityEvent('api_error', {
+      endpoint: 'generate-prompt',
+      ipAddress: AuthUtils.getClientIP(request),
+      reason: error instanceof Error ? error.message : 'Unknown error',
+      severity: 'high'
+    });
+
+    const isDevelopment = env.ENVIRONMENT === 'development';
+    
+    // Handle specific error types
+    let errorResponse = {
+      code: 'INTERNAL_ERROR',
+      message: 'Unable to generate prompt',
+      statusCode: 500
+    };
+
+    if (error?.message) {
+      if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID')) {
+        errorResponse = {
+          code: 'API_KEY_ERROR',
+          message: 'Service configuration error',
+          statusCode: 503
+        };
+      } else if (error.message.toLowerCase().includes('quota')) {
+        errorResponse = {
+          code: 'QUOTA_EXCEEDED',
+          message: 'Service temporarily unavailable due to high demand',
+          statusCode: 503
+        };
+      }
+    }
+    
+    return AuthUtils.createErrorResponse({
+      ...errorResponse,
+      ...(isDevelopment && { 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      })
     });
   }
 };

@@ -1,0 +1,36 @@
+# Teachinspire Prompt Builder - Cloudflare Pages Configuration
+name = "prompt-builder"
+compatibility_date = "2024-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages configuration
+pages_build_output_dir = "./"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB" # This will be available as env.DB in your Workers
+database_name = "teachinspire-prompt-builder-db"
+database_id = "6bd0598d-9305-49dc-b09f-d4faee43e118"
+
+# KV Namespace for rate limiting and session management
+[[kv_namespaces]]
+binding = "KV"
+id = "22cfcc6bff714ddf8f395bd483d04c0d" # Will be populated for preview deployments
+
+# Environment variables (set these via wrangler secret put)
+[vars]
+ENVIRONMENT = "production" # Change to "development" for local testing
+ALLOWED_ORIGINS = "https://yourdomain.com,https://www.yourdomain.com" # Update with your actual domains
+
+# Secrets (set via wrangler secret put)
+# Run these commands to set your secrets:
+# wrangler secret put JWT_SECRET
+# wrangler secret put API_KEY
+
+# Development database (optional - for local development)
+# Uncomment and configure for local testing
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "teachinspire-prompt-builder-dev"
+# database_id = ""
+# preview_database_id = ""

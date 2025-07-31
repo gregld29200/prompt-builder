@@ -4,8 +4,14 @@ import { ChevronRight, Copy, Save, Download, Languages, Sparkles, Brain, Check, 
 // Removed type imports: PromptType, Language, Domain, Complexity, OutputLength, SavedPrompt, Translations
 import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS } from './constants.js';
 import { generateStructuredPromptWithGemini } from './services/geminiService.js';
+import { AuthProvider } from './auth/AuthContext.js';
+import AuthWrapper from './auth/AuthWrapper.js';
+import UserMenu from './components/UserMenu.js';
+import apiService from './services/apiService.js';
+import { useAuth } from './auth/AuthContext.js';
 
-const App = () => {
+const MainApp = () => {
+  const { user, logout } = useAuth();
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
   const [step, setStep] = useState(1);
   const [rawRequest, setRawRequest] = useState('');
@@ -26,20 +32,29 @@ const App = () => {
   const [showLibrary, setShowLibrary] = useState(false);
   const [savedPrompts, setSavedPrompts] = useState([]);
   const [notification, setNotification] = useState('');
+  const [isLoadingPrompts, setIsLoadingPrompts] = useState(false);
   
   const t = translations[language];
 
+  // Load prompts from API instead of localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('teachinspire-prompts');
-    if (saved) {
+    const loadPrompts = async () => {
+      if (!user) return;
+      
+      setIsLoadingPrompts(true);
       try {
-        setSavedPrompts(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse saved prompts from localStorage", e);
-        localStorage.removeItem('teachinspire-prompts');
+        const response = await apiService.getPrompts(1, 50); // Load first 50 prompts
+        setSavedPrompts(response.data || []);
+      } catch (error) {
+        console.error("Failed to load prompts:", error);
+        showNotification(t.notifications.apiError, 'error');
+      } finally {
+        setIsLoadingPrompts(false);
       }
-    }
-  }, []);
+    };
+
+    loadPrompts();
+  }, [user, t]);
 
   const analyzeUserRequest = useCallback((request) => {
     const educationKeywords = ['cours', 'leçon', 'lesson', 'élève', 'student', 'apprendre', 'learn', 'enseigner', 'teach', 'pédagogie', 'pedagogy'];
@@ -118,22 +133,31 @@ const App = () => {
     }
   };
 
-  const savePrompt = () => {
+  const savePrompt = async () => {
     if (!generatedPrompt) return;
-    const newPromptData = {
-      id: Date.now().toString(),
-      timestamp: Date.now(),
-      rawRequest,
-      generatedPrompt,
-      type: promptType,
-      domain: selectedDomain,
-      language
-    };
     
-    const updatedPrompts = [newPromptData, ...savedPrompts];
-    setSavedPrompts(updatedPrompts);
-    localStorage.setItem('teachinspire-prompts', JSON.stringify(updatedPrompts));
-    showNotification(t.notifications.saved, 'success');
+    try {
+      const promptData = {
+        raw_request: rawRequest,
+        generated_prompt: generatedPrompt,
+        prompt_type: promptType,
+        domain: selectedDomain,
+        language: language,
+        expert_role: expertRole,
+        mission: mission,
+        constraints: constraints,
+        output_length: outputLength
+      };
+      
+      const newPrompt = await apiService.createPrompt(promptData);
+      
+      // Add to local state
+      setSavedPrompts(prev => [newPrompt, ...prev]);
+      showNotification(t.notifications.saved, 'success');
+    } catch (error) {
+      console.error("Failed to save prompt:", error);
+      showNotification(error.message || t.notifications.saveError || 'Failed to save prompt', 'error');
+    }
   };
 
   const exportPrompt = () => {
@@ -174,21 +198,31 @@ const App = () => {
   };
 
   const loadPromptFromLibrary = (promptData) => {
-    setRawRequest(promptData.rawRequest);
-    setGeneratedPrompt(promptData.generatedPrompt);
-    setPromptType(promptData.type);
-    setSelectedDomain(promptData.domain);
-    setLanguage(promptData.language);
+    // Map API response fields to local state
+    setRawRequest(promptData.raw_request || promptData.rawRequest || '');
+    setGeneratedPrompt(promptData.generated_prompt || promptData.generatedPrompt || '');
+    setPromptType(promptData.prompt_type || promptData.type || 'MVP');
+    setSelectedDomain(promptData.domain || 'education');
+    setLanguage(promptData.language || DEFAULT_LANGUAGE);
+    setExpertRole(promptData.expert_role || '');
+    setMission(promptData.mission || '');
+    setConstraints(promptData.constraints || '');
+    setOutputLength(promptData.output_length || 'medium');
     setShowLibrary(false);
     setStep(4);
     setIsGenerating(false);
   };
 
-  const handleDeletePrompt = (promptIdToDelete) => {
-    const updatedPrompts = savedPrompts.filter(prompt => prompt.id !== promptIdToDelete);
-    setSavedPrompts(updatedPrompts);
-    localStorage.setItem('teachinspire-prompts', JSON.stringify(updatedPrompts));
-    showNotification(t.notifications.deleted, 'success'); 
+  const handleDeletePrompt = async (promptIdToDelete) => {
+    try {
+      await apiService.deletePrompt(promptIdToDelete);
+      const updatedPrompts = savedPrompts.filter(prompt => prompt.id !== promptIdToDelete);
+      setSavedPrompts(updatedPrompts);
+      showNotification(t.notifications.deleted, 'success');
+    } catch (error) {
+      console.error("Failed to delete prompt:", error);
+      showNotification(error.message || t.notifications.deleteError || 'Failed to delete prompt', 'error');
+    }
   };
 
 
@@ -230,13 +264,16 @@ const App = () => {
           alt: "Teachinspire Logo",
           className: "h-12 md:h-16 w-auto"
         }),
-        React.createElement("button", {
-          onClick: () => setLanguage(language === 'fr' ? 'en' : 'fr'),
-          className: "flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-primary-accent/10 text-brand-primary-accent transition-colors",
-          "aria-label": language === 'fr' ? 'Switch to English' : 'Passer au Français'
-        },
-          React.createElement(Languages, { className: "w-5 h-5" }),
-          React.createElement("span", { className: "font-medium" }, language.toUpperCase())
+        React.createElement("div", { className: "flex items-center gap-4" },
+          React.createElement("button", {
+            onClick: () => setLanguage(language === 'fr' ? 'en' : 'fr'),
+            className: "flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-primary-accent/10 text-brand-primary-accent transition-colors",
+            "aria-label": language === 'fr' ? 'Switch to English' : 'Passer au Français'
+          },
+            React.createElement(Languages, { className: "w-5 h-5" }),
+            React.createElement("span", { className: "font-medium" }, language.toUpperCase())
+          ),
+          React.createElement(UserMenu, { translations: t })
         )
       )
     ),
@@ -396,36 +433,49 @@ const App = () => {
           React.createElement("button", { onClick: () => setShowLibrary(false), className: "p-2 hover:bg-gray-100 rounded-full text-brand-muted-text hover:text-brand-text" }, React.createElement(X, { className: "w-5 h-5" }))
         ),
         React.createElement("div", { className: "p-5 overflow-y-auto flex-grow" },
-          savedPrompts.length === 0 ? React.createElement("p", { className: "text-center text-brand-muted-text py-10" }, t.library.empty)
+          isLoadingPrompts ? React.createElement("div", { className: "text-center py-10" },
+            React.createElement(Loader2, { className: "w-6 h-6 mx-auto animate-spin text-brand-primary-accent mb-2" }),
+            React.createElement("p", { className: "text-brand-muted-text" }, t.auth.loading || 'Loading prompts...')
+          )
+          : savedPrompts.length === 0 ? React.createElement("p", { className: "text-center text-brand-muted-text py-10" }, t.library.empty)
           : React.createElement("div", { className: "space-y-3" },
-            savedPrompts.map((prompt) => React.createElement("div", { key: prompt.id, className: "border border-gray-200 rounded-lg p-4 hover:bg-brand-bg/50 transition-colors" },
-              React.createElement("div", { className: "flex justify-between items-start mb-1.5" },
-                React.createElement("p", { className: "font-semibold text-brand-text text-sm break-all mr-2 flex-grow" }, prompt.rawRequest.substring(0, 70), prompt.rawRequest.length > 70 ? '...' : ''),
-                React.createElement("div", { className: "flex-shrink-0 flex items-center gap-2 ml-2" },
-                   React.createElement("button", { 
-                      onClick: () => loadPromptFromLibrary(prompt), 
-                      className: "px-3 py-1.5 bg-brand-primary-accent text-white rounded-md text-xs hover:bg-opacity-80 whitespace-nowrap flex items-center gap-1",
-                      title: t.actions.usePrompt,
-                      "aria-label": t.actions.usePrompt
-                    }, 
-                    React.createElement(FileText, {className: "w-3 h-3"}),
-                    t.actions.usePrompt
+            savedPrompts.map((prompt) => {
+              const rawRequest = prompt.raw_request || prompt.rawRequest || '';
+              const promptType = prompt.prompt_type || prompt.type || 'MVP';
+              const domain = prompt.domain || 'other';
+              const timestamp = prompt.created_at || prompt.timestamp || Date.now();
+              
+              return React.createElement("div", { key: prompt.id, className: "border border-gray-200 rounded-lg p-4 hover:bg-brand-bg/50 transition-colors" },
+                React.createElement("div", { className: "flex justify-between items-start mb-1.5" },
+                  React.createElement("p", { className: "font-semibold text-brand-text text-sm break-all mr-2 flex-grow" }, 
+                    rawRequest.substring(0, 70), rawRequest.length > 70 ? '...' : ''
                   ),
-                  React.createElement("button", { 
-                      onClick: () => handleDeletePrompt(prompt.id), 
-                      className: "px-3 py-1.5 bg-brand-error/10 text-brand-error rounded-md text-xs hover:bg-brand-error hover:text-white whitespace-nowrap flex items-center gap-1",
-                      title: t.actions.delete,
-                      "aria-label": t.actions.delete
-                    }, 
-                    React.createElement(Trash2, {className: "w-3 h-3"}),
-                    t.actions.delete
+                  React.createElement("div", { className: "flex-shrink-0 flex items-center gap-2 ml-2" },
+                     React.createElement("button", { 
+                        onClick: () => loadPromptFromLibrary(prompt), 
+                        className: "px-3 py-1.5 bg-brand-primary-accent text-white rounded-md text-xs hover:bg-opacity-80 whitespace-nowrap flex items-center gap-1",
+                        title: t.actions.usePrompt,
+                        "aria-label": t.actions.usePrompt
+                      }, 
+                      React.createElement(FileText, {className: "w-3 h-3"}),
+                      t.actions.usePrompt
+                    ),
+                    React.createElement("button", { 
+                        onClick: () => handleDeletePrompt(prompt.id), 
+                        className: "px-3 py-1.5 bg-brand-error/10 text-brand-error rounded-md text-xs hover:bg-brand-error hover:text-white whitespace-nowrap flex items-center gap-1",
+                        title: t.actions.delete,
+                        "aria-label": t.actions.delete
+                      }, 
+                      React.createElement(Trash2, {className: "w-3 h-3"}),
+                      t.actions.delete
+                    )
                   )
+                ),
+                React.createElement("p", { className: "text-xs text-brand-muted-text" },
+                  new Date(timestamp).toLocaleDateString(language), " • ", promptType, " • ", t.domains[domain]
                 )
-              ),
-              React.createElement("p", { className: "text-xs text-brand-muted-text" },
-                new Date(prompt.timestamp).toLocaleDateString(language), " • ", prompt.type, " • ", t.domains[prompt.domain]
-              )
-            ))
+              );
+            })
           )
         )
       )
@@ -435,6 +485,24 @@ const App = () => {
       React.createElement("span", null, notification)
     ) // End of notification element
   ); // End of outermost div's React.createElement call
-}
+};
+
+// Main App component that provides authentication context
+const App = () => {
+  // Make API service available globally for the auth context
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.apiService = apiService;
+    }
+  }, []);
+
+  return React.createElement(AuthProvider, null,
+    React.createElement(AuthWrapper, { 
+      translations: translations 
+    },
+      React.createElement(MainApp)
+    )
+  );
+};
 
 export default App;
