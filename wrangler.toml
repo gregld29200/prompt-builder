@@ -10,7 +10,7 @@ pages_build_output_dir = "./"
 [[d1_databases]]
 binding = "DB" # This will be available as env.DB in your Workers
 database_name = "teachinspire-prompt-builder-db"
-database_id = "6bd0598d-9305-49dc-b09f-d4faee43e118"
+database_id = "2eb75f37-06b7-486a-a2e0-138ea1fb0574"
 
 # KV Namespace for rate limiting and session management
 [[kv_namespaces]]
