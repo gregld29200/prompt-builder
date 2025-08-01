@@ -144,18 +144,34 @@ export const onRequestPost = async (context: any) => {
       });
     }
     
+    } catch (dbError) {
+      console.error('Database check error:', dbError);
+      throw dbError;
+    }
+    
     // Create user
+    console.log('Creating new user...');
     const userId = generateUUID();
     const hashedPassword = await hashPassword(data.password);
     const now = new Date().toISOString();
     
-    await env.DB.prepare(`
-      INSERT INTO users (id, email, password_hash, email_verified, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(userId, data.email, hashedPassword, false, now, now).run();
+    console.log('Inserting user into database...');
+    try {
+      await env.DB.prepare(`
+        INSERT INTO users (id, email, password_hash, email_verified, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).bind(userId, data.email, hashedPassword, false, now, now).run();
+      console.log('User inserted successfully');
+    } catch (dbError) {
+      console.error('Database insert error:', dbError);
+      throw dbError;
+    }
     
     // Create JWT
-    const token = await createJWT({ userId, email: data.email }, env.JWT_SECRET);
+    console.log('Creating JWT token...');
+    try {
+      const token = await createJWT({ userId, email: data.email }, env.JWT_SECRET);
+      console.log('JWT created successfully');
     
     console.log('User created successfully:', userId);
     
