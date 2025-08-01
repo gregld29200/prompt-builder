@@ -20218,9 +20218,6 @@ var onRequestPost8 = /* @__PURE__ */ __name(async (context) => {
   const { request, env } = context;
   try {
     console.log("=== GENERATE PROMPT ENDPOINT ===");
-    console.log("Environment check - JWT_SECRET exists:", !!env.JWT_SECRET);
-    console.log("Environment check - API_KEY exists:", !!env.API_KEY);
-    console.log("Available env keys:", Object.keys(env));
     if (!env.JWT_SECRET) {
       return new Response(JSON.stringify({
         success: false,
@@ -20438,7 +20435,7 @@ var onRequestPost9 = /* @__PURE__ */ __name(async (context) => {
   }
 }, "onRequestPost");
 
-// ../.wrangler/tmp/pages-98dU2z/functionsRoutes-0.22028034003728192.mjs
+// ../.wrangler/tmp/pages-NaYyeI/functionsRoutes-0.2341046095670427.mjs
 var routes = [
   {
     routePath: "/api/prompts/:id/favorite",

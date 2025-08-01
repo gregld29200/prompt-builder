@@ -427,9 +427,6 @@ export const onRequestPost = async (context: any) => {
   
   try {
     console.log('=== GENERATE PROMPT ENDPOINT ===');
-    console.log('Environment check - JWT_SECRET exists:', !!env.JWT_SECRET);
-    console.log('Environment check - API_KEY exists:', !!env.API_KEY);
-    console.log('Available env keys:', Object.keys(env));
     
     // Basic environment check
     if (!env.JWT_SECRET) {
