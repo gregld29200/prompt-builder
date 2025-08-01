@@ -1,31 +1,44 @@
-/**
- * Individual Prompt Management API Endpoints
- * 
- * Handle operations on specific prompts by ID:
- * - PUT: Update existing prompt (title, favorite status, optional fields)
- * - DELETE: Delete prompt with ownership validation
- * - Comprehensive security and ownership validation
- * - Performance-optimized for edge environments
- */
+// Simplified individual prompt management - same pattern as other working endpoints
 
-import { 
-  SecurityMiddleware, 
-  RATE_LIMIT_CONFIGS, 
-  SecurityHelpers, 
-  SecurityLogger 
-} from '../../../lib/security';
-
-import { 
-  AuthUtils, 
-  AUTH_ERRORS, 
-  InputValidator 
-} from '../../../lib/auth-utils';
-
-import { 
-  PromptsDatabase, 
-  PromptError,
-  type UpdatePromptData 
-} from '../../../lib/prompts-db';
+// JWT verification function (same as other endpoints)
+async function verifyJWT(token: string, secret: string): Promise<any> {
+  try {
+    const [headerB64, payloadB64, signatureB64] = token.split('.');
+    if (!headerB64 || !payloadB64 || !signatureB64) {
+      throw new Error('Invalid token format');
+    }
+    
+    // Verify signature
+    const encoder = new TextEncoder();
+    const message = `${headerB64}.${payloadB64}`;
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+    
+    const signature = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+    const isValid = await crypto.subtle.verify('HMAC', key, signature, encoder.encode(message));
+    
+    if (!isValid) {
+      throw new Error('Invalid signature');
+    }
+    
+    // Parse payload
+    const payload = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
+    
+    // Check expiration
+    if (payload.exp < Math.floor(Date.now() / 1000)) {
+      throw new Error('Token expired');
+    }
+    
+    return payload;
+  } catch (error) {
+    throw new Error('Token verification failed');
+  }
+}
 
 // Cloudflare Pages Functions context interface
 interface EventContext {
@@ -316,132 +329,108 @@ export const onRequestPut: (context: EventContext) => Promise<Response> = async 
   }
 };
 
-/**
- * DELETE /api/prompts/[id] - Delete prompt
- */
-export const onRequestDelete: (context: EventContext) => Promise<Response> = async (context) => {
+// DELETE /api/prompts/[id] - Delete prompt
+export const onRequestDelete = async (context: any) => {
   const { request, env, params } = context;
-
-  // Validate environment configuration
-  if (!env.JWT_SECRET || !env.DB) {
-    SecurityLogger.logSecurityEvent('api_error', {
-      endpoint: 'prompts_delete',
-      reason: 'Missing environment configuration',
-      severity: 'critical'
-    });
-
-    return AuthUtils.createErrorResponse({
-      code: 'CONFIG_ERROR',
-      message: 'Service temporarily unavailable',
-      statusCode: 503
-    });
-  }
-
+  
   try {
-    const db = new PromptsDatabase(env.DB);
-
-    // Validate prompt ID parameter
-    const idValidation = PromptUpdateValidator.validatePromptId(params.id);
-    if (!idValidation.isValid) {
-      return AuthUtils.createErrorResponse({
-        code: 'INVALID_PROMPT_ID',
-        message: idValidation.error!,
-        statusCode: 400
+    console.log('=== DELETE PROMPT ENDPOINT ===');
+    
+    // Basic environment check
+    if (!env.JWT_SECRET || !env.DB) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: {
+          code: 'CONFIG_ERROR',
+          message: 'Service temporarily unavailable'
+        }
+      }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
-
+    
+    // Get token from Authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: {
+          code: 'NO_TOKEN',
+          message: 'Authorization token required'
+        }
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    const token = authHeader.substring(7);
+    
+    // Verify JWT
+    let user;
+    try {
+      user = await verifyJWT(token, env.JWT_SECRET);
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: {
+          code: 'INVALID_TOKEN',
+          message: 'Invalid or expired token'
+        }
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
     const promptId = params.id;
-
-    // Initialize security middleware
-    const security = new SecurityMiddleware(env.KV, env.JWT_SECRET);
-
-    // Apply comprehensive security checks (authentication required)
-    const securityResult = await security.applySecurityChecks(request, {
-      rateLimitConfig: RATE_LIMIT_CONFIGS.API,
-      requireAuth: true,
-      allowedMethods: ['DELETE'],
-      endpoint: 'prompts_delete'
-    });
-
-    if (!securityResult.allowed) {
-      return security.wrapResponse(securityResult.response!, request);
-    }
-
-    const userId = securityResult.userId!;
-    const clientIP = AuthUtils.getClientIP(request);
-    const userAgent = AuthUtils.getUserAgent(request);
-
-    // Delete the prompt
-    const deleted = await db.deletePrompt(promptId, userId);
-
-    if (!deleted) {
-      return security.wrapResponse(
-        AuthUtils.createErrorResponse({
+    console.log(`Deleting prompt ${promptId} for user:`, user.userId);
+    
+    // Delete the prompt (only if owned by user)
+    const result = await env.DB.prepare(`
+      DELETE FROM prompts 
+      WHERE id = ? AND user_id = ?
+    `).bind(promptId, user.userId).run();
+    
+    if (result.changes === 0) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: {
           code: 'PROMPT_NOT_FOUND',
-          message: 'Prompt not found or access denied',
-          statusCode: 404
-        }),
-        request
-      );
+          message: 'Prompt not found or access denied'
+        }
+      }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
-
-    // Log successful deletion
-    SecurityLogger.logSecurityEvent('api_success', {
-      endpoint: 'prompts_delete',
-      ipAddress: clientIP,
-      userAgent,
-      reason: `Deleted prompt ${promptId}`,
-      severity: 'low'
-    });
-
-    // Return success response
-    const responseData = {
+    
+    console.log(`Prompt ${promptId} deleted successfully`);
+    
+    return new Response(JSON.stringify({
       success: true,
       message: 'Prompt deleted successfully',
       data: {
         deletedId: promptId
       }
-    };
-
-    return security.wrapResponse(
-      SecurityHelpers.createSecureResponse(responseData),
-      request
-    );
-
-  } catch (error) {
-    // Handle known prompt errors
-    if (error instanceof PromptError) {
-      SecurityLogger.logSecurityEvent('api_error', {
-        endpoint: 'prompts_delete',
-        ipAddress: AuthUtils.getClientIP(request),
-        reason: error.message,
-        severity: 'medium'
-      });
-
-      return AuthUtils.createErrorResponse({
-        code: error.code,
-        message: error.message,
-        statusCode: error.statusCode
-      });
-    }
-
-    // Handle unknown errors
-    SecurityLogger.logSecurityEvent('api_error', {
-      endpoint: 'prompts_delete',
-      ipAddress: AuthUtils.getClientIP(request),
-      reason: error instanceof Error ? error.message : 'Unknown error',
-      severity: 'high'
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
-
-    const isDevelopment = env.ENVIRONMENT === 'development';
-
-    return AuthUtils.createErrorResponse({
-      code: 'INTERNAL_ERROR',
-      message: 'Unable to delete prompt',
-      statusCode: 500,
-      ...(isDevelopment && {
-        details: error instanceof Error ? error.message : 'Unknown error'
-      })
+    
+  } catch (error: any) {
+    console.error('Delete prompt error:', error);
+    
+    return new Response(JSON.stringify({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Unable to delete prompt'
+      }
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 };

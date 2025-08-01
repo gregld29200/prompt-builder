@@ -1,0 +1,141 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/prompts/:id/favorite",
+      "mountPath": "/api/prompts/:id",
+      "method": "OPTIONS",
+      "module": [
+        "api/prompts/[id]/favorite.ts:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/prompts/:id/favorite",
+      "mountPath": "/api/prompts/:id",
+      "method": "POST",
+      "module": [
+        "api/prompts/[id]/favorite.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/auth/login",
+      "mountPath": "/api/auth",
+      "method": "POST",
+      "module": [
+        "api/auth/login.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/auth/logout",
+      "mountPath": "/api/auth",
+      "method": "POST",
+      "module": [
+        "api/auth/logout.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/auth/refresh",
+      "mountPath": "/api/auth",
+      "method": "POST",
+      "module": [
+        "api/auth/refresh.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/auth/register",
+      "mountPath": "/api/auth",
+      "method": "POST",
+      "module": [
+        "api/auth/register.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/auth/register-complex-backup",
+      "mountPath": "/api/auth",
+      "method": "POST",
+      "module": [
+        "api/auth/register-complex-backup.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/debug/bindings",
+      "mountPath": "/api/debug",
+      "method": "GET",
+      "module": [
+        "api/debug/bindings.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/debug/test-bindings",
+      "mountPath": "/api/debug",
+      "method": "POST",
+      "module": [
+        "api/debug/test-bindings.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/prompts/stats",
+      "mountPath": "/api/prompts",
+      "method": "GET",
+      "module": [
+        "api/prompts/stats.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/prompts/stats",
+      "mountPath": "/api/prompts",
+      "method": "OPTIONS",
+      "module": [
+        "api/prompts/stats.ts:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/prompts/:id",
+      "mountPath": "/api/prompts",
+      "method": "DELETE",
+      "module": [
+        "api/prompts/[id].ts:onRequestDelete"
+      ]
+    },
+    {
+      "routePath": "/api/prompts/:id",
+      "mountPath": "/api/prompts",
+      "method": "OPTIONS",
+      "module": [
+        "api/prompts/[id].ts:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/prompts/:id",
+      "mountPath": "/api/prompts",
+      "method": "PUT",
+      "module": [
+        "api/prompts/[id].ts:onRequestPut"
+      ]
+    },
+    {
+      "routePath": "/api/generate-prompt",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/generate-prompt.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/prompts",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/prompts.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/prompts",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/prompts.ts:onRequestPost"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}

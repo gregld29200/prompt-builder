@@ -517,6 +517,43 @@ export const onRequestPost = async (context: any) => {
 
     console.log('Prompt generated successfully for user:', user.userId);
 
+    // Save prompt to user's library
+    if (env.DB) {
+      try {
+        const promptId = generateUUID();
+        const title = params.rawRequest.substring(0, 97) + 
+                      (params.rawRequest.length > 97 ? '...' : '');
+        
+        await env.DB.prepare(`
+          INSERT INTO prompts (
+            id, user_id, title, raw_request, generated_prompt,
+            prompt_type, domain, language, output_length,
+            expert_role, mission, constraints, is_favorite,
+            created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+        `).bind(
+          promptId,
+          user.userId,
+          title,
+          params.rawRequest,
+          result.text,
+          params.promptType,
+          params.domain,
+          params.language,
+          params.outputLength,
+          params.expertRole || null,
+          params.mission || null,
+          params.constraints || null,
+          0 // is_favorite - false by default
+        ).run();
+        
+        console.log('Prompt saved to library with ID:', promptId);
+      } catch (error) {
+        console.error('Failed to save prompt to library:', error);
+        // Don't fail the request if saving fails
+      }
+    }
+
     return new Response(JSON.stringify({
       success: true,
       prompt: result.text
