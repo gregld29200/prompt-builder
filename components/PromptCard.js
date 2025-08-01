@@ -36,10 +36,10 @@ const PromptCard = ({ prompt, translations, viewMode = 'grid', onUsePrompt, onDe
   // Get domain label
   const domainLabel = t.domains[domain] || domain;
 
-  // Card classes based on view mode
+  // Card classes based on view mode with premium styling
   const cardClasses = viewMode === 'grid'
-    ? "bg-brand-card-bg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 overflow-hidden group"
-    : "bg-brand-card-bg rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-100 overflow-hidden group";
+    ? "bg-brand-card-bg rounded-xl shadow-brand hover:shadow-brand-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100/60 overflow-hidden group backdrop-blur-sm"
+    : "bg-brand-card-bg rounded-lg shadow-brand hover:shadow-brand-lg transition-all duration-200 border border-gray-100/60 overflow-hidden group backdrop-blur-sm";
 
   const contentClasses = viewMode === 'grid' 
     ? "p-6" 
@@ -88,14 +88,14 @@ const PromptCard = ({ prompt, translations, viewMode = 'grid', onUsePrompt, onDe
       React.createElement("div", { className: "flex gap-2" },
         React.createElement("button", {
           onClick: onUsePrompt,
-          className: "flex-1 px-4 py-2.5 bg-brand-primary-accent text-white rounded-lg font-medium hover:bg-brand-primary-accent/90 transition-colors flex items-center justify-center gap-2 text-sm"
+          className: "flex-1 px-4 py-2.5 bg-brand-primary-accent text-white rounded-lg font-medium hover:bg-brand-primary-accent/90 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-2 text-sm"
         },
           React.createElement(FileText, { className: "w-4 h-4" }),
           t.actions.usePrompt
         ),
         React.createElement("button", {
           onClick: onDeletePrompt,
-          className: "px-3 py-2.5 bg-brand-error/10 text-brand-error rounded-lg hover:bg-brand-error hover:text-white transition-colors flex items-center justify-center"
+          className: "px-3 py-2.5 bg-brand-error/10 text-brand-error rounded-lg hover:bg-brand-error hover:text-white hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center"
         },
           React.createElement(Trash2, { className: "w-4 h-4" })
         )

@@ -66,13 +66,13 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt }) => {
 
   return React.createElement("div", { className: "min-h-screen bg-brand-bg" },
     // Header Section
-    React.createElement("div", { className: "bg-brand-card-bg shadow-brand sticky top-0 z-10" },
+    React.createElement("div", { className: "bg-brand-card-bg/95 backdrop-blur-md shadow-brand sticky top-0 z-10 border-b border-gray-100/60" },
       React.createElement("div", { className: "container mx-auto px-4 sm:px-6 lg:px-8 py-6" },
         // Navigation breadcrumbs
         React.createElement("div", { className: "flex items-center gap-3 mb-4" },
           React.createElement("button", {
             onClick: onNavigateBack,
-            className: "flex items-center gap-2 text-brand-primary-accent hover:text-brand-primary-accent/80 transition-colors font-medium"
+            className: "flex items-center gap-2 text-brand-primary-accent hover:text-brand-primary-accent/80 hover:bg-brand-primary-accent/10 px-3 py-2 rounded-lg transition-all duration-200 font-medium"
           },
             React.createElement(ArrowLeft, { className: "w-5 h-5" }),
             React.createElement("span", null, "Retour à l'app")
@@ -93,16 +93,16 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt }) => {
           ),
           
           // View mode toggle
-          React.createElement("div", { className: "flex items-center gap-2 bg-brand-bg rounded-lg p-1" },
+          React.createElement("div", { className: "flex items-center gap-1 bg-brand-bg rounded-lg p-1 shadow-sm border border-gray-100/60" },
             React.createElement("button", {
               onClick: () => setViewMode('grid'),
-              className: `p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-brand-primary-accent text-white' : 'text-brand-muted-text hover:text-brand-text'}`
+              className: `p-2.5 rounded-md transition-all duration-200 ${viewMode === 'grid' ? 'bg-brand-primary-accent text-white shadow-sm' : 'text-brand-muted-text hover:text-brand-text hover:bg-white'}`
             },
               React.createElement(Grid, { className: "w-4 h-4" })
             ),
             React.createElement("button", {
               onClick: () => setViewMode('list'),
-              className: `p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-brand-primary-accent text-white' : 'text-brand-muted-text hover:text-brand-text'}`
+              className: `p-2.5 rounded-md transition-all duration-200 ${viewMode === 'list' ? 'bg-brand-primary-accent text-white shadow-sm' : 'text-brand-muted-text hover:text-brand-text hover:bg-white'}`
             },
               React.createElement(List, { className: "w-4 h-4" })
             )
@@ -122,7 +122,7 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt }) => {
             placeholder: "Rechercher dans mes prompts...",
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none text-base bg-brand-card-bg"
+            className: "w-full pl-10 pr-4 py-3 border-2 border-gray-200/80 rounded-xl focus:border-brand-primary-accent focus:ring-2 focus:ring-brand-primary-accent/20 outline-none text-base bg-brand-card-bg shadow-sm transition-all duration-200 hover:border-gray-300"
           })
         )
       ),
