@@ -131,77 +131,28 @@ class RegisterDatabase {
 export const onRequestPost: (context: EventContext) => Promise<Response> = async (context) => {
   const { request, env } = context;
   
-  // DEBUGGING: Comprehensive environment inspection
-  console.log('=== ENVIRONMENT DEBUG START ===');
-  console.log('Full env object keys:', Object.keys(env));
-  console.log('env.JWT_SECRET exists:', !!env.JWT_SECRET);
-  console.log('env.JWT_SECRET type:', typeof env.JWT_SECRET);
-  console.log('env.DB exists:', !!env.DB);
-  console.log('env.DB type:', typeof env.DB);
-  console.log('env.KV exists:', !!env.KV);
-  console.log('env.KV type:', typeof env.KV);
-  console.log('env.ENVIRONMENT:', env.ENVIRONMENT);
+  // Environment validation - bindings now working correctly
   
-  // Check for alternative binding names that might exist
-  const allEnvKeys = Object.keys(env);
-  console.log('All environment keys:', allEnvKeys);
-  
-  // Look for any database-related bindings
-  const dbKeys = allEnvKeys.filter(key => key.toLowerCase().includes('db') || key.toLowerCase().includes('database'));
-  console.log('Database-related keys:', dbKeys);
-  
-  // Look for any KV-related bindings
-  const kvKeys = allEnvKeys.filter(key => key.toLowerCase().includes('kv') || key.toLowerCase().includes('rate'));
-  console.log('KV-related keys:', kvKeys);
-  
-  // Check for secret-related bindings
-  const secretKeys = allEnvKeys.filter(key => key.toLowerCase().includes('secret') || key.toLowerCase().includes('jwt'));
-  console.log('Secret-related keys:', secretKeys);
-  console.log('=== ENVIRONMENT DEBUG END ===');
-  
-  // Enhanced validation with detailed error reporting
-  const missingBindings = [];
-  if (!env.JWT_SECRET) missingBindings.push('JWT_SECRET');
-  if (!env.DB) missingBindings.push('DB');
-  
-  if (missingBindings.length > 0) {
-    const errorDetails = {
+  // Validate required environment bindings
+  if (!env.JWT_SECRET || env.JWT_SECRET.trim() === '' || !env.DB) {
+    SecurityLogger.logSecurityEvent('auth_failure', {
       endpoint: 'register',
-      reason: `Missing environment bindings: ${missingBindings.join(', ')}`,
-      severity: 'critical',
-      availableKeys: Object.keys(env),
-      contextInfo: {
-        functionPath: context.functionPath,
-        environment: env.ENVIRONMENT || 'unknown'
-      }
-    };
-    
-    console.error('CONFIG_ERROR Details:', errorDetails);
-    
-    SecurityLogger.logSecurityEvent('auth_failure', errorDetails);
+      reason: 'Missing environment configuration',
+      severity: 'critical'
+    });
     
     return AuthUtils.createErrorResponse({
       code: 'CONFIG_ERROR',
       message: 'Service temporarily unavailable',
-      statusCode: 503,
-      // In development, include diagnostic info
-      ...(env.ENVIRONMENT === 'development' && {
-        debug: {
-          missingBindings,
-          availableKeys: Object.keys(env),
-          functionPath: context.functionPath
-        }
-      })
+      statusCode: 503
     });
   }
 
   try {
     const db = new RegisterDatabase(env.DB);
     
-    // Initialize security middleware with correct KV binding
-    const kvNamespace = env.RATE_LIMITER;
-    console.log('Using KV namespace RATE_LIMITER:', kvNamespace ? 'Available' : 'Not available');
-    const security = new SecurityMiddleware(kvNamespace, env.JWT_SECRET);
+    // Initialize security middleware with RATE_LIMITER KV binding
+    const security = new SecurityMiddleware(env.RATE_LIMITER, env.JWT_SECRET);
     
     // Apply comprehensive security checks with strict rate limiting for registration
     const securityResult = await security.applySecurityChecks(request, {
