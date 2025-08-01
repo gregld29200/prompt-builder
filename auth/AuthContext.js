@@ -77,7 +77,8 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        const errorMessage = data.error?.message || data.error || 'Login failed';
+        throw new Error(errorMessage);
       }
 
       // Store token and user data
@@ -112,8 +113,18 @@ export const AuthProvider = ({ children }) => {
 
       const data = await response.json();
 
+      // DEBUG: Log response data
+      console.log('=== FRONTEND REGISTER RESPONSE ===');
+      console.log('Response status:', response.status);
+      console.log('Response data:', data);
+      console.log('Error object:', data.error);
+      console.log('Error type:', typeof data.error);
+      console.log('Error message:', data.error?.message);
+
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        const errorMessage = data.error?.message || data.error || 'Registration failed';
+        console.log('Final error message:', errorMessage);
+        throw new Error(errorMessage);
       }
 
       // Store token and user data

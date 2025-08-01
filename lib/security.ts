@@ -41,9 +41,9 @@ export const RATE_LIMIT_CONFIGS = {
   } as RateLimitConfig,
   
   REGISTER: {
-    windowMs: 60 * 60 * 1000, // 1 hour
-    maxRequests: 3, // 3 registrations per IP per hour
-    skipSuccessfulRequests: false,
+    windowMs: 15 * 60 * 1000, // 15 minutes  
+    maxRequests: 10, // 10 registrations per IP per 15 minutes (more generous for testing)
+    skipSuccessfulRequests: true, // Don't count successful registrations
     skipFailedRequests: false
   } as RateLimitConfig,
   
@@ -374,7 +374,14 @@ export class RequestValidator {
    */
   static async parseAndValidateJSON(request: Request): Promise<{ valid: boolean; data?: any; error?: AuthError }> {
     try {
+      console.log('=== SecurityHelpers.parseAndValidateJSON ===');
+      console.log('Request bodyUsed before text():', request.bodyUsed);
+      
       const text = await request.text();
+      
+      console.log('Text received - length:', text.length);
+      console.log('Text content (first 200 chars):', text.substring(0, 200));
+      console.log('Text content (full):', text);
       
       // Check JSON size
       if (text.length > SECURITY_CONFIG.MAX_JSON_SIZE) {
