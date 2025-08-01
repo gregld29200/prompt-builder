@@ -20438,7 +20438,7 @@ var onRequestPost9 = /* @__PURE__ */ __name(async (context) => {
   }
 }, "onRequestPost");
 
-// ../.wrangler/tmp/pages-dVnKBs/functionsRoutes-0.5884168552494891.mjs
+// ../.wrangler/tmp/pages-98dU2z/functionsRoutes-0.22028034003728192.mjs
 var routes = [
   {
     routePath: "/api/prompts/:id/favorite",
