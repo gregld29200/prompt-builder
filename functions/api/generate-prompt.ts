@@ -1,23 +1,49 @@
-// File: functions/api/generate-prompt.ts
+// Simplified generate-prompt.ts - same pattern as auth endpoints
 
 import { GoogleGenAI } from "@google/genai";
-import type { Language, Domain, OutputLength, PromptType } from '../../types'; // Adjust path as needed
-import { translations as appTranslations } from '../../constants'; // Renamed to avoid conflict
+import type { Language, Domain, OutputLength, PromptType } from '../../types';
+import { translations as appTranslations } from '../../constants';
 
-// Import security utilities
-import { 
-  SecurityMiddleware, 
-  RATE_LIMIT_CONFIGS, 
-  SecurityHelpers, 
-  SecurityLogger 
-} from '../../lib/security';
+// JWT verification function (same as prompts.ts)
+async function verifyJWT(token: string, secret: string): Promise<any> {
+  try {
+    const [headerB64, payloadB64, signatureB64] = token.split('.');
+    if (!headerB64 || !payloadB64 || !signatureB64) {
+      throw new Error('Invalid token format');
+    }
+    
+    // Verify signature
+    const encoder = new TextEncoder();
+    const message = `${headerB64}.${payloadB64}`;
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+    
+    const signature = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+    const isValid = await crypto.subtle.verify('HMAC', key, signature, encoder.encode(message));
+    
+    if (!isValid) {
+      throw new Error('Invalid signature');
+    }
+    
+    // Parse payload
+    const payload = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
+    
+    // Check expiration
+    if (payload.exp < Math.floor(Date.now() / 1000)) {
+      throw new Error('Token expired');
+    }
+    
+    return payload;
+  } catch (error) {
+    throw new Error('Token verification failed');
+  }
+}
 
-import { 
-  InputValidator, 
-  AuthUtils 
-} from '../../lib/auth-utils';
-
-// This is the structure of the incoming request body from the client
 interface GeneratePromptParams {
   rawRequest: string;
   promptType: PromptType;
@@ -27,25 +53,6 @@ interface GeneratePromptParams {
   expertRole: string;
   mission: string;
   constraints: string;
-}
-
-// Define the structure for Cloudflare Pages Functions onRequestPost
-// The 'context' object contains 'request' and 'env'
-interface EventContext {
-  request: Request;
-  env: {
-    DB: D1Database; // D1 database for user and session management
-    KV?: KVNamespace; // KV namespace for rate limiting
-    API_KEY?: string; // Gemini API key
-    JWT_SECRET: string; // JWT signing secret
-    ENVIRONMENT?: string; // Environment (development/production)
-    ALLOWED_ORIGINS?: string; // Comma-separated allowed origins for CORS
-    [key: string]: any; // Allows for other environment variables
-  };
-  params: any; // For route parameters, not used here
-  waitUntil: (promise: Promise<any>) => void;
-  next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-  functionPath: string;
 }
 
 // Enhanced metaPromptTranslations with detailed methodology for both approaches
@@ -275,59 +282,13 @@ const metaPromptTranslations = {
 
 const GEMINI_MODEL_NAME = 'gemini-2.5-pro-preview-05-06'; // As per user request
 
-/**
- * Database Operations for Prompt Generation
- */
-class PromptDatabase {
-  constructor(private db: D1Database) {}
-
-  /**
-   * Save generated prompt to user's library
-   */
-  async savePrompt(userId: string, promptData: {
-    rawRequest: string;
-    generatedPrompt: string;
-    promptType: PromptType;
-    domain: Domain;
-    language: Language;
-    outputLength: OutputLength;
-    expertRole?: string;
-    mission?: string;
-    constraints?: string;
-  }): Promise<string> {
-    const promptId = AuthUtils.generateSecureRandom(16);
-    
-    const stmt = this.db.prepare(`
-      INSERT INTO prompts (
-        id, user_id, title, raw_request, generated_prompt,
-        prompt_type, domain, language, output_length,
-        expert_role, mission, constraints, is_favorite,
-        created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-    `);
-    
-    // Generate title from raw request (first 100 chars)
-    const title = promptData.rawRequest.substring(0, 97) + 
-                  (promptData.rawRequest.length > 97 ? '...' : '');
-    
-    await stmt.bind(
-      promptId,
-      userId,
-      title,
-      promptData.rawRequest,
-      promptData.generatedPrompt,
-      promptData.promptType,
-      promptData.domain,
-      promptData.language,
-      promptData.outputLength,
-      promptData.expertRole || null,
-      promptData.mission || null,
-      promptData.constraints || null,
-      0 // is_favorite - false by default
-    ).run();
-    
-    return promptId;
-  }
+// Simple UUID generator (same as register.ts)
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 /**
@@ -461,98 +422,90 @@ ${tMeta.agenticFooter}
   return { systemInstruction, userQuery };
 }
 
-/**
- * SECURE Main generate-prompt handler with comprehensive security measures
- */
-export const onRequestPost: (context: EventContext) => Promise<Response> = async (context) => {
+export const onRequestPost = async (context: any) => {
   const { request, env } = context;
   
-  // Validate environment configuration - CRITICAL SECURITY CHECK
-  if (!env.JWT_SECRET || !env.DB || !env.API_KEY) {
-    SecurityLogger.logSecurityEvent('api_error', {
-      endpoint: 'generate-prompt',
-      reason: 'Missing environment configuration',
-      severity: 'critical'
-    });
-    
-    return AuthUtils.createErrorResponse({
-      code: 'CONFIG_ERROR',
-      message: 'Service temporarily unavailable',
-      statusCode: 503
-    });
-  }
-
   try {
-    const db = new PromptDatabase(env.DB);
+    console.log('=== GENERATE PROMPT ENDPOINT ===');
+    console.log('Environment check - JWT_SECRET exists:', !!env.JWT_SECRET);
+    console.log('Environment check - API_KEY exists:', !!env.API_KEY);
+    console.log('Available env keys:', Object.keys(env));
     
-    // Initialize security middleware with full configuration
-    const security = new SecurityMiddleware(env.KV, env.JWT_SECRET, {
-      origins: env.ALLOWED_ORIGINS?.split(',') || ['https://yourdomain.com'],
-      credentials: true
-    });
-    
-    // Apply comprehensive security checks - THIS IS THE CRITICAL FIX
-    const securityResult = await security.applySecurityChecks(request, {
-      rateLimitConfig: RATE_LIMIT_CONFIGS.API,
-      requireAuth: true, // CRITICAL: Require authentication
-      allowedMethods: ['POST'],
-      endpoint: 'generate-prompt'
-    });
-    
-    if (!securityResult.allowed) {
-      SecurityLogger.logSecurityEvent('api_access_denied', {
-        endpoint: 'generate-prompt',
-        ipAddress: AuthUtils.getClientIP(request),
-        reason: 'Security check failed',
-        severity: 'medium'
+    // Basic environment check
+    if (!env.JWT_SECRET) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: {
+          code: 'CONFIG_ERROR',
+          message: 'JWT configuration missing'
+        }
+      }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
       });
-      
-      return security.wrapResponse(securityResult.response!, request);
-    }
-
-    // Extract client information for security tracking
-    const clientIP = AuthUtils.getClientIP(request);
-    const userAgent = AuthUtils.getUserAgent(request);
-    const authenticatedUserId = securityResult.userId!; // Now guaranteed to exist
-    
-    // Log successful authentication
-    SecurityLogger.logSecurityEvent('api_access', {
-      endpoint: 'generate-prompt',
-      userId: authenticatedUserId,
-      ipAddress: clientIP,
-      severity: 'low'
-    });
-    
-    // Validate and sanitize input using our secure validation
-    const validationResult = await SecurityHelpers.validateRequest<GeneratePromptParams>(
-      request,
-      InputValidator.validateGeneratePromptRequest
-    );
-    
-    if (!validationResult.valid) {
-      SecurityLogger.logSecurityEvent('input_validation_failed', {
-        endpoint: 'generate-prompt',
-        userId: authenticatedUserId,
-        ipAddress: clientIP,
-        reason: 'Invalid input data'
-      });
-      
-      return security.wrapResponse(validationResult.response!, request);
     }
     
-    const params = validationResult.data as GeneratePromptParams;
+    if (!env.API_KEY) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: {
+          code: 'CONFIG_ERROR',
+          message: 'API key configuration missing'
+        }
+      }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // Get token from Authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: {
+          code: 'NO_TOKEN',
+          message: 'Authorization token required'
+        }
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    const token = authHeader.substring(7);
+    
+    // Verify JWT
+    let user;
+    try {
+      user = await verifyJWT(token, env.JWT_SECRET);
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: {
+          code: 'INVALID_TOKEN',
+          message: 'Invalid or expired token'
+        }
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // Parse JSON
+    const params: GeneratePromptParams = await request.json();
+    console.log('Generating prompt for user:', user.userId);
     
     // Get translations
     const tMeta = metaPromptTranslations[params.language] || metaPromptTranslations.en;
-    const tApp = appTranslations[params.language] || appTranslations.en;
-
-    // Build secure prompt query
+    
+    // Build prompt query
     const { systemInstruction, userQuery } = buildPromptQuery(params, tMeta);
 
-    // Initialize Gemini AI with secure configuration
+    // Initialize Gemini AI
     const ai = new GoogleGenAI({ apiKey: env.API_KEY });
 
-    // Call Gemini API with proper error handling
+    // Call Gemini API
     const result = await ai.models.generateContent({
       model: GEMINI_MODEL_NAME,
       contents: userQuery,
@@ -562,94 +515,48 @@ export const onRequestPost: (context: EventContext) => Promise<Response> = async
     });
      
     if (!result || typeof result.text !== 'string') {
-      SecurityLogger.logSecurityEvent('gemini_api_error', {
-        endpoint: 'generate-prompt',
-        userId: authenticatedUserId,
-        reason: 'Invalid Gemini API response',
-        severity: 'medium'
-      });
-      
       throw new Error('Invalid response from Gemini API');
     }
 
-    // Save prompt to user's library (async operation)
-    context.waitUntil(
-      db.savePrompt(authenticatedUserId, {
-        rawRequest: params.rawRequest,
-        generatedPrompt: result.text,
-        promptType: params.promptType,
-        domain: params.domain,
-        language: params.language,
-        outputLength: params.outputLength,
-        expertRole: params.expertRole,
-        mission: params.mission,
-        constraints: params.constraints
-      }).catch(error => {
-        SecurityLogger.logSecurityEvent('database_error', {
-          endpoint: 'generate-prompt',
-          userId: authenticatedUserId,
-          reason: `Failed to save prompt: ${error.message}`,
-          severity: 'low'
-        });
-      })
-    );
+    console.log('Prompt generated successfully for user:', user.userId);
 
-    // Log successful prompt generation
-    SecurityLogger.logSecurityEvent('prompt_generated', {
-      endpoint: 'generate-prompt',
-      userId: authenticatedUserId,
-      ipAddress: clientIP,
-      severity: 'low'
+    return new Response(JSON.stringify({
+      success: true,
+      prompt: result.text
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
-
-    // Return secure success response
-    return security.wrapResponse(
-      SecurityHelpers.createSecureResponse({
-        success: true,
-        prompt: result.text
-      }),
-      request
-    );
 
   } catch (error: any) {
-    // Secure error handling with comprehensive logging
-    SecurityLogger.logSecurityEvent('api_error', {
-      endpoint: 'generate-prompt',
-      ipAddress: AuthUtils.getClientIP(request),
-      reason: error instanceof Error ? error.message : 'Unknown error',
-      severity: 'high'
-    });
-
-    const isDevelopment = env.ENVIRONMENT === 'development';
+    console.error('Generate prompt error:', error);
     
     // Handle specific error types
     let errorResponse = {
       code: 'INTERNAL_ERROR',
-      message: 'Unable to generate prompt',
-      statusCode: 500
+      message: 'Unable to generate prompt'
     };
 
     if (error?.message) {
       if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID')) {
         errorResponse = {
           code: 'API_KEY_ERROR',
-          message: 'Service configuration error',
-          statusCode: 503
+          message: 'Service configuration error'
         };
       } else if (error.message.toLowerCase().includes('quota')) {
         errorResponse = {
           code: 'QUOTA_EXCEEDED',
-          message: 'Service temporarily unavailable due to high demand',
-          statusCode: 503
+          message: 'Service temporarily unavailable due to high demand'
         };
       }
     }
     
-    return AuthUtils.createErrorResponse({
-      ...errorResponse,
-      ...(isDevelopment && { 
-        details: error instanceof Error ? error.message : 'Unknown error' 
-      })
+    return new Response(JSON.stringify({
+      success: false,
+      error: errorResponse
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 };
