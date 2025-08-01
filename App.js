@@ -7,6 +7,7 @@ import { generateStructuredPromptWithGemini } from './services/geminiService.js'
 import { AuthProvider } from './auth/AuthContext.js';
 import AuthWrapper from './auth/AuthWrapper.js';
 import UserMenu from './components/UserMenu.js';
+import LibraryPage from './components/LibraryPage.js';
 import apiService from './services/apiService.js';
 import { useAuth } from './auth/AuthContext.js';
 
@@ -30,6 +31,7 @@ const MainApp = () => {
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
+  const [showLibraryPage, setShowLibraryPage] = useState(false);
   const [savedPrompts, setSavedPrompts] = useState([]);
   const [notification, setNotification] = useState('');
   const [isLoadingPrompts, setIsLoadingPrompts] = useState(false);
@@ -209,6 +211,7 @@ const MainApp = () => {
     setConstraints(promptData.constraints || '');
     setOutputLength(promptData.output_length || 'medium');
     setShowLibrary(false);
+    setShowLibraryPage(false);
     setStep(4);
     setIsGenerating(false);
   };
@@ -256,6 +259,15 @@ const MainApp = () => {
   ];
 
 
+  // If library page is active, render only the library page
+  if (showLibraryPage) {
+    return React.createElement(LibraryPage, {
+      translations: t,
+      onNavigateBack: () => setShowLibraryPage(false),
+      onLoadPrompt: loadPromptFromLibrary
+    });
+  }
+
   return React.createElement("div", { className: "min-h-screen bg-brand-bg text-brand-text font-inter" },
     React.createElement("header", { className: "bg-brand-card-bg shadow-brand" },
       React.createElement("div", { className: "container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center" },
@@ -299,7 +311,7 @@ const MainApp = () => {
           ),
           React.createElement("div", {className: "flex gap-3"},
             React.createElement("button", {
-              onClick: () => setShowLibrary(true),
+              onClick: () => setShowLibraryPage(true),
               className: "px-5 py-2.5 border-2 border-brand-primary-accent text-brand-primary-accent rounded-lg font-semibold hover:bg-brand-primary-accent hover:text-white transition-colors flex items-center gap-2 text-sm"
             },
               React.createElement(FileText, { className: "w-4 h-4" }),
