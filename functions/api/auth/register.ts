@@ -172,21 +172,26 @@ export const onRequestPost = async (context: any) => {
     try {
       const token = await createJWT({ userId, email: data.email }, env.JWT_SECRET);
       console.log('JWT created successfully');
-    
-    console.log('User created successfully:', userId);
-    
-    return new Response(JSON.stringify({
-      success: true,
-      token,
-      user: {
-        id: userId,
-        email: data.email,
-        emailVerified: false
-      }
-    }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' }
-    });
+      
+      console.log('User created successfully:', userId);
+      
+      return new Response(JSON.stringify({
+        success: true,
+        token,
+        user: {
+          id: userId,
+          email: data.email,
+          emailVerified: false
+        }
+      }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+    } catch (jwtError) {
+      console.error('JWT creation error:', jwtError);
+      throw jwtError;
+    }
     
   } catch (error) {
     console.error('Registration error:', error);
