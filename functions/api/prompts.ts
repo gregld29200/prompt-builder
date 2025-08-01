@@ -85,8 +85,26 @@ export const onRequestGet = async (context: any) => {
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 100);
     const offset = (page - 1) * limit;
     
-    // Fetch user's prompts (for now, return empty array since we haven't created prompts table structure yet)
-    const prompts = [];
+    // Fetch user's prompts from database
+    const results = await env.DB.prepare(`
+      SELECT id, title, raw_request, generated_prompt, prompt_type, domain, language, 
+             output_length, expert_role, mission, constraints, is_favorite, 
+             created_at, updated_at
+      FROM prompts 
+      WHERE user_id = ? 
+      ORDER BY created_at DESC 
+      LIMIT ? OFFSET ?
+    `).bind(user.userId, limit, offset).all();
+    
+    const prompts = results.results || [];
+    
+    // Get total count for pagination
+    const countResult = await env.DB.prepare(`
+      SELECT COUNT(*) as total FROM prompts WHERE user_id = ?
+    `).bind(user.userId).first();
+    
+    const total = countResult?.total || 0;
+    const totalPages = Math.ceil(total / limit);
     
     return new Response(JSON.stringify({
       success: true,
@@ -94,8 +112,8 @@ export const onRequestGet = async (context: any) => {
       pagination: {
         page,
         limit,
-        total: 0,
-        totalPages: 0
+        total,
+        totalPages
       }
     }), {
       status: 200,
