@@ -14,8 +14,8 @@ database_id = "2eb75f37-06b7-486a-a2e0-138ea1fb0574"
 
 # KV Namespace for rate limiting and session management
 [[kv_namespaces]]
-binding = "KV"
-id = "341d4109a4044a3a88cb3ccea2797278" # Will be populated for preview deployments
+binding = "RATE_LIMITER"  # Match the actual namespace title from dashboard
+id = "341d4109a4044a3a88cb3ccea2797278"
 
 # Environment variables (set these via wrangler secret put)
 [vars]
