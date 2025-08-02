@@ -194,20 +194,6 @@ const MainApp = () => {
     setStep(3);
   };
 
-  const resetForm = () => {
-    setStep(1);
-    setRawRequest('');
-    setGeneratedPrompt('');
-    setExpertRole('');
-    setMission('');
-    setConstraints('');
-    setAnalyzedDomain('other');
-    setAnalyzedComplexity('simple');
-    setRecommendedType('MVP');
-    setSelectedDomain('education');
-    setOutputLength('medium');
-    setPromptType('MVP');
-  };
 
   const loadPromptFromLibrary = (promptData) => {
     // Map API response fields to local state
