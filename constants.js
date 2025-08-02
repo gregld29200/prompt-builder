@@ -390,3 +390,159 @@ export const translations = {
     }
   }
 };
+
+// ✅ AJOUT UX: QuickStart Options pour simplifier l'étape 2
+export const QUICK_START_OPTIONS = {
+  fr: {
+    simple: {
+      title: "Création Rapide",
+      subtitle: "Générer en 30 secondes",
+      description: "Configuration automatique pour un résultat rapide",
+      icon: "⚡"
+    },
+    advanced: {
+      title: "Mode Expert", 
+      subtitle: "Contrôle total",
+      description: "Personnalisation complète de tous les paramètres",
+      icon: "🎯"
+    }
+  },
+  en: {
+    simple: {
+      title: "Quick Creation",
+      subtitle: "Generate in 30 seconds", 
+      description: "Auto-configuration for fast results",
+      icon: "⚡"
+    },
+    advanced: {
+      title: "Expert Mode",
+      subtitle: "Full control", 
+      description: "Complete customization of all parameters",
+      icon: "🎯"
+    }
+  }
+};
+
+// ✅ AJOUT UX: Helpers contextuels pour guider l'utilisateur dans l'étape 3
+export const CONTEXTUAL_HELPERS = {
+  education: {
+    expertRole: {
+      suggestions: ["Concepteur pédagogique", "Enseignant expert", "Formateur", "Responsable formation"],
+      tip: "Le rôle influence le style et la méthodologie du prompt généré"
+    },
+    mission: {
+      suggestions: [
+        "Créer des activités d'apprentissage engageantes",
+        "Développer une séquence pédagogique complète", 
+        "Concevoir une évaluation adaptée au niveau",
+        "Produire des supports de cours interactifs"
+      ],
+      tip: "Décrivez précisément ce que vous voulez accomplir avec vos étudiants"
+    },
+    constraints: {
+      suggestions: [
+        "Durée: 50 minutes",
+        "Niveau: A2-B1", 
+        "Groupe: 15 étudiants",
+        "Support: Tableau interactif"
+      ],
+      tip: "Les contraintes aident l'IA à créer un contenu adapté à votre contexte"
+    }
+  },
+  technical: {
+    expertRole: {
+      suggestions: ["Architecte logiciel", "DevOps engineer", "Tech lead", "Développeur senior"],
+      tip: "Choisissez l'expertise technique qui correspond à votre projet"
+    },
+    mission: {
+      suggestions: [
+        "Optimiser les performances du système",
+        "Concevoir une architecture scalable",
+        "Implémenter des bonnes pratiques de sécurité",
+        "Automatiser les processus de déploiement"
+      ],
+      tip: "Précisez l'objectif technique que vous souhaitez atteindre"
+    },
+    constraints: {
+      suggestions: [
+        "Technologies: React, Node.js",
+        "Budget: 3 mois développeur",
+        "Performance: < 200ms",
+        "Compatibilité: Chrome, Firefox"
+      ],
+      tip: "Définissez les contraintes techniques et business de votre projet"
+    }
+  },
+  creative: {
+    expertRole: {
+      suggestions: ["Créateur de contenu", "Rédacteur créatif", "Designer UX", "Directeur artistique"],
+      tip: "Le rôle créatif oriente le style et l'approche du contenu généré"
+    },
+    mission: {
+      suggestions: [
+        "Créer un contenu viral et engageant",
+        "Développer une identité de marque cohérente",
+        "Concevoir une expérience utilisateur intuitive",
+        "Produire du contenu multimédia impactant"
+      ],
+      tip: "Exprimez votre vision créative et les émotions à transmettre"
+    },
+    constraints: {
+      suggestions: [
+        "Ton: Moderne et accessible",
+        "Audience: 25-35 ans",
+        "Format: Post réseaux sociaux",
+        "Longueur: 150 mots max"
+      ],
+      tip: "Précisez le style, l'audience et les formats souhaités"
+    }
+  },
+  analysis: {
+    expertRole: {
+      suggestions: ["Analyste de données", "Consultant stratégique", "Chercheur", "Business analyst"],
+      tip: "Le rôle d'expert définit la méthodologie et la profondeur d'analyse"
+    },
+    mission: {
+      suggestions: [
+        "Analyser les tendances et identifier les opportunités",
+        "Évaluer la performance et proposer des améliorations",
+        "Synthétiser des données complexes en insights",
+        "Créer des recommandations stratégiques"
+      ],
+      tip: "Définissez le type d'analyse et les livrables attendus"
+    },
+    constraints: {
+      suggestions: [
+        "Données: 12 mois historique",
+        "Focus: Metrics de conversion",
+        "Format: Présentation exécutive",
+        "Délai: Analyse express"
+      ],
+      tip: "Précisez les sources de données et le format de restitution"
+    }
+  },
+  other: {
+    expertRole: {
+      suggestions: ["Consultant expert", "Spécialiste métier", "Professionnel expérimenté", "Expert reconnu"],
+      tip: "Choisissez un rôle qui correspond à votre domaine d'expertise"
+    },
+    mission: {
+      suggestions: [
+        "Résoudre un problème spécifique",
+        "Optimiser un processus existant",
+        "Créer une solution innovante",
+        "Améliorer une situation actuelle"
+      ],
+      tip: "Décrivez clairement l'objectif que vous souhaitez atteindre"
+    },
+    constraints: {
+      suggestions: [
+        "Contexte: Environnement professionnel",
+        "Ressources: Limitées",
+        "Urgence: Priorité haute",
+        "Impact: Maximum"
+      ],
+      tip: "Précisez le contexte et les contraintes de votre situation"
+    }
+  }
+};
