@@ -1,4 +1,6 @@
-// Working minimal registration endpoint - no complex imports
+// Secure registration endpoint with proper password hashing and validation
+import { EdgeBcrypt, InputValidator, AuthUtils, AUTH_ERRORS } from '../../../lib/auth-utils.js';
+import { SecurityMiddleware, RATE_LIMIT_CONFIGS } from '../../../lib/security.js';
 
 // Simple UUID generator (avoiding external imports)
 function generateUUID(): string {
@@ -15,27 +17,7 @@ interface RegisterRequest {
   password: string;
 }
 
-// Simple password validation
-function validatePassword(password: string): boolean {
-  return password.length >= 8 && 
-         /[A-Z]/.test(password) && 
-         /[a-z]/.test(password) && 
-         /[0-9]/.test(password);
-}
-
-// Simple email validation  
-function validateEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-// Simple password hashing (for now - will enhance later)
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password + 'salt123'); // Temporary salt
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
+// Remove insecure password and email validation - using secure utilities instead
 
 // Simple JWT creation
 async function createJWT(payload: any, secret: string): Promise<string> {
@@ -66,66 +48,81 @@ export const onRequestPost = async (context: any) => {
   const { request, env } = context;
   
   try {
-    console.log('=== WORKING REGISTER ENDPOINT ===');
+    console.log('=== SECURE REGISTER ENDPOINT ===');
     
     // Basic environment check
     if (!env.JWT_SECRET || !env.DB) {
       console.log('Missing environment variables');
-      return new Response(JSON.stringify({
-        success: false,
-        error: {
-          code: 'CONFIG_ERROR',
-          message: 'Service temporarily unavailable'
-        }
-      }), {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' }
+      return AuthUtils.createErrorResponse(AUTH_ERRORS.INTERNAL_ERROR);
+    }
+    
+    // Apply rate limiting and security checks
+    console.log('Applying security checks and rate limiting...');
+    const security = new SecurityMiddleware(env.RATE_LIMITER, env.JWT_SECRET);
+    const securityCheck = await security.applySecurityChecks(request, {
+      rateLimitConfig: RATE_LIMIT_CONFIGS.REGISTER,
+      allowedMethods: ['POST'],
+      endpoint: 'register'
+    });
+    
+    if (!securityCheck.allowed) {
+      console.log('Security check failed - request blocked');
+      return security.wrapResponse(securityCheck.response!, request);
+    }
+    
+    console.log('Security checks passed');
+    
+    // Parse and validate JSON input
+    const rawData = await request.json();
+    console.log('Received registration data:', { firstName: rawData.firstName, email: rawData.email, hasPassword: !!rawData.password });
+    
+    // Comprehensive input validation using secure utilities
+    if (!rawData.firstName || typeof rawData.firstName !== 'string' || rawData.firstName.trim().length === 0) {
+      return AuthUtils.createErrorResponse({
+        code: 'MISSING_FIELDS',
+        message: 'First name is required',
+        statusCode: 400
       });
     }
     
-    // Parse JSON
-    const data: RegisterRequest = await request.json();
-    console.log('Received registration data:', { firstName: data.firstName, email: data.email, hasPassword: !!data.password });
-    
-    // Validation
-    if (!data.firstName || !data.email || !data.password) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: {
-          code: 'MISSING_FIELDS',
-          message: 'First name, email and password are required'
-        }
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
+    if (!rawData.email || !rawData.password) {
+      return AuthUtils.createErrorResponse({
+        code: 'MISSING_FIELDS', 
+        message: 'Email and password are required',
+        statusCode: 400
       });
     }
     
-    if (!validateEmail(data.email)) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: {
-          code: 'INVALID_EMAIL',
-          message: 'Please enter a valid email address'
-        }
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
+    // Validate email using secure validator
+    const emailValidation = InputValidator.validateEmail(rawData.email);
+    if (!emailValidation.isValid) {
+      return AuthUtils.createErrorResponse({
+        code: 'INVALID_EMAIL',
+        message: emailValidation.error || 'Invalid email address',
+        statusCode: 400
       });
     }
     
-    if (!validatePassword(data.password)) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: {
-          code: 'WEAK_PASSWORD',
-          message: 'Password must be at least 8 characters with uppercase, lowercase, and numbers'
-        }
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
+    // Validate password strength
+    const passwordValidation = InputValidator.validateLoginRequest({ 
+      email: emailValidation.sanitized, 
+      password: rawData.password 
+    });
+    if (!passwordValidation.isValid) {
+      return AuthUtils.createErrorResponse({
+        code: 'WEAK_PASSWORD',
+        message: passwordValidation.errors.join(', '),
+        statusCode: 400
       });
     }
+    
+    // Sanitize firstName input
+    const firstName = InputValidator.sanitizeInput(rawData.firstName);
+    const data: RegisterRequest = {
+      firstName,
+      email: emailValidation.sanitized,
+      password: rawData.password
+    };
     
     // Check if user exists
     console.log('Checking if user exists...');
@@ -133,27 +130,25 @@ export const onRequestPost = async (context: any) => {
       const existingUser = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(data.email).first();
       console.log('User check result:', existingUser);
       if (existingUser) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: {
+        return AuthUtils.createErrorResponse({
           code: 'EMAIL_EXISTS',
-          message: 'An account with this email already exists'
-        }
-      }), {
-        status: 409,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-    
+          message: 'An account with this email already exists',
+          statusCode: 409
+        });
+      }
     } catch (dbError) {
       console.error('Database check error:', dbError);
-      throw dbError;
+      return AuthUtils.createErrorResponse(AUTH_ERRORS.INTERNAL_ERROR);
     }
     
-    // Create user
+    // Create user with secure password hashing
     console.log('Creating new user...');
     const userId = generateUUID();
-    const hashedPassword = await hashPassword(data.password);
+    
+    // Use secure bcrypt hashing instead of weak SHA-256
+    const hashedPassword = await EdgeBcrypt.hash(data.password);
+    console.log('Password securely hashed with bcrypt');
+    
     const now = new Date().toISOString();
     
     console.log('Inserting user into database...');
@@ -176,7 +171,7 @@ export const onRequestPost = async (context: any) => {
       
       console.log('User created successfully:', userId);
       
-      return new Response(JSON.stringify({
+      const response = new Response(JSON.stringify({
         success: true,
         token,
         user: {
@@ -190,6 +185,9 @@ export const onRequestPost = async (context: any) => {
         headers: { 'Content-Type': 'application/json' }
       });
       
+      // Wrap response with security headers and CORS
+      return security.wrapResponse(response, request);
+      
     } catch (jwtError) {
       console.error('JWT creation error:', jwtError);
       throw jwtError;
@@ -198,7 +196,7 @@ export const onRequestPost = async (context: any) => {
   } catch (error) {
     console.error('Registration error:', error);
     
-    return new Response(JSON.stringify({
+    const errorResponse = new Response(JSON.stringify({
       success: false,
       error: {
         code: 'INTERNAL_ERROR',
@@ -208,5 +206,9 @@ export const onRequestPost = async (context: any) => {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
+    
+    // Apply security headers even to error responses
+    const security = new SecurityMiddleware(env.RATE_LIMITER, env.JWT_SECRET);
+    return security.wrapResponse(errorResponse, request);
   }
 };

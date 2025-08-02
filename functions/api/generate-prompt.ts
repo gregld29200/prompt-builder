@@ -3,6 +3,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { Language, Domain, OutputLength, PromptType } from '../../types';
 import { translations as appTranslations } from '../../constants';
+import { SecurityHeadersManager } from '../../lib/security.js';
 
 // JWT verification function (same as prompts.ts)
 async function verifyJWT(token: string, secret: string): Promise<any> {
@@ -610,7 +611,7 @@ export const onRequestPost = async (context: any) => {
     
     // Basic environment check
     if (!env.JWT_SECRET) {
-      return new Response(JSON.stringify({
+      const errorResponse = new Response(JSON.stringify({
         success: false,
         error: {
           code: 'CONFIG_ERROR',
@@ -620,10 +621,11 @@ export const onRequestPost = async (context: any) => {
         status: 503,
         headers: { 'Content-Type': 'application/json' }
       });
+      return SecurityHeadersManager.addSecurityHeaders(errorResponse);
     }
     
     if (!env.API_KEY) {
-      return new Response(JSON.stringify({
+      const errorResponse = new Response(JSON.stringify({
         success: false,
         error: {
           code: 'CONFIG_ERROR',
@@ -633,12 +635,13 @@ export const onRequestPost = async (context: any) => {
         status: 503,
         headers: { 'Content-Type': 'application/json' }
       });
+      return SecurityHeadersManager.addSecurityHeaders(errorResponse);
     }
     
     // Get token from Authorization header
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({
+      const errorResponse = new Response(JSON.stringify({
         success: false,
         error: {
           code: 'NO_TOKEN',
@@ -648,6 +651,7 @@ export const onRequestPost = async (context: any) => {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
       });
+      return SecurityHeadersManager.addSecurityHeaders(errorResponse);
     }
     
     const token = authHeader.substring(7);
@@ -657,7 +661,7 @@ export const onRequestPost = async (context: any) => {
     try {
       user = await verifyJWT(token, env.JWT_SECRET);
     } catch (error) {
-      return new Response(JSON.stringify({
+      const errorResponse = new Response(JSON.stringify({
         success: false,
         error: {
           code: 'INVALID_TOKEN',
@@ -667,6 +671,7 @@ export const onRequestPost = async (context: any) => {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
       });
+      return SecurityHeadersManager.addSecurityHeaders(errorResponse);
     }
     
     // Parse JSON
@@ -742,43 +747,49 @@ export const onRequestPost = async (context: any) => {
       }
     }
 
-    return new Response(JSON.stringify({
+    const response = new Response(JSON.stringify({
       success: true,
       prompt: promptContent
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
+    
+    // Add security headers
+    return SecurityHeadersManager.addSecurityHeaders(response);
 
   } catch (error: any) {
     console.error('Generate prompt error:', error);
     
     // Handle specific error types
-    let errorResponse = {
+    let errorData = {
       code: 'INTERNAL_ERROR',
       message: 'Unable to generate prompt'
     };
 
     if (error?.message) {
       if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID')) {
-        errorResponse = {
+        errorData = {
           code: 'API_KEY_ERROR',
           message: 'Service configuration error'
         };
       } else if (error.message.toLowerCase().includes('quota')) {
-        errorResponse = {
+        errorData = {
           code: 'QUOTA_EXCEEDED',
           message: 'Service temporarily unavailable due to high demand'
         };
       }
     }
     
-    return new Response(JSON.stringify({
+    const errorResponse = new Response(JSON.stringify({
       success: false,
-      error: errorResponse
+      error: errorData
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
+    
+    // Add security headers even to error responses
+    return SecurityHeadersManager.addSecurityHeaders(errorResponse);
   }
 };

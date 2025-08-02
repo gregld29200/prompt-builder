@@ -1,4 +1,5 @@
 // Simple prompts API endpoint
+import { SecurityHeadersManager } from '../../lib/security.js';
 
 // JWT verification function
 async function verifyJWT(token: string, secret: string): Promise<any> {
@@ -49,19 +50,21 @@ export const onRequestGet = async (context: any) => {
     
     // Check environment
     if (!env.JWT_SECRET || !env.DB) {
-      return new Response(JSON.stringify({
+      const errorResponse = new Response(JSON.stringify({
         success: false,
         error: { code: 'CONFIG_ERROR', message: 'Service unavailable' }
       }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+      return SecurityHeadersManager.addSecurityHeaders(errorResponse);
     }
     
     // Get token from Authorization header
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({
+      const errorResponse = new Response(JSON.stringify({
         success: false,
         error: { code: 'NO_TOKEN', message: 'Authorization token required' }
       }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      return SecurityHeadersManager.addSecurityHeaders(errorResponse);
     }
     
     const token = authHeader.substring(7);
@@ -71,10 +74,11 @@ export const onRequestGet = async (context: any) => {
     try {
       user = await verifyJWT(token, env.JWT_SECRET);
     } catch (error) {
-      return new Response(JSON.stringify({
+      const errorResponse = new Response(JSON.stringify({
         success: false,
         error: { code: 'INVALID_TOKEN', message: 'Invalid or expired token' }
       }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      return SecurityHeadersManager.addSecurityHeaders(errorResponse);
     }
     
     console.log('Fetching prompts for user:', user.userId);
@@ -106,7 +110,7 @@ export const onRequestGet = async (context: any) => {
     const total = countResult?.total || 0;
     const totalPages = Math.ceil(total / limit);
     
-    return new Response(JSON.stringify({
+    const response = new Response(JSON.stringify({
       success: true,
       prompts,
       pagination: {
@@ -120,16 +124,20 @@ export const onRequestGet = async (context: any) => {
       headers: { 'Content-Type': 'application/json' }
     });
     
+    return SecurityHeadersManager.addSecurityHeaders(response);
+    
   } catch (error) {
     console.error('Get prompts error:', error);
     
-    return new Response(JSON.stringify({
+    const errorResponse = new Response(JSON.stringify({
       success: false,
       error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch prompts' }
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
+    
+    return SecurityHeadersManager.addSecurityHeaders(errorResponse);
   }
 };
 
@@ -141,7 +149,7 @@ export const onRequestPost = async (context: any) => {
     console.log('=== CREATE PROMPT ENDPOINT ===');
     
     // For now, just return success (we'll implement full functionality later)
-    return new Response(JSON.stringify({
+    const response = new Response(JSON.stringify({
       success: true,
       message: 'Prompt creation not implemented yet',
       prompt: { id: 'temp-id', title: 'Temporary' }
@@ -150,15 +158,19 @@ export const onRequestPost = async (context: any) => {
       headers: { 'Content-Type': 'application/json' }
     });
     
+    return SecurityHeadersManager.addSecurityHeaders(response);
+    
   } catch (error) {
     console.error('Create prompt error:', error);
     
-    return new Response(JSON.stringify({
+    const errorResponse = new Response(JSON.stringify({
       success: false,
       error: { code: 'INTERNAL_ERROR', message: 'Failed to create prompt' }
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
+    
+    return SecurityHeadersManager.addSecurityHeaders(errorResponse);
   }
 };
