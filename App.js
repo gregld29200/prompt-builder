@@ -10,7 +10,7 @@ import UserMenu from './components/UserMenu.js';
 import LibraryPage from './components/LibraryPage.js';
 import QuickStartSelector from './components/QuickStartSelector.js';
 import ContextualHelper from './components/ContextualHelper.js';
-import FloatingLibraryButton from './components/FloatingLibraryButton.js';
+// FloatingLibraryButton supprimé - remplacé par bouton header
 import apiService from './services/apiService.js';
 import { useAuth } from './auth/AuthContext.js';
 
@@ -381,10 +381,14 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
           React.createElement("div", {className: "flex gap-3"},
             React.createElement("button", {
               onClick: () => setShowLibraryPage(true),
-              className: "px-5 py-2.5 border-2 border-brand-primary-accent text-brand-primary-accent rounded-lg font-semibold hover:bg-brand-primary-accent hover:text-white transition-colors flex items-center gap-2 text-sm"
+              className: "px-5 py-2.5 border-2 border-brand-primary-accent text-brand-primary-accent rounded-lg font-semibold hover:bg-brand-primary-accent hover:text-white transition-colors flex items-center gap-2 text-sm relative"
             },
               React.createElement(FileText, { className: "w-4 h-4" }),
-              t.actions.viewLibrary
+              React.createElement("span", null, t.actions.viewLibrary),
+              // Compteur de prompts si > 0
+              savedPrompts.length > 0 && React.createElement("span", {
+                className: "ml-1 bg-brand-secondary-accent text-brand-text text-xs rounded-full px-2 py-0.5 font-bold"
+              }, savedPrompts.length.toString())
             ),
             React.createElement("button", {
               onClick: handleAnalyzeRequest,
@@ -604,13 +608,6 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
         )
       )
     ), // End of library modal element
-    
-    // ✅ AJOUT UX: Bouton flottant d'accès rapide à la bibliothèque
-    React.createElement(FloatingLibraryButton, {
-      onOpenLibrary: () => setShowLibraryPage(true),
-      promptCount: savedPrompts.length,
-      language: language
-    }),
     
     notification && React.createElement("div", { className: "fixed bottom-6 right-6 bg-brand-text text-white px-5 py-3 rounded-lg shadow-brand-lg flex items-center gap-3 z-[100]" },
       React.createElement(Check, { className: "w-5 h-5 text-brand-success" }),
