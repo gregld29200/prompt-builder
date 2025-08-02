@@ -58,7 +58,7 @@ interface GeneratePromptParams {
 // Enhanced metaPromptTranslations with detailed methodology for both approaches
 const metaPromptTranslations = {
   en: {
-    systemInstructionBase: "You are an expert prompt engineer. Generate a complete, executable prompt following the exact format: <System>, <User>, <Example>. The final prompt must be in {TARGET_LANGUAGE} and ready for immediate use by an AI. Include detailed methodology in the User section and compelling examples. Output ONLY the prompt text - no meta-commentary or explanations outside the prompt structure.",
+    systemInstructionBase: "You are an expert prompt engineer. Generate a complete, executable prompt following the exact format: <System>, <User>, <Example>. The final prompt must be in {TARGET_LANGUAGE} and ready for immediate use by an AI. Include detailed methodology in the User section and compelling examples. IMPORTANT: Start your response with a concise title (5-8 words maximum) using this EXACT format:\n\nTITLE: [Your concise title here]\n\nPROMPT:\n[Your complete prompt here]\n\nOutput ONLY the title and prompt - no meta-commentary or explanations outside this structure.",
     
     userQueryHeader: "Please generate a structured prompt. Here are the details:",
     rawRequestLabel: "User's Goal / Raw Request:",
@@ -115,7 +115,9 @@ const metaPromptTranslations = {
     // Fixed Example Instruction  
     mvpExampleInstruction: "Show the exact beginning of the expected deliverable - first 3-5 lines of actual output, not process description. Examples: For podcast → 'Voice 1: Welcome everyone to today's show...', for lesson plan → 'LESSON: [Title] | OBJECTIVES: Students will be able to...', for analysis → 'EXECUTIVE SUMMARY: This analysis reveals...'. The example must be a direct sample of the deliverable.",
     
-    mvpFooter: "CRITICAL: Generate ONLY the complete prompt above with <System>, <User>, and <Example> sections. Do not add meta-commentary or explanations outside the prompt structure.",
+    mvpTitleInstruction: "Create a concise, professional title (5-8 words maximum) that summarizes the prompt's purpose. Focus on the main action and subject. Examples: 'Course Design Marketing Strategy', 'Analysis Customer Feedback', 'Training Module Creation'.",
+    
+    mvpFooter: "CRITICAL: First provide the title using format 'TITLE: [your title]', then generate the complete prompt with <System>, <User>, and <Example> sections. Do not add meta-commentary or explanations outside this structure.",
     
     // Enhanced AGENTIC Section
     agenticTemplateHeader: "For an \"AGENTIC\" type prompt, generate a complete executable prompt with self-assessment capabilities:",
@@ -165,11 +167,13 @@ const metaPromptTranslations = {
     },
     agenticEvalTableHeader: "| Criterion                     | Rating (/10) | Justification for Rating | Concrete Suggestions for Improvement |\n    |-------------------------------|--------------|--------------------------|--------------------------------------|",
     agenticSelfAssessmentQuestion2: "After presenting the evaluation, the AI **must also ask the user verbatim**:\n    \"Based on the evaluation above, would you like me to attempt to improve the draft? (Yes/No)\"",
-    agenticFooter: "CRITICAL: Generate ONLY the complete prompt above with Title, <System>, <User>, and <Example> sections. Do not add meta-commentary or explanations outside the prompt structure.",
+    agenticTitleInstruction: "Create a concise, professional title (5-8 words maximum) that captures the agentic prompt's purpose. Focus on the main analytical or creative goal. Examples: 'Strategic Marketing Analysis Tool', 'Interactive Learning Module Builder', 'Content Creation Assistant'.",
+    
+    agenticFooter: "CRITICAL: First provide the title using format 'TITLE: [your title]', then generate the complete prompt with <System>, <User>, and <Example> sections. Do not add meta-commentary or explanations outside this structure.",
   },
   
   fr: {
-    systemInstructionBase: "Vous êtes un ingénieur de prompts expert. Générez un prompt complet et exécutable suivant exactement le format : <System>, <User>, <Example>. Le prompt final doit être en {TARGET_LANGUAGE} et prêt à être utilisé immédiatement par une IA. Incluez une méthodologie détaillée dans la section User et des exemples convaincants. Ne générez QUE le texte du prompt - aucun méta-commentaire ou explication en dehors de la structure du prompt.",
+    systemInstructionBase: "Vous êtes un ingénieur de prompts expert. Générez un prompt complet et exécutable suivant exactement le format : <System>, <User>, <Example>. Le prompt final doit être en {TARGET_LANGUAGE} et prêt à être utilisé immédiatement par une IA. Incluez une méthodologie détaillée dans la section User et des exemples convaincants. IMPORTANT: Commencez votre réponse par un titre concis (5-8 mots maximum) en utilisant ce format EXACT :\n\nTITRE: [Votre titre concis ici]\n\nPROMPT:\n[Votre prompt complet ici]\n\nNe générez QUE le titre et le prompt - aucun méta-commentaire ou explication en dehors de cette structure.",
     
     userQueryHeader: "Veuillez générer un prompt structuré. Voici les détails :",
     rawRequestLabel: "Objectif / Demande brute de l'utilisateur :",
@@ -226,7 +230,9 @@ const metaPromptTranslations = {
     // Fixed Example Instruction - French
     mvpExampleInstruction: "Montrez le début exact du livrable attendu - les 3-5 premières lignes de sortie réelle, pas une description de processus. Exemples : Pour podcast → 'Voix 1: Bienvenue dans cette émission...', pour plan de cours → 'COURS: [Titre] | OBJECTIFS: Les apprenants seront capables de...', pour analyse → 'SYNTHÈSE EXÉCUTIVE: Cette analyse révèle...'. L'exemple doit être un échantillon direct du livrable.",
     
-    mvpFooter: "CRITIQUE: Générez UNIQUEMENT le prompt complet ci-dessus avec les sections <System>, <User>, et <Example>. N'ajoutez aucun méta-commentaire ou explication en dehors de la structure du prompt.",
+    mvpTitleInstruction: "Créez un titre concis et professionnel (5-8 mots maximum) qui résume l'objectif du prompt. Concentrez-vous sur l'action principale et le sujet. Exemples : 'Conception Cours Stratégie Marketing', 'Analyse Retours Clients', 'Création Module Formation'.",
+    
+    mvpFooter: "CRITIQUE: Fournissez d'abord le titre en utilisant le format 'TITRE: [votre titre]', puis générez le prompt complet avec les sections <System>, <User>, et <Example>. N'ajoutez aucun méta-commentaire ou explication en dehors de cette structure.",
     
     // Enhanced AGENTIC Section - French (same structure, with self-assessment)
     agenticTemplateHeader: "Pour un prompt de type \"AGENTIQUE\", générez un prompt exécutable complet avec capacités d'auto-évaluation :",
@@ -276,7 +282,9 @@ const metaPromptTranslations = {
     },
     agenticEvalTableHeader: "| Critère                       | Note (/10)   | Justification de la Note | Suggestions Concrètes d'Amélioration |\n    |-------------------------------|--------------|--------------------------|--------------------------------------|",
     agenticSelfAssessmentQuestion2: "Après avoir présenté l'évaluation, l'IA **doit également demander à l'utilisateur textuellement** :\n    \"Sur la base de l'évaluation ci-dessus, souhaitez-vous que j'essaie d'améliorer le brouillon ? (Oui/Non)\"",
-    agenticFooter: "CRITIQUE: Générez UNIQUEMENT le prompt complet ci-dessus avec les sections Titre, <System>, <User>, et <Example>. N'ajoutez aucun méta-commentaire ou explication en dehors de la structure du prompt.",
+    agenticTitleInstruction: "Créez un titre concis et professionnel (5-8 mots maximum) qui capture l'objectif du prompt agentique. Concentrez-vous sur le but analytique ou créatif principal. Exemples : 'Outil Analyse Marketing Stratégique', 'Constructeur Module Apprentissage', 'Assistant Création Contenu'.",
+    
+    agenticFooter: "CRITIQUE: Fournissez d'abord le titre en utilisant le format 'TITRE: [votre titre]', puis générez le prompt complet avec les sections <System>, <User>, et <Example>. N'ajoutez aucun méta-commentaire ou explication en dehors de cette structure.",
   }
 };
 
@@ -397,6 +405,71 @@ function generatePromptTitle(params: GeneratePromptParams, language: string): st
 }
 
 /**
+ * Parse AI response to extract title and prompt content
+ */
+function parseAIResponse(response: string, language: string): { title: string; prompt: string } {
+  try {
+    // Look for both TITLE: and TITRE: patterns (bilingual support)
+    const titlePattern = language === 'fr' 
+      ? /^TITRE:\s*(.+?)(?:\n|$)/im 
+      : /^TITLE:\s*(.+?)(?:\n|$)/im;
+    
+    // Also try the other language as fallback
+    const fallbackTitlePattern = language === 'fr' 
+      ? /^TITLE:\s*(.+?)(?:\n|$)/im 
+      : /^TITRE:\s*(.+?)(?:\n|$)/im;
+    
+    // Look for PROMPT: section
+    const promptPattern = /PROMPT:\s*([\s\S]*?)(?:\n\n---|\n\nFin|$)/i;
+    
+    // Extract title
+    let titleMatch = titlePattern.exec(response) || fallbackTitlePattern.exec(response);
+    let title = '';
+    
+    if (titleMatch && titleMatch[1]) {
+      title = titleMatch[1].trim();
+      // Clean up title
+      title = title.replace(/['"\"]/g, '').trim();
+      // Ensure reasonable length
+      if (title.length > 80) {
+        title = title.substring(0, 77) + '...';
+      }
+      // Validate title has content
+      if (title.length < 3) {
+        title = '';
+      }
+    }
+    
+    // Extract prompt content
+    let promptMatch = promptPattern.exec(response);
+    let prompt = '';
+    
+    if (promptMatch && promptMatch[1]) {
+      prompt = promptMatch[1].trim();
+    } else {
+      // Fallback: if no PROMPT: section found, use everything after title
+      const titleEnd = titleMatch ? titleMatch.index + titleMatch[0].length : 0;
+      prompt = response.substring(titleEnd).trim();
+      // Remove any remaining PROMPT: prefix
+      prompt = prompt.replace(/^PROMPT:\s*/i, '').trim();
+    }
+    
+    // Validate prompt has content
+    if (!prompt || prompt.length < 50) {
+      // If parsing failed, use original response as prompt
+      prompt = response;
+    }
+    
+    return { title, prompt };
+    
+  } catch (error) {
+    console.error('Error parsing AI response:', error);
+    // Return original response as prompt with empty title
+    return { title: '', prompt: response };
+  }
+}
+
+/**
  * Build prompt query based on parameters
  */
 function buildPromptQuery(params: GeneratePromptParams, tMeta: any): { systemInstruction: string; userQuery: string } {
@@ -440,6 +513,8 @@ ${tMeta.constructPromptInstruction}
     userQuery += `
 ${tMeta.mvpTemplateHeader}
 
+${tMeta.mvpTitleInstruction}
+
 ${tMeta.mvpGenerateInstruction}
 
 <System>:
@@ -482,9 +557,9 @@ ${tMeta.mvpFooter}
     userQuery += `
 ${tMeta.agenticTemplateHeader}
 
-${tMeta.agenticGenerateInstruction}
+${tMeta.agenticTitleInstruction}
 
-Title: ${tMeta.agenticTitleInstruction}
+${tMeta.agenticGenerateInstruction}
 
 <System>:
 ${tMeta.agenticRole.replace('{expertRolePlaceholder}', expertRole || tMeta.agenticExpertPlaceholder)} ${tMeta.agenticNote} ${language === 'fr' ? 'Votre mission est d\'' : 'Your mission is to '}${mission || tMeta.mvpMissionPlaceholder}.
@@ -622,11 +697,20 @@ export const onRequestPost = async (context: any) => {
 
     console.log('Prompt generated successfully for user:', user.userId);
 
+    // Parse AI response to extract title and prompt content
+    const { title: aiTitle, prompt: promptContent } = parseAIResponse(result.text, params.language);
+    
+    // Use AI-generated title, fallback to algorithmic generation if needed
+    let finalTitle = aiTitle;
+    if (!finalTitle || finalTitle.length < 3) {
+      console.log('AI title extraction failed, using algorithmic fallback');
+      finalTitle = generatePromptTitle(params, params.language);
+    }
+
     // Save prompt to user's library
     if (env.DB) {
       try {
         const promptId = generateUUID();
-        const title = generatePromptTitle(params, params.language);
         
         await env.DB.prepare(`
           INSERT INTO prompts (
@@ -638,9 +722,9 @@ export const onRequestPost = async (context: any) => {
         `).bind(
           promptId,
           user.userId,
-          title,
+          finalTitle,
           params.rawRequest,
-          result.text,
+          promptContent,
           params.promptType,
           params.domain,
           params.language,
@@ -660,7 +744,7 @@ export const onRequestPost = async (context: any) => {
 
     return new Response(JSON.stringify({
       success: true,
-      prompt: result.text
+      prompt: promptContent
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

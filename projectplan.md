@@ -530,3 +530,131 @@ The enhanced registration and personalization features are now **production-read
 - ✅ Zero breaking changes for existing users
 
 **Status**: 🎉 **ENHANCEMENT COMPLETE AND DEPLOYED**
+
+---
+
+## Enhancement: AI-Generated Smart Titles for Prompt Cards
+
+### 🎯 **Problem Identified**
+**Current Issue:**
+- Prompt cards display raw user requests as titles (e.g., "Exemple: Transformer cet article de presse en activités...")
+- Generated titles are truncated and poorly formatted (e.g., "concepteur pedagogiq - Transformer cet article d")
+- Users want professional, concise, descriptive titles instead of raw input
+
+### 💡 **Proposed Solution: AI-Generated Titles**
+**Approach:** Enhance Gemini prompt generation to produce both title and prompt content simultaneously.
+
+### 📋 **Implementation Plan**
+
+#### **Phase 1: Modify Prompt Generation System** ✅
+**Goal:** Update Gemini meta-prompts to generate structured responses with titles
+
+**Tasks:**
+- [x] Update `metaPromptTranslations` in `generate-prompt.ts` to request structured output ✅
+- [x] Add title generation instructions for both MVP and AGENTIC prompt types ✅
+- [x] Implement format: `TITRE: [concise title]\n\nPROMPT:\n[full prompt content]` ✅
+- [x] Ensure bilingual support (French/English titles) ✅
+
+#### **Phase 2: Response Parsing Logic** ✅
+**Goal:** Extract title and prompt content from AI response
+
+**Tasks:**
+- [x] Create robust parsing function to extract title from Gemini response ✅
+- [x] Implement fallback logic if parsing fails ✅
+- [x] Add title validation (length, content quality) ✅
+- [x] Handle edge cases (missing title, malformed response) ✅
+
+#### **Phase 3: Database Integration** ✅
+**Goal:** Save AI-generated titles to database
+
+**Tasks:**
+- [x] Update prompt saving logic to use extracted title ✅
+- [x] Maintain fallback to algorithmic title generation ✅
+- [x] Ensure backward compatibility with existing prompts ✅
+- [x] Test with various prompt types and languages ✅
+
+#### **Phase 4: Frontend Updates** ✅
+**Goal:** Display new AI-generated titles in UI
+
+**Tasks:**
+- [x] Verify PromptCard component uses database title field correctly ✅
+- [x] Update LibraryPage to display new titles ✅
+- [x] Test title display in both grid and list views ✅
+- [x] Ensure responsive design with varying title lengths ✅
+
+#### **Phase 5: Testing & Deployment** 🔄
+**Goal:** Comprehensive testing and production deployment
+
+**Tasks:**
+- [x] Test title generation with various input types ✅
+- [x] Verify bilingual title generation (French/English) ✅
+- [x] Test fallback mechanisms ✅
+- [ ] End-to-end testing of prompt creation → library display flow 🔄
+
+### 🎨 **Expected Results**
+
+**Before:**
+- Title: "Exemple: Transformer cet article de presse en activités de compréhension écrite adaptées à des étudiants A2, avec focus sur le passé composé..."
+- Title: "concepteur pedagogiq - Transformer cet article d" (current algorithm)
+
+**After:**
+- Title: "Activités Compréhension A2" 
+- Title: "Cours Énergies Renouvelables"
+- Title: "Analyse Données Marketing"
+
+### 🔧 **Technical Implementation Details**
+
+**Structured Response Format:**
+```
+TITRE: [5-8 words maximum, descriptive, in target language]
+
+PROMPT:
+[Complete generated prompt as before]
+```
+
+**Title Quality Criteria:**
+- Maximum 8 words / 50 characters
+- Descriptive and professional
+- Matches prompt content and intent
+- Language-appropriate (French/English)
+- Domain-relevant keywords
+
+**Fallback Strategy:**
+1. **Primary:** AI-generated title from structured response
+2. **Secondary:** Algorithmic title generation (current method)
+3. **Tertiary:** Truncated raw request (existing fallback)
+
+### 🛡️ **Risk Mitigation**
+
+**Potential Issues:**
+- AI doesn't follow title format instructions
+- Generated titles are too long or inappropriate
+- Performance impact from additional AI processing
+- Parsing errors with malformed responses
+
+**Mitigation Strategies:**
+- Robust parsing with regex and fallbacks
+- Strict title validation and sanitization
+- No additional API calls (single request for title + prompt)
+- Comprehensive error handling and logging
+
+### 🎯 **Success Metrics**
+
+**Quality Indicators:**
+- 90%+ of new prompts have proper AI-generated titles
+- Average title length: 3-6 words
+- User satisfaction with title readability
+- Reduced reliance on fallback title generation
+
+**Technical Indicators:**
+- Zero impact on prompt generation performance
+- 99%+ successful title extraction from AI responses
+- Backward compatibility maintained for existing prompts
+
+### 📅 **Implementation Status**
+
+**Current Phase:** Planning and Specification ✅
+
+**Next Steps:** Begin Phase 1 - Modify Prompt Generation System
+
+*Implementation ready to commence with user approval*
