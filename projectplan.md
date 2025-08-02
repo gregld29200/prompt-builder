@@ -294,3 +294,30 @@ User reports inconsistent library behavior:
 6. ✅ Delete functionality: Updates both local and parent state properly
 
 **Issue Status**: 🎉 **FULLY RESOLVED**
+
+---
+
+## Issue: Saved Prompts Display Empty Content
+
+### 🐛 New Issue Identified  
+User reports that while saving now works correctly:
+- ✅ Prompts are successfully saved to the library
+- ❌ Saved prompts display empty (no title, no content)
+- ❌ Library shows prompts exist but with blank information
+
+### 🔍 Investigation Plan
+- [ ] Check prompt saving logic in generate-prompt API endpoint
+- [ ] Verify database schema and field mapping between save and retrieve
+- [ ] Debug frontend prompt saving data structure
+- [ ] Test complete save flow: generate → save → retrieve → display
+- [ ] Fix empty prompt display issue
+
+### 📝 Initial Analysis
+**Pattern**: Prompts save successfully but display without content
+**Likely Causes**:
+1. Database INSERT using wrong field names during save
+2. Frontend passing incomplete data to save endpoint
+3. Mismatch between save fields and display fields in PromptCard component
+4. Database schema inconsistency
+
+*Investigation in progress...*
