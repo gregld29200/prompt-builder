@@ -391,37 +391,6 @@ export const translations = {
   }
 };
 
-// ✅ AJOUT UX: QuickStart Options pour simplifier l'étape 2
-export const QUICK_START_OPTIONS = {
-  fr: {
-    simple: {
-      title: "Création Rapide",
-      subtitle: "Générer en 30 secondes",
-      description: "Configuration automatique pour un résultat rapide",
-      icon: "⚡"
-    },
-    advanced: {
-      title: "Mode Expert", 
-      subtitle: "Contrôle total",
-      description: "Personnalisation complète de tous les paramètres",
-      icon: "🎯"
-    }
-  },
-  en: {
-    simple: {
-      title: "Quick Creation",
-      subtitle: "Generate in 30 seconds", 
-      description: "Auto-configuration for fast results",
-      icon: "⚡"
-    },
-    advanced: {
-      title: "Expert Mode",
-      subtitle: "Full control", 
-      description: "Complete customization of all parameters",
-      icon: "🎯"
-    }
-  }
-};
 
 // ✅ AJOUT UX: Helpers contextuels pour guider l'utilisateur dans l'étape 3
 export const CONTEXTUAL_HELPERS = {

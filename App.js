@@ -2,15 +2,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronRight, Copy, Save, Download, Languages, Sparkles, Brain, Check, X, AlertCircle, FileText, Clock, Star, Loader2, Trash2 } from 'lucide-react'; // Added Trash2
 // Removed type imports: PromptType, Language, Domain, Complexity, OutputLength, SavedPrompt, Translations
-import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS, QUICK_START_OPTIONS, CONTEXTUAL_HELPERS } from './constants.js';
+import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS, CONTEXTUAL_HELPERS } from './constants.js';
 import { generateStructuredPromptWithGemini } from './services/geminiService.js';
 import { AuthProvider } from './auth/AuthContext.js';
 import AuthWrapper from './auth/AuthWrapper.js';
 import UserMenu from './components/UserMenu.js';
 import LibraryPage from './components/LibraryPage.js';
-import QuickStartSelector from './components/QuickStartSelector.js';
 import ContextualHelper from './components/ContextualHelper.js';
-// FloatingLibraryButton supprimé - remplacé par bouton header
+// QuickStartSelector supprimé - trop complexe
 import apiService from './services/apiService.js';
 import { useAuth } from './auth/AuthContext.js';
 
@@ -53,9 +52,6 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
   const [savedPrompts, setSavedPrompts] = useState([]);
   const [notification, setNotification] = useState('');
   const [isLoadingPrompts, setIsLoadingPrompts] = useState(false);
-  
-  // ✅ AJOUT UX: QuickStart mode state
-  const [quickStartMode, setQuickStartMode] = useState(null);
   
   const t = translations[language];
 
@@ -102,28 +98,6 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
       recommendedType: isComplex ? 'AGENTIC' : 'MVP'
     };
   }, []);
-
-  // ✅ AJOUT UX: Fonction de gestion du QuickStart
-  const handleQuickStartMode = async (mode) => {
-    setQuickStartMode(mode);
-    if (mode === 'simple') {
-      // Auto-configuration pour mode simple
-      setPromptType(recommendedType);
-      setSelectedDomain(analyzedDomain);
-      setOutputLength('medium');
-      // Mission auto-générée à partir de la demande
-      if (!mission.trim() && rawRequest.trim()) {
-        setMission(rawRequest);
-      }
-      // Passer directement à la génération
-      setStep(4);
-      setIsGenerating(true);
-      await generatePrompt();
-    } else {
-      // Mode avancé = comportement normal vers étape 3
-      setStep(3);
-    }
-  };
 
   const handleAnalyzeRequest = () => {
     if (rawRequest.length >= MIN_RAW_REQUEST_LENGTH) {
@@ -221,8 +195,6 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
     setConstraints('');
     setGeneratedPrompt('');
     setIsGenerating(false);
-    // ✅ AJOUT UX: Reset QuickStart mode
-    setQuickStartMode(null);
   };
 
   // Back to dashboard (same as reset but explicit)
@@ -402,16 +374,7 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
         )
       ),
       step === 2 && React.createElement("div", { className: "space-y-6" },
-        // ✅ AJOUT UX: QuickStart Selector au début de l'étape 2
-        quickStartMode === null && React.createElement(QuickStartSelector, {
-          translations: { quickStart: QUICK_START_OPTIONS[language] },
-          onSelectMode: handleQuickStartMode,
-          selectedMode: quickStartMode,
-          language: language
-        }),
-        
-        // ✅ MODIFICATION UX: Afficher le contenu existant seulement en mode avancé
-        quickStartMode === 'advanced' && React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand p-6 md:p-8" },
+        React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand p-6 md:p-8" },
           React.createElement("h2", { className: "text-xl font-semibold text-brand-text mb-5 pb-2 border-b-2 border-brand-primary-accent/50" }, t.analysis.title),
           React.createElement("div", { className: "grid md:grid-cols-3 gap-4 text-center" },
             [
@@ -425,7 +388,7 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
             ))
           )
         ),
-        quickStartMode === 'advanced' && React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand p-6 md:p-8" },
+        React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand p-6 md:p-8" },
           React.createElement("h2", { className: "text-xl font-semibold text-brand-text mb-5 pb-2 border-b-2 border-brand-primary-accent/50" }, t.approach.title),
           React.createElement("div", { className: "grid md:grid-cols-2 gap-4" },
             [
