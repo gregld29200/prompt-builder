@@ -312,12 +312,52 @@ User reports that while saving now works correctly:
 - [ ] Test complete save flow: generate → save → retrieve → display
 - [ ] Fix empty prompt display issue
 
-### 📝 Initial Analysis
-**Pattern**: Prompts save successfully but display without content
-**Likely Causes**:
-1. Database INSERT using wrong field names during save
-2. Frontend passing incomplete data to save endpoint
-3. Mismatch between save fields and display fields in PromptCard component
-4. Database schema inconsistency
+### 🔍 Root Cause Analysis 
+✅ **Issue Identified**: App.js was mixing API response objects with database prompt objects
 
-*Investigation in progress...*
+**What Was Happening**:
+1. Prompts were correctly saved to database during generation ✅
+2. User clicked "Save" button in UI
+3. App.js called `apiService.createPrompt()` which returned `{success: true, message: "...", prompt: {...}}`
+4. This API response object was added directly to `savedPrompts` array via `setSavedPrompts(prev => [newPrompt, ...prev])`
+5. PromptCard tried to render API response object which had fields `['success', 'message', 'prompt']` instead of database fields `['id', 'title', 'raw_request', ...]`
+6. Result: Empty cards because `prompt.raw_request` was undefined in API response objects
+
+**Console Evidence**:
+```javascript
+// API Response Object (wrong)
+{id: undefined, title: undefined, raw_request: undefined, all_fields: ['success', 'message', 'prompt']}
+
+// Database Prompt Object (correct)  
+{id: 'bbb25...', title: 'Exemple: Je veux...', raw_request: 'Exemple: Je veux...', all_fields: ['id', 'title', 'raw_request', ...]}
+```
+
+### ✅ Fix Implemented
+**Strategy**: Since prompts are automatically saved during generation, the manual "Save" button should just refresh the prompts list.
+
+**Changes Made**:
+1. **App.js (`savePrompt` function, lines 138-151)**: 
+   - ❌ **Before**: Called `apiService.createPrompt()` and added API response to prompts array
+   - ✅ **After**: Calls `apiService.getPrompts()` to refresh the list with real database objects
+
+**Benefits**:
+- ✅ Eliminates mixing of API response and database objects
+- ✅ Ensures consistent data structure in prompts array
+- ✅ Prevents empty/undefined fields in prompt cards
+- ✅ Maintains automatic saving during generation
+- ✅ "Save" button now properly refreshes to show latest prompts
+
+### 🚀 Deployment
+- Fixed deployed to: https://68f2a965.prompt-builder-b0d.pages.dev
+- Empty prompt cards issue resolved
+- Library now displays saved prompts with correct title and content
+
+### 📋 Verification Complete
+1. ✅ Generate prompt: Works and auto-saves to database  
+2. ✅ Click Save button: Refreshes list and shows real database prompt
+3. ✅ Library navigation: Shows prompts with proper titles and content
+4. ✅ Prompt cards: Display `raw_request` as title correctly
+5. ✅ Use Prompt button: Loads `generated_prompt` content back into app
+6. ✅ Delete functionality: Removes prompts properly
+
+**Issue Status**: 🎉 **FULLY RESOLVED**
