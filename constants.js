@@ -25,7 +25,7 @@ export const translations = {
       subtitle: "Transformez vos idées en prompts structurés efficaces"
     },
     input: {
-      placeholder: "Décrivez ce que vous voulez faire avec l'IA...",
+      placeholder: "Exemple: Transformer cet article de presse en activités de compréhension écrite adaptées à des étudiants A2, avec focus sur le passé composé...",
       button: "Analyser ma demande",
       charCount: "caractères",
       minCharWarning: `Minimum ${MIN_RAW_REQUEST_LENGTH} caractères requis`
@@ -89,7 +89,14 @@ export const translations = {
     library: {
       title: "Bibliothèque de prompts",
       empty: "Aucun prompt sauvegardé",
-      close: "Fermer"
+      close: "Fermer",
+      searchPlaceholder: "Rechercher dans mes prompts...",
+      promptsAvailable: "disponible",
+      promptsAvailablePlural: "disponibles",
+      noResultsFound: "Aucun résultat trouvé",
+      noResultsMessage: "Aucun prompt ne correspond à",
+      tryOtherSearch: "Essayez un autre terme de recherche.",
+      emptyMessage: "Vous n'avez pas encore sauvegardé de prompts. Commencez par créer votre premier prompt !"
     },
     domains: {
       education: "Éducation",
@@ -200,7 +207,7 @@ export const translations = {
       subtitle: "Transform your ideas into structured, effective prompts"
     },
     input: {
-      placeholder: "Describe what you want to do with AI...",
+      placeholder: "Example: Transform this news article into reading comprehension activities adapted for A2 students, with focus on past tense...",
       button: "Analyze my request",
       charCount: "characters",
       minCharWarning: `Minimum ${MIN_RAW_REQUEST_LENGTH} characters required`
@@ -264,7 +271,14 @@ export const translations = {
     library: {
       title: "Prompt Library",
       empty: "No saved prompts",
-      close: "Close"
+      close: "Close",
+      searchPlaceholder: "Search in my prompts...",
+      promptsAvailable: "available",
+      promptsAvailablePlural: "available",
+      noResultsFound: "No results found",
+      noResultsMessage: "No prompts match",
+      tryOtherSearch: "Try a different search term.",
+      emptyMessage: "You haven't saved any prompts yet. Start by creating your first prompt!"
     },
     domains: {
       education: "Education",

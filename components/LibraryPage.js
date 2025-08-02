@@ -89,7 +89,8 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt, initialPrompt
               t.library.title
             ),
             React.createElement("p", { className: "text-brand-muted-text mt-1" },
-              filteredPrompts.length, " prompt", filteredPrompts.length !== 1 ? "s" : "", " disponible", filteredPrompts.length !== 1 ? "s" : ""
+              filteredPrompts.length, " prompt", filteredPrompts.length !== 1 ? "s" : "", " ", 
+              filteredPrompts.length !== 1 ? t.library.promptsAvailablePlural : t.library.promptsAvailable
             )
           ),
           
@@ -120,7 +121,7 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt, initialPrompt
           React.createElement(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-brand-muted-text w-5 h-5" }),
           React.createElement("input", {
             type: "text",
-            placeholder: "Rechercher dans mes prompts...",
+            placeholder: t.library.searchPlaceholder,
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
             className: "w-full pl-10 pr-4 py-3 border-2 border-gray-200/80 rounded-xl focus:border-brand-primary-accent focus:ring-2 focus:ring-brand-primary-accent/20 outline-none text-base bg-brand-card-bg shadow-sm transition-all duration-200 hover:border-gray-300"
@@ -154,12 +155,12 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt, initialPrompt
             )
           ),
           React.createElement("h3", { className: "text-xl font-semibold text-brand-text mb-2" },
-            searchTerm ? "Aucun résultat trouvé" : t.library.empty
+            searchTerm ? t.library.noResultsFound : t.library.empty
           ),
           React.createElement("p", { className: "text-brand-muted-text max-w-md mx-auto" },
             searchTerm 
-              ? `Aucun prompt ne correspond à "${searchTerm}". Essayez un autre terme de recherche.`
-              : "Vous n'avez pas encore sauvegardé de prompts. Commencez par créer votre premier prompt !"
+              ? `${t.library.noResultsMessage} "${searchTerm}". ${t.library.tryOtherSearch}`
+              : t.library.emptyMessage
           )
         ),
 
