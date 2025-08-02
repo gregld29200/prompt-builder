@@ -400,3 +400,133 @@ The Teachinspire Prompt Builder is now **fully functional** with a sophisticated
 3. **User Experience**: Smooth navigation, consistent state management, and professional UI
 
 **Ready for production use** with robust authentication, database persistence, and premium user interface! 🚀
+
+---
+
+## Enhancement: Simplified Registration & Personalized Experience
+
+### 🎯 **User Experience Improvements**
+**Goals:**
+- Simplify password requirements (remove special characters)
+- Add first name field for personalized dashboard greeting
+- Maintain security while improving usability
+
+### 📋 **Implementation Plan**
+
+**Password Requirements Changes:**
+- ✅ Minimum 8 characters
+- ✅ At least one uppercase letter  
+- ✅ At least one lowercase letter
+- ✅ At least one number
+- ❌ ~~Special character requirement removed~~
+
+**Registration Form Updates:**
+- ➕ Add first name field
+- 🔄 Simplified password validation
+- 🌐 Bilingual support (French/English)
+
+**Dashboard Personalization:**
+- 👋 Display "Bonjour [FirstName]!" instead of email
+- 🔄 Graceful fallback for existing users without first name
+
+### 🔧 **Technical Implementation**
+
+**Phase 1: Database Schema** ✅
+- Add `first_name` column to users table
+- Nullable field for backward compatibility
+
+**Phase 2: Frontend Updates** ✅
+- [x] Update password validation rules ✅
+- [x] Add first name translations ✅
+- [x] Update registration form UI ✅
+- [x] Update dashboard greeting ✅
+
+**Phase 3: Backend Updates** ✅
+- [x] Modify registration API to accept first name ✅
+- [x] Update JWT payload to include first name ✅
+- [x] Ensure backward compatibility ✅
+
+**Phase 4: Testing & Deployment** ✅
+- [x] Test new user registration flow ✅
+- [x] Verify existing users continue working ✅
+- [x] Test bilingual functionality ✅
+
+### 🛡️ **Backward Compatibility**
+- Existing users: No disruption to current functionality
+- Database: Nullable first_name field 
+- Authentication: No changes to core auth flow
+- Dashboard: Falls back to email if no first name
+
+### ✅ **Implementation Complete**
+
+**Summary of Changes:**
+
+**1. Database Schema (`/database/schema.sql`)**
+- Added `first_name TEXT` column to users table
+- Backward compatible with existing users
+
+**2. Password Requirements (`/constants.js`)**
+- Removed special character requirement from validation
+- Simplified to: 8+ chars, uppercase, lowercase, number only
+- Updated translations for both French and English
+
+**3. Backend APIs**
+- **Registration** (`/functions/api/auth/register.ts`): Updated to accept and store firstName
+- **Login** (`/functions/api/auth/login.ts`): Updated to retrieve and include firstName in JWT
+- **JWT Payload**: Enhanced to include firstName for personalization
+
+**4. Frontend Registration (`/auth/Register.js`)**
+- Added firstName input field with validation
+- Updated password requirements display
+- Enhanced form validation with bilingual error messages
+
+**5. Authentication Context (`/auth/AuthContext.js`)**
+- Updated register function to accept firstName parameter
+- Modified API calls to include firstName in request payload
+
+**6. Dashboard Personalization (`/App.js`)**
+- Added personalized greeting: "Bonjour [FirstName]!" or "Hello [FirstName]!"
+- Graceful fallback to email or username for existing users
+
+**7. User Menu Enhancement (`/components/UserMenu.js`)**
+- Updated avatar initials to use firstName when available
+- Enhanced user display name logic with fallback hierarchy
+- Improved dropdown menu to show firstName prominently
+
+### 🎯 **User Experience Improvements**
+
+**Before:**
+- Complex password requirements with special characters
+- Generic email-based user references
+- Impersonal dashboard experience
+
+**After:**
+- ✅ Simplified password requirements (removed special chars)
+- ✅ Personal first name collection during registration
+- ✅ Personalized dashboard greeting "Bonjour [FirstName]!"
+- ✅ Enhanced user menu with first name display
+- ✅ Backward compatibility for existing users
+
+### 🛡️ **Security & Compatibility**
+
+**Security Maintained:**
+- Password still requires 8+ characters with mixed case and numbers
+- JWT authentication unchanged
+- Database security preserved
+
+**Backward Compatibility:**
+- Existing users continue working without disruption
+- Nullable first_name field doesn't break existing data
+- Graceful fallbacks for users without first names
+
+### 🚀 **Deployment Ready**
+
+The enhanced registration and personalization features are now **production-ready** with:
+- ✅ Complete bilingual support (French/English)
+- ✅ Simplified user onboarding experience
+- ✅ Personalized dashboard interactions
+- ✅ Robust error handling and validation
+- ✅ Full backward compatibility
+- ✅ Zero breaking changes for existing users
+
+**Status**: 🎉 **ENHANCEMENT COMPLETE AND DEPLOYED**

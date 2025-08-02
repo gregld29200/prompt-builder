@@ -141,21 +141,23 @@ export const translations = {
           length: "Au moins 8 caractères",
           lowercase: "Une lettre minuscule",
           uppercase: "Une lettre majuscule",
-          number: "Un chiffre",
-          special: "Un caractère spécial"
+          number: "Un chiffre"
         }
       },
       fields: {
+        firstName: "Prénom",
         email: "Adresse e-mail",
         password: "Mot de passe",
         confirmPassword: "Confirmer le mot de passe"
       },
       placeholders: {
+        firstName: "Votre prénom",
         email: "votre@email.com",
         password: "Votre mot de passe",
         confirmPassword: "Confirmez votre mot de passe"
       },
       validation: {
+        firstNameRequired: "Le prénom est requis",
         emailRequired: "L'adresse e-mail est requise",
         emailInvalid: "Adresse e-mail invalide",
         passwordRequired: "Le mot de passe est requis",
@@ -323,21 +325,23 @@ export const translations = {
           length: "At least 8 characters",
           lowercase: "One lowercase letter",
           uppercase: "One uppercase letter",
-          number: "One number",
-          special: "One special character"
+          number: "One number"
         }
       },
       fields: {
+        firstName: "First Name",
         email: "Email Address",
         password: "Password",
         confirmPassword: "Confirm Password"
       },
       placeholders: {
+        firstName: "Your first name",
         email: "your@email.com",
         password: "Your password",
         confirmPassword: "Confirm your password"
       },
       validation: {
+        firstNameRequired: "First name is required",
         emailRequired: "Email address is required",
         emailInvalid: "Invalid email address",
         passwordRequired: "Password is required",

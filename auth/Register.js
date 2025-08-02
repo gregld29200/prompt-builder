@@ -5,6 +5,7 @@ import { useAuth } from './AuthContext.js';
 const Register = ({ onSwitchToLogin, translations }) => {
   const { register } = useAuth();
   const [formData, setFormData] = useState({
+    firstName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -23,13 +24,17 @@ const Register = ({ onSwitchToLogin, translations }) => {
       lowercase: /[a-z]/.test(password),
       uppercase: /[A-Z]/.test(password),
       number: /\d/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
     };
     return requirements;
   };
 
   const validateForm = () => {
     const errors = {};
+    
+    // First name validation
+    if (!formData.firstName.trim()) {
+      errors.firstName = t.auth.validation.firstNameRequired;
+    }
     
     // Email validation
     if (!formData.email) {
@@ -96,7 +101,7 @@ const Register = ({ onSwitchToLogin, translations }) => {
     setError('');
 
     try {
-      const result = await register(formData.email, formData.password);
+      const result = await register(formData.firstName, formData.email, formData.password);
       
       if (!result.success) {
         setError(result.error || t.auth.errors.registrationFailed);
@@ -126,6 +131,32 @@ const Register = ({ onSwitchToLogin, translations }) => {
 
       React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand p-8" },
         React.createElement("form", { onSubmit: handleSubmit, className: "space-y-6" },
+          // First Name field
+          React.createElement("div", null,
+            React.createElement("label", { 
+              htmlFor: "firstName", 
+              className: "block text-sm font-medium text-brand-text mb-2" 
+            }, t.auth.fields.firstName),
+            React.createElement("div", { className: "relative" },
+              React.createElement("input", {
+                id: "firstName",
+                name: "firstName",
+                type: "text",
+                autoComplete: "given-name",
+                required: true,
+                value: formData.firstName,
+                onChange: handleInputChange,
+                className: `block w-full px-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-primary-accent text-base ${
+                  validationErrors.firstName 
+                    ? 'border-brand-error focus:border-brand-error' 
+                    : 'border-gray-300 focus:border-brand-primary-accent'
+                }`,
+                placeholder: t.auth.placeholders.firstName
+              })
+            ),
+            validationErrors.firstName && React.createElement("p", { className: "mt-2 text-sm text-brand-error" }, validationErrors.firstName)
+          ),
+
           // Email field
           React.createElement("div", null,
             React.createElement("label", { 
@@ -201,7 +232,6 @@ const Register = ({ onSwitchToLogin, translations }) => {
                   { key: 'lowercase', label: t.auth.register.requirements.lowercase, met: passwordRequirements.lowercase },
                   { key: 'uppercase', label: t.auth.register.requirements.uppercase, met: passwordRequirements.uppercase },
                   { key: 'number', label: t.auth.register.requirements.number, met: passwordRequirements.number },
-                  { key: 'special', label: t.auth.register.requirements.special, met: passwordRequirements.special },
                 ].map(req => React.createElement("div", { key: req.key, className: "flex items-center gap-2" },
                   React.createElement(Check, { 
                     className: `h-3 w-3 ${req.met ? 'text-brand-success' : 'text-brand-muted-text'}` 

@@ -43,13 +43,36 @@ const UserMenu = ({ translations }) => {
   };
 
   // Get user initials for avatar
-  const getUserInitials = (email) => {
-    if (!email) return 'U';
-    const parts = email.split('@')[0].split('.');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
+  const getUserInitials = (user) => {
+    if (!user) return 'U';
+    
+    // If firstName is available, use first letter of firstName + first letter of last name (email prefix)
+    if (user.firstName) {
+      const firstNameInitial = user.firstName[0].toUpperCase();
+      if (user.email) {
+        const emailPrefix = user.email.split('@')[0];
+        const emailParts = emailPrefix.split('.');
+        // If email has multiple parts, use second part's first letter as last name initial
+        if (emailParts.length >= 2) {
+          return firstNameInitial + emailParts[1][0].toUpperCase();
+        }
+        // Otherwise use second character of first name or email prefix
+        const secondInitial = user.firstName.length > 1 ? user.firstName[1].toUpperCase() : emailPrefix[0].toUpperCase();
+        return firstNameInitial + secondInitial;
+      }
+      return firstNameInitial + (user.firstName.length > 1 ? user.firstName[1].toUpperCase() : 'U');
     }
-    return email[0].toUpperCase();
+    
+    // Fallback to email-based initials
+    if (user.email) {
+      const parts = user.email.split('@')[0].split('.');
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return user.email[0].toUpperCase();
+    }
+    
+    return 'U';
   };
 
   return React.createElement("div", { className: "relative", ref: menuRef },
@@ -62,11 +85,11 @@ const UserMenu = ({ translations }) => {
     },
       // User avatar
       React.createElement("div", { className: "w-8 h-8 bg-brand-primary-accent text-white rounded-full flex items-center justify-center text-sm font-medium" },
-        getUserInitials(user?.email)
+        getUserInitials(user)
       ),
-      // User email (hidden on mobile)
+      // User display name (hidden on mobile)
       React.createElement("span", { className: "hidden sm:block text-sm font-medium text-brand-text max-w-32 truncate" },
-        user?.email || t.auth.user.unknown
+        user?.firstName || user?.email || t.auth.user.unknown
       ),
       // Dropdown arrow
       React.createElement(ChevronDown, { 
@@ -83,7 +106,8 @@ const UserMenu = ({ translations }) => {
       // User info section
       React.createElement("div", { className: "px-4 py-3 border-b border-gray-200" },
         React.createElement("p", { className: "text-sm font-medium text-brand-text" }, t.auth.user.signedInAs),
-        React.createElement("p", { className: "text-sm text-brand-muted-text truncate" }, user?.email)
+        React.createElement("p", { className: "text-sm text-brand-text font-medium truncate" }, user?.firstName || user?.email?.split('@')[0] || t.auth.user.unknown),
+        user?.firstName && React.createElement("p", { className: "text-xs text-brand-muted-text truncate" }, user?.email)
       ),
 
       // Menu items

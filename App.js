@@ -311,6 +311,11 @@ const MainApp = () => {
     React.createElement("main", { className: "container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-3xl" },
       React.createElement("div", { className: "text-center mb-10" },
         React.createElement("h1", { className: "font-playfair text-3xl md:text-4xl font-bold text-brand-text mb-3" }, t.app.title),
+        React.createElement("p", { className: "text-brand-muted-text text-base mb-2" }, 
+          language === 'fr' 
+            ? `Bonjour ${user?.firstName || user?.email?.split('@')[0] || 'Utilisateur'}!`
+            : `Hello ${user?.firstName || user?.email?.split('@')[0] || 'User'}!`
+        ),
         React.createElement("p", { className: "text-brand-primary-accent text-lg" }, t.app.subtitle)
       ),
       step === 1 && React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand p-6 md:p-8" },

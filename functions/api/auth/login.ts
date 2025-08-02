@@ -77,7 +77,7 @@ export const onRequestPost = async (context: any) => {
     }
     
     // Find user
-    const user = await env.DB.prepare('SELECT id, email, password_hash, email_verified FROM users WHERE email = ?').bind(data.email).first();
+    const user = await env.DB.prepare('SELECT id, first_name, email, password_hash, email_verified FROM users WHERE email = ?').bind(data.email).first();
     if (!user) {
       return new Response(JSON.stringify({
         success: false,
@@ -107,7 +107,7 @@ export const onRequestPost = async (context: any) => {
     }
     
     // Create JWT
-    const token = await createJWT({ userId: user.id, email: user.email }, env.JWT_SECRET);
+    const token = await createJWT({ userId: user.id, firstName: user.first_name, email: user.email }, env.JWT_SECRET);
     
     console.log('Login successful for:', user.email);
     
@@ -116,6 +116,7 @@ export const onRequestPost = async (context: any) => {
       token,
       user: {
         id: user.id,
+        firstName: user.first_name,
         email: user.email,
         emailVerified: user.email_verified
       }
