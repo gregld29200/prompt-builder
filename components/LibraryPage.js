@@ -25,15 +25,6 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt, initialPrompt
 
   // Update local state when props change
   useEffect(() => {
-    console.log('LibraryPage: Received prompts:', initialPrompts?.length || 0);
-    if (initialPrompts?.length > 0) {
-      console.log('LibraryPage: First prompt:', {
-        id: initialPrompts[0].id,
-        title: initialPrompts[0].title,
-        raw_request: initialPrompts[0].raw_request || initialPrompts[0].rawRequest,
-        has_generated_prompt: !!(initialPrompts[0].generated_prompt || initialPrompts[0].generatedPrompt)
-      });
-    }
     setPrompts(initialPrompts);
     setIsLoading(isLoadingPrompts);
   }, [initialPrompts, isLoadingPrompts]);

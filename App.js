@@ -139,25 +139,13 @@ const MainApp = () => {
     if (!generatedPrompt) return;
     
     try {
-      const promptData = {
-        raw_request: rawRequest,
-        generated_prompt: generatedPrompt,
-        prompt_type: promptType,
-        domain: selectedDomain,
-        language: language,
-        expert_role: expertRole,
-        mission: mission,
-        constraints: constraints,
-        output_length: outputLength
-      };
-      
-      const newPrompt = await apiService.createPrompt(promptData);
-      
-      // Add to local state
-      setSavedPrompts(prev => [newPrompt, ...prev]);
+      // Since prompts are automatically saved during generation,
+      // we just need to refresh the prompts list to show the latest
+      const response = await apiService.getPrompts(1, 50);
+      setSavedPrompts(response.prompts || []);
       showNotification(t.notifications.saved, 'success');
     } catch (error) {
-      console.error("Failed to save prompt:", error);
+      console.error("Failed to refresh prompts:", error);
       showNotification(error.message || t.notifications.saveError || 'Failed to save prompt', 'error');
     }
   };

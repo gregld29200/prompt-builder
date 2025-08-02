@@ -98,18 +98,6 @@ export const onRequestGet = async (context: any) => {
     
     const prompts = results.results || [];
     
-    // Debug: Log the prompts data
-    console.log('Retrieved prompts count:', prompts.length);
-    if (prompts.length > 0) {
-      console.log('First prompt data:', {
-        id: prompts[0].id,
-        title: prompts[0].title,
-        raw_request: prompts[0].raw_request,
-        has_generated_prompt: !!prompts[0].generated_prompt,
-        generated_prompt_length: prompts[0].generated_prompt?.length || 0
-      });
-    }
-    
     // Get total count for pagination
     const countResult = await env.DB.prepare(`
       SELECT COUNT(*) as total FROM prompts WHERE user_id = ?
