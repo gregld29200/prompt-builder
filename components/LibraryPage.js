@@ -14,46 +14,47 @@ import PromptCard from './PromptCard.js';
  * - Responsive grid layout
  * - Navigation breadcrumbs
  */
-const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt }) => {
-  const { user } = useAuth();
-  const [prompts, setPrompts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt, initialPrompts = [], isLoadingPrompts = false, onRefreshPrompts, onUpdatePrompts }) => {
+  const [prompts, setPrompts] = useState(initialPrompts);
+  const [isLoading, setIsLoading] = useState(isLoadingPrompts);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   
   const t = translations;
 
-  // Load prompts on component mount
+  // Update local state when props change
   useEffect(() => {
-    const loadPrompts = async () => {
-      if (!user) return;
-      
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        const response = await apiService.getPrompts(1, 50);
-        setPrompts(response.prompts || []);
-      } catch (err) {
-        console.error('Failed to load prompts:', err);
-        setError(err.message || 'Failed to load prompts');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPrompts();
-  }, [user]);
+    setPrompts(initialPrompts);
+    setIsLoading(isLoadingPrompts);
+  }, [initialPrompts, isLoadingPrompts]);
 
   // Handle prompt deletion
   const handleDeletePrompt = async (promptId) => {
     try {
       await apiService.deletePrompt(promptId);
-      setPrompts(prev => prev.filter(prompt => prompt.id !== promptId));
+      // Update local state immediately for optimistic UI
+      const updatedPrompts = prompts.filter(prompt => prompt.id !== promptId);
+      setPrompts(updatedPrompts);
+      // Update parent state if available
+      if (onUpdatePrompts) {
+        onUpdatePrompts(updatedPrompts);
+      }
     } catch (err) {
       console.error('Failed to delete prompt:', err);
       setError(err.message || 'Failed to delete prompt');
+      // Refresh data on error to ensure consistency
+      if (onRefreshPrompts) {
+        onRefreshPrompts();
+      }
+    }
+  };
+
+  // Handle refresh when there's an error
+  const handleRefresh = () => {
+    if (onRefreshPrompts) {
+      setError(null);
+      onRefreshPrompts();
     }
   };
 
@@ -138,7 +139,11 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt }) => {
         // Error State
         error && !isLoading && React.createElement("div", { className: "bg-brand-error/10 border border-brand-error/20 rounded-lg p-6 text-center" },
           React.createElement("p", { className: "text-brand-error font-medium mb-2" }, "Erreur de chargement"),
-          React.createElement("p", { className: "text-brand-muted-text" }, error)
+          React.createElement("p", { className: "text-brand-muted-text mb-4" }, error),
+          onRefreshPrompts && React.createElement("button", {
+            onClick: handleRefresh,
+            className: "px-4 py-2 bg-brand-primary-accent text-white rounded-lg hover:bg-brand-primary-accent/90 transition-colors font-medium"
+          }, "Réessayer")
         ),
 
         // Empty State

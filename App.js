@@ -46,7 +46,7 @@ const MainApp = () => {
       setIsLoadingPrompts(true);
       try {
         const response = await apiService.getPrompts(1, 50); // Load first 50 prompts
-        setSavedPrompts(response.data || []);
+        setSavedPrompts(response.prompts || []);
       } catch (error) {
         console.error("Failed to load prompts:", error);
         showNotification(t.notifications.apiError, 'error');
@@ -264,7 +264,30 @@ const MainApp = () => {
     return React.createElement(LibraryPage, {
       translations: t,
       onNavigateBack: () => setShowLibraryPage(false),
-      onLoadPrompt: loadPromptFromLibrary
+      onLoadPrompt: loadPromptFromLibrary,
+      // Pass the prompts data and loading state from App.js
+      initialPrompts: savedPrompts,
+      isLoadingPrompts: isLoadingPrompts,
+      // Pass function to refresh prompts
+      onRefreshPrompts: () => {
+        const loadPrompts = async () => {
+          if (!user) return;
+          
+          setIsLoadingPrompts(true);
+          try {
+            const response = await apiService.getPrompts(1, 50);
+            setSavedPrompts(response.prompts || []);
+          } catch (error) {
+            console.error("Failed to load prompts:", error);
+            showNotification(t.notifications.apiError, 'error');
+          } finally {
+            setIsLoadingPrompts(false);
+          }
+        };
+        loadPrompts();
+      },
+      // Pass function to update prompts after delete
+      onUpdatePrompts: (updatedPrompts) => setSavedPrompts(updatedPrompts)
     });
   }
 

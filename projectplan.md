@@ -232,3 +232,28 @@ setPrompts(response.prompts || []);
 6. ✅ Empty states and error handling working properly
 
 The premium library feature is now **fully functional** and production-ready.
+
+---
+
+## Issue: Intermittent Library Loading Problem
+
+### 🐛 New Issue Identified  
+User reports inconsistent library behavior:
+1. ✅ First visit to library works correctly - shows saved prompts
+2. ❌ After clicking back button and returning to library → "objects signal" error  
+3. ❌ Third visit to library → shows "no prompts saved" (completely empty)
+
+### 🔍 Investigation Plan
+- [ ] Analyze navigation state management and component lifecycle
+- [ ] Check authentication token persistence across navigation  
+- [ ] Debug API call patterns and error responses
+- [ ] Test component remounting behavior when navigating back and forth
+- [ ] Implement fix for consistent library loading
+
+### 📝 Symptoms Analysis
+- **Pattern**: Works first time, fails on subsequent visits
+- **Error Type**: "objects signal" error on second visit
+- **Final State**: Empty library on third visit
+- **Navigation**: Issue triggered by back button → library button sequence
+
+*Investigation in progress...*
