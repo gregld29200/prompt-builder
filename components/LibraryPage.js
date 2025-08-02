@@ -34,7 +34,7 @@ const LibraryPage = ({ translations, onNavigateBack, onLoadPrompt }) => {
       
       try {
         const response = await apiService.getPrompts(1, 50);
-        setPrompts(response.data || []);
+        setPrompts(response.prompts || []);
       } catch (err) {
         console.error('Failed to load prompts:', err);
         setError(err.message || 'Failed to load prompts');
