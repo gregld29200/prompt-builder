@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Languages } from 'lucide-react';
 import { useAuth } from './AuthContext.js';
 import Login from './Login.js';
 import Register from './Register.js';
 import MigrationDialog from '../components/MigrationDialog.js';
 
-const AuthWrapper = ({ children, translations }) => {
+const AuthWrapper = ({ children, translations, language, onLanguageChange }) => {
   const { 
     isAuthenticated, 
     isLoading, 
@@ -15,10 +15,20 @@ const AuthWrapper = ({ children, translations }) => {
     retryMigration 
   } = useAuth();
   const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
-  const [currentLanguage, setCurrentLanguage] = useState('fr');
+  
+  // Use the language from props instead of local state
+  const currentLanguage = language || 'fr';
   
   // Get the current language translations
   const t = translations[currentLanguage];
+  
+  // Handle language toggle
+  const toggleLanguage = () => {
+    const newLanguage = currentLanguage === 'fr' ? 'en' : 'fr';
+    if (onLanguageChange) {
+      onLanguageChange(newLanguage);
+    }
+  };
 
   // Show loading spinner while checking authentication status
   if (isLoading) {
@@ -37,17 +47,30 @@ const AuthWrapper = ({ children, translations }) => {
 
   // Show authentication forms if not authenticated
   if (!isAuthenticated) {
-    if (authMode === 'login') {
-      return React.createElement(Login, {
-        onSwitchToRegister: () => setAuthMode('register'),
-        translations: t
-      });
-    } else {
-      return React.createElement(Register, {
-        onSwitchToLogin: () => setAuthMode('login'),
-        translations: t
-      });
-    }
+    const authComponent = authMode === 'login' 
+      ? React.createElement(Login, {
+          onSwitchToRegister: () => setAuthMode('register'),
+          translations: t
+        })
+      : React.createElement(Register, {
+          onSwitchToLogin: () => setAuthMode('login'),
+          translations: t
+        });
+
+    return React.createElement("div", { className: "min-h-screen bg-brand-bg" },
+      // Language toggle in top right corner
+      React.createElement("div", { className: "absolute top-4 right-4" },
+        React.createElement("button", {
+          onClick: toggleLanguage,
+          className: "flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-primary-accent/10 text-brand-primary-accent transition-colors",
+          "aria-label": currentLanguage === 'fr' ? 'Switch to English' : 'Passer au Français'
+        },
+          React.createElement(Languages, { className: "w-5 h-5" }),
+          React.createElement("span", { className: "font-medium" }, currentLanguage.toUpperCase())
+        )
+      ),
+      authComponent
+    );
   }
 
   // Show main app if authenticated

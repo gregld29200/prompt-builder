@@ -25,6 +25,7 @@ export const translations = {
       subtitle: "Transformez vos idées en prompts structurés efficaces"
     },
     input: {
+      label: "Que voulez-vous que l'IA fasse pour vous ?",
       placeholder: "Exemple: Transformer cet article de presse en activités de compréhension écrite adaptées à des étudiants A2, avec focus sur le passé composé...",
       button: "Analyser ma demande",
       charCount: "caractères",
@@ -209,6 +210,7 @@ export const translations = {
       subtitle: "Transform your ideas into structured, effective prompts"
     },
     input: {
+      label: "What do you want the AI to do for you?",
       placeholder: "Example: Transform this news article into reading comprehension activities adapted for A2 students, with focus on past tense...",
       button: "Analyze my request",
       charCount: "characters",

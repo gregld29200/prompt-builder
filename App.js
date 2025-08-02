@@ -11,9 +11,24 @@ import LibraryPage from './components/LibraryPage.js';
 import apiService from './services/apiService.js';
 import { useAuth } from './auth/AuthContext.js';
 
-const MainApp = () => {
+const MainApp = ({ initialLanguage, onLanguageChange }) => {
   const { user, logout } = useAuth();
-  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
+  const [language, setLanguage] = useState(initialLanguage || DEFAULT_LANGUAGE);
+  
+  // Update language when prop changes
+  useEffect(() => {
+    if (initialLanguage) {
+      setLanguage(initialLanguage);
+    }
+  }, [initialLanguage]);
+  
+  // Handle language change and propagate to parent
+  const handleLanguageChange = (newLanguage) => {
+    setLanguage(newLanguage);
+    if (onLanguageChange) {
+      onLanguageChange(newLanguage);
+    }
+  };
   const [step, setStep] = useState(1);
   const [rawRequest, setRawRequest] = useState('');
   const [promptType, setPromptType] = useState('MVP');
@@ -297,7 +312,7 @@ const MainApp = () => {
         }),
         React.createElement("div", { className: "flex items-center gap-4" },
           React.createElement("button", {
-            onClick: () => setLanguage(language === 'fr' ? 'en' : 'fr'),
+            onClick: () => handleLanguageChange(language === 'fr' ? 'en' : 'fr'),
             className: "flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-primary-accent/10 text-brand-primary-accent transition-colors",
             "aria-label": language === 'fr' ? 'Switch to English' : 'Passer au Français'
           },
@@ -319,12 +334,12 @@ const MainApp = () => {
         React.createElement("p", { className: "text-brand-primary-accent text-lg" }, t.app.subtitle)
       ),
       step === 1 && React.createElement("div", { className: "bg-brand-card-bg rounded-lg shadow-brand p-6 md:p-8" },
-        React.createElement("label", { htmlFor: "rawRequestInput", className: "block text-xl font-semibold text-brand-text mb-4 pb-2 border-b-2 border-brand-primary-accent/50" }, t.input.placeholder),
+        React.createElement("label", { htmlFor: "rawRequestInput", className: "block text-xl font-semibold text-brand-text mb-4 pb-2 border-b-2 border-brand-primary-accent/50" }, t.input.label),
         React.createElement("textarea", {
           id: "rawRequestInput",
           value: rawRequest,
           onChange: (e) => setRawRequest(e.target.value),
-          placeholder: language === 'fr' ? "Exemple: Je veux créer un cours interactif sur les énergies renouvelables pour des lycéens..." : "Example: I want to create an interactive lesson about renewable energy for high school students...",
+          placeholder: t.input.placeholder,
           className: "w-full h-40 p-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none resize-none font-inter text-base",
           maxLength: MAX_RAW_REQUEST_LENGTH
         }),
@@ -543,6 +558,8 @@ const MainApp = () => {
 
 // Main App component that provides authentication context
 const App = () => {
+  const [globalLanguage, setGlobalLanguage] = useState(DEFAULT_LANGUAGE);
+  
   // Make API service available globally for the auth context
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -552,9 +569,14 @@ const App = () => {
 
   return React.createElement(AuthProvider, null,
     React.createElement(AuthWrapper, { 
-      translations: translations 
+      translations: translations,
+      language: globalLanguage,
+      onLanguageChange: setGlobalLanguage
     },
-      React.createElement(MainApp)
+      React.createElement(MainApp, {
+        initialLanguage: globalLanguage,
+        onLanguageChange: setGlobalLanguage
+      })
     )
   );
 };
