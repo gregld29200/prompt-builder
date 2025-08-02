@@ -509,15 +509,21 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
           : savedPrompts.length === 0 ? React.createElement("p", { className: "text-center text-brand-muted-text py-10" }, t.library.empty)
           : React.createElement("div", { className: "space-y-3" },
             savedPrompts.map((prompt) => {
+              const title = prompt.title || '';
               const rawRequest = prompt.raw_request || prompt.rawRequest || '';
               const promptType = prompt.prompt_type || prompt.type || 'MVP';
               const domain = prompt.domain || 'other';
               const timestamp = prompt.created_at || prompt.timestamp || Date.now();
               
+              // Use proper title, fallback to truncated raw request if no title
+              const displayTitle = title || 
+                (rawRequest.length > 70 ? rawRequest.substring(0, 70) + '...' : rawRequest) || 
+                (language === 'fr' ? 'Prompt sans titre' : 'Untitled Prompt');
+              
               return React.createElement("div", { key: prompt.id, className: "border border-gray-200 rounded-lg p-4 hover:bg-brand-bg/50 transition-colors" },
                 React.createElement("div", { className: "flex justify-between items-start mb-1.5" },
                   React.createElement("p", { className: "font-semibold text-brand-text text-sm break-all mr-2 flex-grow" }, 
-                    rawRequest.substring(0, 70), rawRequest.length > 70 ? '...' : ''
+                    displayTitle
                   ),
                   React.createElement("div", { className: "flex-shrink-0 flex items-center gap-2 ml-2" },
                      React.createElement("button", { 

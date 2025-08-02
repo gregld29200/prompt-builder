@@ -292,6 +292,111 @@ function generateUUID(): string {
 }
 
 /**
+ * Generate a descriptive title for the prompt based on its parameters
+ */
+function generatePromptTitle(params: GeneratePromptParams, language: string): string {
+  const { rawRequest, domain, promptType, expertRole, mission } = params;
+  
+  // Domain-specific keywords for title generation
+  const domainKeywords = {
+    fr: {
+      education: ['Cours', 'Formation', 'Apprentissage', 'Pédagogie', 'Enseignement'],
+      technical: ['Analyse', 'Développement', 'Système', 'Solution', 'Architecture'],
+      creative: ['Création', 'Design', 'Rédaction', 'Conception', 'Innovation'],
+      analysis: ['Étude', 'Analyse', 'Évaluation', 'Rapport', 'Recherche'],
+      other: ['Projet', 'Tâche', 'Mission', 'Activité', 'Développement']
+    },
+    en: {
+      education: ['Course', 'Training', 'Learning', 'Teaching', 'Instruction'],
+      technical: ['Analysis', 'Development', 'System', 'Solution', 'Architecture'],
+      creative: ['Creation', 'Design', 'Writing', 'Conception', 'Innovation'],
+      analysis: ['Study', 'Analysis', 'Evaluation', 'Report', 'Research'],
+      other: ['Project', 'Task', 'Mission', 'Activity', 'Development']
+    }
+  };
+
+  const keywords = domainKeywords[language] || domainKeywords.en;
+  const domainWords = keywords[domain] || keywords.other;
+  
+  // Extract key concepts from rawRequest
+  let title = '';
+  
+  // Try to identify the main action/goal
+  const rawLower = rawRequest.toLowerCase();
+  
+  // Common action words that might indicate the main task
+  const actionPatterns = {
+    fr: {
+      'créer|génér|développ|concevoir|élabor': 'Création',
+      'transform|convert|adapt|modifi': 'Transformation', 
+      'analys|évalu|étudi|examin': 'Analyse',
+      'enseign|form|apprend|expliqu': 'Formation',
+      'organis|planifi|structur': 'Organisation',
+      'résoudr|répond|aider|assist': 'Assistance'
+    },
+    en: {
+      'creat|generat|develop|design|build': 'Creation',
+      'transform|convert|adapt|modif|change': 'Transformation',
+      'analyz|evaluat|study|examin|assess': 'Analysis', 
+      'teach|train|learn|explain|instruct': 'Training',
+      'organiz|plan|structur|arrang': 'Organization',
+      'solv|help|assist|support': 'Assistance'
+    }
+  };
+
+  const patterns = actionPatterns[language] || actionPatterns.en;
+  let actionWord = '';
+  
+  for (const [pattern, action] of Object.entries(patterns)) {
+    if (new RegExp(pattern, 'i').test(rawLower)) {
+      actionWord = action;
+      break;
+    }
+  }
+  
+  // Extract target subject/topic (look for key nouns)
+  const subjectMatch = rawRequest.match(/(?:cours|lesson|article|document|activité|exercise|projet|project|système|system|application|app|site|website|rapport|report|analyse|analysis|formation|training|guide|tutorial)[\s\w]*?(?:sur|about|de|on|pour|for)\s+([^,.!?]{5,30})/i);
+  const subject = subjectMatch ? subjectMatch[1].trim() : '';
+  
+  // Build title using different strategies
+  if (expertRole && mission) {
+    // Strategy 1: Use expert role and mission
+    const roleShort = expertRole.length > 20 ? expertRole.substring(0, 20) + '...' : expertRole;
+    const missionShort = mission.length > 25 ? mission.substring(0, 25) + '...' : mission;
+    title = `${roleShort} - ${missionShort}`;
+  } else if (actionWord && subject) {
+    // Strategy 2: Use detected action and subject
+    title = `${actionWord} ${subject}`;
+  } else if (actionWord) {
+    // Strategy 3: Use action word + domain
+    const domainWord = domainWords[Math.floor(Math.random() * domainWords.length)];
+    title = `${actionWord} ${domainWord}`;
+  } else if (subject) {
+    // Strategy 4: Use subject + domain word
+    const domainWord = domainWords[Math.floor(Math.random() * domainWords.length)];
+    title = `${domainWord} - ${subject}`;
+  } else {
+    // Strategy 5: Fallback to domain + type
+    const domainWord = domainWords[0];
+    title = `${domainWord} ${promptType}`;
+  }
+  
+  // Clean up and ensure proper length
+  title = title.replace(/[^\w\s\-àâäéèêëîïôöùûüÿç]/gi, '').trim();
+  if (title.length > 80) {
+    title = title.substring(0, 77) + '...';
+  }
+  
+  // Ensure minimum length
+  if (title.length < 10) {
+    const domainWord = domainWords[0];
+    title = `${domainWord} ${promptType}`;
+  }
+  
+  return title;
+}
+
+/**
  * Build prompt query based on parameters
  */
 function buildPromptQuery(params: GeneratePromptParams, tMeta: any): { systemInstruction: string; userQuery: string } {
@@ -521,8 +626,7 @@ export const onRequestPost = async (context: any) => {
     if (env.DB) {
       try {
         const promptId = generateUUID();
-        const title = params.rawRequest.substring(0, 97) + 
-                      (params.rawRequest.length > 97 ? '...' : '');
+        const title = generatePromptTitle(params, params.language);
         
         await env.DB.prepare(`
           INSERT INTO prompts (

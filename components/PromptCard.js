@@ -15,16 +15,17 @@ const PromptCard = ({ prompt, translations, viewMode = 'grid', onUsePrompt, onDe
   const t = translations;
   
   // Extract prompt data with fallbacks
+  const title = prompt.title || '';
   const rawRequest = prompt.raw_request || prompt.rawRequest || '';
   const promptType = prompt.prompt_type || prompt.type || 'MVP';
   const domain = prompt.domain || 'other';
   const timestamp = prompt.created_at || prompt.timestamp || Date.now();
   const language = prompt.language || 'fr';
   
-  // Format the display title (truncated raw request)
-  const displayTitle = rawRequest.length > 80 
-    ? rawRequest.substring(0, 80) + '...' 
-    : rawRequest || 'Prompt sans titre';
+  // Use proper title, fallback to truncated raw request if no title
+  const displayTitle = title || 
+    (rawRequest.length > 80 ? rawRequest.substring(0, 80) + '...' : rawRequest) || 
+    (language === 'fr' ? 'Prompt sans titre' : 'Untitled Prompt');
     
   // Format the date
   const formattedDate = new Date(timestamp).toLocaleDateString(language, {

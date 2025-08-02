@@ -147,14 +147,54 @@ class MigrationService {
   }
 
   /**
+   * Generate a better title for migrated prompts
+   */
+  generateMigrationTitle(oldPrompt) {
+    if (!oldPrompt.rawRequest) return 'Prompt Migré';
+    
+    const rawRequest = oldPrompt.rawRequest.toLowerCase();
+    const domain = oldPrompt.domain || 'other';
+    
+    // Simple action detection for migration
+    let actionWord = '';
+    if (/créer|génér|développ|concevoir/.test(rawRequest)) actionWord = 'Création';
+    else if (/transform|convert|adapt/.test(rawRequest)) actionWord = 'Transformation';
+    else if (/analys|évalu|étudi/.test(rawRequest)) actionWord = 'Analyse';
+    else if (/enseign|form|apprend/.test(rawRequest)) actionWord = 'Formation';
+    else if (/organis|planifi/.test(rawRequest)) actionWord = 'Organisation';
+    
+    // Domain-specific words
+    const domainWords = {
+      education: 'Cours',
+      technical: 'Solution',
+      creative: 'Création',
+      analysis: 'Analyse',
+      other: 'Projet'
+    };
+    
+    // Create title
+    let title = '';
+    if (actionWord) {
+      title = `${actionWord} ${domainWords[domain] || 'Projet'}`;
+    } else {
+      title = `${domainWords[domain] || 'Projet'} ${oldPrompt.type || 'MVP'}`;
+    }
+    
+    // Ensure reasonable length
+    if (title.length < 10) {
+      title = oldPrompt.rawRequest.substring(0, 47).trim() + (oldPrompt.rawRequest.length > 47 ? '...' : '');
+    }
+    
+    return title;
+  }
+
+  /**
    * Convert old SavedPrompt format to new API format
    */
   convertPromptFormat(oldPrompt) {
     try {
-      // Generate a title from the raw request (first 50 chars)
-      const title = oldPrompt.rawRequest 
-        ? oldPrompt.rawRequest.substring(0, 50).trim() + (oldPrompt.rawRequest.length > 50 ? '...' : '')
-        : 'Migrated Prompt';
+      // Generate a better title for the migrated prompt
+      const title = this.generateMigrationTitle(oldPrompt);
 
       // Map the old format to new API format (using snake_case as expected by API)
       const converted = {
