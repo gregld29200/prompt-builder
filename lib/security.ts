@@ -32,17 +32,17 @@ import { AUTH_CONFIG, AUTH_ERRORS, JWTManager, InputValidator, AuthUtils } from 
  * Optimized for edge environments with distributed state considerations
  */
 export const RATE_LIMIT_CONFIGS = {
-  // Authentication endpoints - most restrictive
+  // Authentication endpoints - more permissive for development
   LOGIN: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    maxRequests: 5, // 5 attempts per IP per 15 minutes
-    skipSuccessfulRequests: false,
+    windowMs: 5 * 60 * 1000, // 5 minutes (reduced window)
+    maxRequests: 20, // 20 attempts per IP per 5 minutes (increased)
+    skipSuccessfulRequests: true, // Don't count successful logins
     skipFailedRequests: false
   } as RateLimitConfig,
   
   REGISTER: {
     windowMs: 15 * 60 * 1000, // 15 minutes  
-    maxRequests: 10, // 10 registrations per IP per 15 minutes (more generous for testing)
+    maxRequests: 20, // 20 registrations per IP per 15 minutes (increased)
     skipSuccessfulRequests: true, // Don't count successful registrations
     skipFailedRequests: false
   } as RateLimitConfig,
