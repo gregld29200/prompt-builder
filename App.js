@@ -163,6 +163,28 @@ const MainApp = () => {
     URL.revokeObjectURL(url);
   };
 
+  // Reset form to start a new prompt
+  const resetForm = () => {
+    setStep(1);
+    setRawRequest('');
+    setPromptType('MVP');
+    setAnalyzedDomain('other');
+    setAnalyzedComplexity('simple');
+    setRecommendedType('MVP');
+    setSelectedDomain('education');
+    setOutputLength('medium');
+    setExpertRole('');
+    setMission('');
+    setConstraints('');
+    setGeneratedPrompt('');
+    setIsGenerating(false);
+  };
+
+  // Back to dashboard (same as reset but explicit)
+  const backToDashboard = () => {
+    resetForm();
+  };
+
   // Function to handle navigation to step 3 with auto-fill
   const goToStep3WithAutoFill = () => {
     // Auto-fill mission with rawRequest if mission is empty
@@ -371,10 +393,16 @@ const MainApp = () => {
             ))
           ),
           React.createElement("div", { className: "flex justify-between items-center mt-6" },
-            React.createElement("button", {
-              onClick: () => setStep(1),
-              className: "px-5 py-2.5 border-2 border-gray-300 text-brand-muted-text rounded-lg font-semibold hover:bg-gray-100 hover:border-gray-400 transition-colors text-sm"
-            }, t.variables.back),
+            React.createElement("div", { className: "flex gap-3" },
+              React.createElement("button", {
+                onClick: () => setStep(1),
+                className: "px-5 py-2.5 border-2 border-gray-300 text-brand-muted-text rounded-lg font-semibold hover:bg-gray-100 hover:border-gray-400 transition-colors text-sm"
+              }, t.variables.back),
+              React.createElement("button", {
+                onClick: backToDashboard,
+                className: "px-5 py-2.5 border-2 border-brand-error text-brand-error rounded-lg font-semibold hover:bg-brand-error hover:text-white transition-colors text-sm"
+              }, t.actions.backToDashboard)
+            ),
             React.createElement("button", {
               onClick: goToStep3WithAutoFill,
               className: "px-5 py-2.5 bg-brand-primary-accent text-white rounded-lg font-semibold hover:bg-opacity-80 transition-all flex items-center gap-2 text-sm"
@@ -425,7 +453,13 @@ const MainApp = () => {
           ))
         ),
         React.createElement("div", { className: "flex justify-between items-center mt-6" },
-          React.createElement("button", { onClick: () => setStep(2), className: "px-5 py-2.5 border-2 border-gray-300 text-brand-muted-text rounded-lg font-semibold hover:bg-gray-100 hover:border-gray-400 transition-colors text-sm" }, t.variables.back),
+          React.createElement("div", { className: "flex gap-3" },
+            React.createElement("button", { onClick: () => setStep(2), className: "px-5 py-2.5 border-2 border-gray-300 text-brand-muted-text rounded-lg font-semibold hover:bg-gray-100 hover:border-gray-400 transition-colors text-sm" }, t.variables.back),
+            React.createElement("button", {
+              onClick: backToDashboard,
+              className: "px-5 py-2.5 border-2 border-brand-error text-brand-error rounded-lg font-semibold hover:bg-brand-error hover:text-white transition-colors text-sm"
+            }, t.actions.backToDashboard)
+          ),
           React.createElement("button", { onClick: handleGeneratePrompt, className: "px-5 py-2.5 bg-brand-primary-accent text-white rounded-lg font-semibold hover:bg-opacity-80 transition-all flex items-center gap-2 text-sm" },
             t.actions.generate, React.createElement(ChevronRight, { className: "w-4 h-4" })
           )
@@ -445,7 +479,13 @@ const MainApp = () => {
             React.createElement("button", { onClick: savePrompt, className: "w-full px-4 py-2.5 border-2 border-brand-primary-accent text-brand-primary-accent rounded-lg font-semibold hover:bg-brand-primary-accent hover:text-white transition-colors flex items-center justify-center gap-2 text-sm" }, React.createElement(Save, { className: "w-4 h-4" }), t.actions.save),
             React.createElement("button", { onClick: exportPrompt, className: "w-full px-4 py-2.5 border-2 border-brand-primary-accent text-brand-primary-accent rounded-lg font-semibold hover:bg-brand-primary-accent hover:text-white transition-colors flex items-center justify-center gap-2 text-sm" }, React.createElement(Download, { className: "w-4 h-4" }), t.actions.export)
           ),
-          React.createElement("button", { onClick: resetForm, className: "w-full mt-4 px-5 py-3 bg-brand-secondary-accent text-brand-text rounded-lg font-semibold hover:bg-opacity-80 transition-all text-base" }, t.actions.newPrompt)
+          React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4" },
+            React.createElement("button", { onClick: resetForm, className: "w-full px-5 py-3 bg-brand-secondary-accent text-brand-text rounded-lg font-semibold hover:bg-opacity-80 transition-all text-base" }, t.actions.newPrompt),
+            React.createElement("button", { 
+              onClick: backToDashboard, 
+              className: "w-full px-5 py-3 border-2 border-brand-error text-brand-error rounded-lg font-semibold hover:bg-brand-error hover:text-white transition-colors text-base" 
+            }, t.actions.backToDashboardFull)
+          )
         )
       )
     ), // End of main element

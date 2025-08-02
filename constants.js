@@ -82,7 +82,9 @@ export const translations = {
       copyError: "Erreur de copie",
       savedSuccess: "Sauvegardé!",
       usePrompt: "Utiliser",
-      delete: "Supprimer"
+      delete: "Supprimer",
+      backToDashboard: "Tableau de bord",
+      backToDashboardFull: "Retour tableau de bord"
     },
     library: {
       title: "Bibliothèque de prompts",
@@ -255,7 +257,9 @@ export const translations = {
       copyError: "Copy failed",
       savedSuccess: "Saved!",
       usePrompt: "Use",
-      delete: "Delete"
+      delete: "Delete",
+      backToDashboard: "Dashboard",
+      backToDashboardFull: "Back to Dashboard"
     },
     library: {
       title: "Prompt Library",
