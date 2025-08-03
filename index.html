@@ -138,6 +138,85 @@
             gap: 20px;
         }
 
+        /* Language Selector */
+        .language-selector {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: rgba(133, 162, 163, 0.1);
+            border: 1px solid rgba(133, 162, 163, 0.2);
+            color: var(--brand-text);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .language-toggle:hover {
+            background: rgba(133, 162, 163, 0.15);
+            border-color: var(--brand-accent);
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid rgba(133, 162, 163, 0.2);
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            z-index: 1001;
+            min-width: 120px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .language-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .language-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--brand-text);
+            cursor: pointer;
+            transition: background 0.3s var(--ease-smooth);
+            border-radius: 6px;
+            margin: 4px;
+        }
+
+        .language-option:hover {
+            background: rgba(133, 162, 163, 0.1);
+        }
+
+        .language-option.active {
+            background: rgba(133, 162, 163, 0.15);
+            font-weight: 600;
+        }
+
+        .flag-icon {
+            width: 20px;
+            height: 15px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
         .nav-link {
             color: var(--brand-text);
             text-decoration: none;
@@ -1210,9 +1289,31 @@
                  class="logo">
             
             <div class="nav-actions">
-                <a href="https://www.teachinspire.me" class="nav-link">Formation IA</a>
-                <a href="#" class="btn-connexion" onclick="scrollToApp()">Connexion</a>
-                <a href="#app" class="btn-primary-nav">Tester gratuitement</a>
+                <a href="https://www.teachinspire.me" class="nav-link" data-translate="nav.formation">Formation IA</a>
+                
+                <!-- Language Selector -->
+                <div class="language-selector">
+                    <div class="language-toggle" onclick="toggleLanguageDropdown()">
+                        <span class="flag-icon" id="currentFlag">🇫🇷</span>
+                        <span id="currentLang">FR</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="language-dropdown" id="languageDropdown">
+                        <div class="language-option active" onclick="setLanguage('fr')" data-lang="fr">
+                            <span class="flag-icon">🇫🇷</span>
+                            <span>Français</span>
+                        </div>
+                        <div class="language-option" onclick="setLanguage('en')" data-lang="en">
+                            <span class="flag-icon">🇺🇸</span>
+                            <span>English</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="#" class="btn-connexion" onclick="scrollToApp()" data-translate="nav.login">Connexion</a>
+                <a href="#app" class="btn-primary-nav" data-translate="nav.tryFree">Tester gratuitement</a>
             </div>
 
             <!-- Mobile menu toggle -->
@@ -1250,8 +1351,8 @@
                     </svg>
                     Prompt Builder TeachInspire
                 </div>
-                <h1 class="hero-title">Créez des prompts IA structurés en quelques clics</h1>
-                <p class="hero-subtitle">
+                <h1 class="hero-title" data-translate="hero.title">Créez des prompts IA structurés en quelques clics</h1>
+                <p class="hero-subtitle" data-translate="hero.subtitle">
                     Transformez vos idées en instructions précises compatibles avec n'importe quel outil d'intelligence artificielle
                 </p>
                 <div class="hero-cta-group">
