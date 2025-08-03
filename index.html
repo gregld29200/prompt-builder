@@ -856,6 +856,26 @@
             transition: all 0.3s var(--ease-smooth);
         }
 
+        .step-number {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 28px;
+            height: 28px;
+            background: var(--brand-white);
+            border: 2px solid var(--brand-text);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--brand-text);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s var(--ease-smooth);
+            z-index: 10;
+        }
+
         .process-step:hover .step-icon {
             transform: scale(1.08) rotate(3deg);
             box-shadow: var(--shadow-lg);
@@ -884,6 +904,35 @@
         .process-step:nth-child(4):hover .step-icon {
             border-color: var(--brand-accent-light);
             box-shadow: 0 8px 25px rgba(133, 162, 163, 0.3);
+        }
+
+        /* Numéros avec couleurs de marque au hover */
+        .process-step:nth-child(1):hover .step-number {
+            background: var(--brand-accent);
+            border-color: var(--brand-accent);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .process-step:nth-child(2):hover .step-number {
+            background: var(--brand-gold);
+            border-color: var(--brand-gold);
+            color: var(--brand-text);
+            transform: scale(1.1);
+        }
+
+        .process-step:nth-child(3):hover .step-number {
+            background: var(--brand-gold);
+            border-color: var(--brand-gold);
+            color: var(--brand-text);
+            transform: scale(1.1);
+        }
+
+        .process-step:nth-child(4):hover .step-number {
+            background: var(--brand-accent);
+            border-color: var(--brand-accent);
+            color: white;
+            transform: scale(1.1);
         }
 
         .step-content {
@@ -1513,6 +1562,7 @@
                 <div class="process-step scroll-reveal">
                     <div class="step-icon">
                         <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/83df86f3-3278-4160-87cc-ddebab94ac00/public" alt="Étape 1" class="step-icon-image" />
+                        <div class="step-number">1</div>
                     </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.0.title">Décrivez votre objectif</h3>
@@ -1526,6 +1576,7 @@
                 <div class="process-step scroll-reveal">
                     <div class="step-icon">
                         <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/45b7d16c-8315-4b74-eb09-d171e5471700/public" alt="Étape 2" class="step-icon-image" />
+                        <div class="step-number">2</div>
                     </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.1.title">Analyse intelligente</h3>
@@ -1539,6 +1590,7 @@
                 <div class="process-step scroll-reveal">
                     <div class="step-icon">
                         <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/c4522fa4-3291-4d0d-4ecf-1d36adffcd00/public" alt="Étape 3" class="step-icon-image" />
+                        <div class="step-number">3</div>
                     </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.2.title">Personnalisation</h3>
@@ -1552,6 +1604,7 @@
                 <div class="process-step scroll-reveal">
                     <div class="step-icon">
                         <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/7024b639-ef35-4648-1bca-3a125c811900/public" alt="Étape 4" class="step-icon-image" />
+                        <div class="step-number">4</div>
                     </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.3.title">Prompt prêt à l'emploi</h3>
