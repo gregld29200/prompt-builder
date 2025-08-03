@@ -856,22 +856,28 @@
             transition: all 0.3s var(--ease-smooth);
         }
 
-        .step-number-badge {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, var(--brand-text), var(--brand-text-light));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+        .step-number {
+            font-size: 1.4rem;
             font-weight: 800;
-            color: var(--brand-white);
-            box-shadow: var(--shadow-md);
-            margin: 0 auto 15px;
+            margin-right: 8px;
             transition: all 0.3s var(--ease-smooth);
-            position: relative;
-            z-index: 5;
+        }
+
+        /* Couleurs alternées pour les numéros */
+        .process-step:nth-child(1) .step-number {
+            color: var(--brand-accent);
+        }
+
+        .process-step:nth-child(2) .step-number {
+            color: var(--brand-gold);
+        }
+
+        .process-step:nth-child(3) .step-number {
+            color: var(--brand-gold);
+        }
+
+        .process-step:nth-child(4) .step-number {
+            color: var(--brand-accent);
         }
 
         .process-step:hover .step-icon {
@@ -904,31 +910,10 @@
             box-shadow: 0 8px 25px rgba(133, 162, 163, 0.3);
         }
 
-        /* Badges numérotés avec couleurs de marque au hover */
-        .process-step:nth-child(1):hover .step-number-badge {
-            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
-            transform: scale(1.1) rotate(-5deg);
-            box-shadow: 0 8px 25px rgba(133, 162, 163, 0.4);
-        }
-
-        .process-step:nth-child(2):hover .step-number-badge {
-            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
-            color: var(--brand-text);
-            transform: scale(1.1) rotate(-5deg);
-            box-shadow: 0 8px 25px rgba(241, 210, 99, 0.4);
-        }
-
-        .process-step:nth-child(3):hover .step-number-badge {
-            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
-            color: var(--brand-text);
-            transform: scale(1.1) rotate(-5deg);
-            box-shadow: 0 8px 25px rgba(241, 210, 99, 0.4);
-        }
-
-        .process-step:nth-child(4):hover .step-number-badge {
-            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
-            transform: scale(1.1) rotate(-5deg);
-            box-shadow: 0 8px 25px rgba(133, 162, 163, 0.4);
+        /* Effets hover pour les numéros */
+        .process-step:hover .step-number {
+            transform: scale(1.1);
+            text-shadow: 0 0 8px currentColor;
         }
 
         .step-content {
@@ -1556,12 +1541,11 @@
             
             <div class="process-steps">
                 <div class="process-step scroll-reveal">
-                    <div class="step-number-badge">1</div>
                     <div class="step-icon">
                         <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/83df86f3-3278-4160-87cc-ddebab94ac00/public" alt="Étape 1" class="step-icon-image" />
                     </div>
                     <div class="step-content">
-                        <h3 class="step-title" data-translate="process.steps.0.title">Décrivez votre objectif</h3>
+                        <h3 class="step-title"><span class="step-number">1.</span> <span data-translate="process.steps.0.title">Décrivez votre objectif</span></h3>
                         <p class="step-description" data-translate="process.steps.0.description">
                             Exprimez simplement ce que vous voulez créer. 
                             Notre IA comprend le langage naturel, pas besoin d'être technique !
@@ -1570,12 +1554,11 @@
                 </div>
                 
                 <div class="process-step scroll-reveal">
-                    <div class="step-number-badge">2</div>
                     <div class="step-icon">
                         <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/45b7d16c-8315-4b74-eb09-d171e5471700/public" alt="Étape 2" class="step-icon-image" />
                     </div>
                     <div class="step-content">
-                        <h3 class="step-title" data-translate="process.steps.1.title">Analyse intelligente</h3>
+                        <h3 class="step-title"><span class="step-number">2.</span> <span data-translate="process.steps.1.title">Analyse intelligente</span></h3>
                         <p class="step-description" data-translate="process.steps.1.description">
                             L'outil analyse votre demande et recommande automatiquement 
                             l'approche optimale (MVP ou Agentique)
@@ -1584,12 +1567,11 @@
                 </div>
                 
                 <div class="process-step scroll-reveal">
-                    <div class="step-number-badge">3</div>
                     <div class="step-icon">
                         <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/c4522fa4-3291-4d0d-4ecf-1d36adffcd00/public" alt="Étape 3" class="step-icon-image" />
                     </div>
                     <div class="step-content">
-                        <h3 class="step-title" data-translate="process.steps.2.title">Personnalisation</h3>
+                        <h3 class="step-title"><span class="step-number">3.</span> <span data-translate="process.steps.2.title">Personnalisation</span></h3>
                         <p class="step-description" data-translate="process.steps.2.description">
                             Affinez les paramètres : niveau de détail, format de sortie, 
                             contraintes spécifiques selon vos besoins
@@ -1598,12 +1580,11 @@
                 </div>
                 
                 <div class="process-step scroll-reveal">
-                    <div class="step-number-badge">4</div>
                     <div class="step-icon">
                         <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/7024b639-ef35-4648-1bca-3a125c811900/public" alt="Étape 4" class="step-icon-image" />
                     </div>
                     <div class="step-content">
-                        <h3 class="step-title" data-translate="process.steps.3.title">Prompt prêt à l'emploi</h3>
+                        <h3 class="step-title"><span class="step-number">4.</span> <span data-translate="process.steps.3.title">Prompt prêt à l'emploi</span></h3>
                         <p class="step-description" data-translate="process.steps.3.description">
                             Récupérez votre prompt optimisé, testez-le et utilisez-le 
                             avec ChatGPT, Claude, Gemini ou tout autre outil IA
