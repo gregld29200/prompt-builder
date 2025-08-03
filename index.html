@@ -35,19 +35,6 @@
             }
         }
     </script>
-    <script type="importmap">
-    {
-        "imports": {
-            "react": "https://esm.sh/react@^19.0.0",
-            "react-dom/client": "https://esm.sh/react-dom@^19.0.0/client",
-            "react-dom/": "https://esm.sh/react-dom@^19.0.0/",
-            "react/": "https://esm.sh/react@^19.0.0/",
-            "lucide-react": "https://esm.sh/lucide-react@^0.511.0",
-            "@google/genai": "https://esm.sh/@google/genai@^1.1.0",
-            "lucide": "https://esm.sh/lucide@^0.511.0"
-        }
-    }
-    </script>
     
     <style>
         :root {
@@ -1215,13 +1202,6 @@
             outline-offset: 2px;
         }
 
-        /* ===== APP CONTAINER ===== */
-        #app {
-            min-height: 100vh;
-            width: 100%;
-            background: var(--brand-bg);
-            padding: 40px 20px;
-        }
 
         /* ===== RESPONSIVE DESIGN ===== */
         @media (max-width: 1024px) {
@@ -1378,8 +1358,8 @@
                     </div>
                 </div>
                 
-                <a href="#" class="btn-connexion" onclick="scrollToApp()" data-translate="nav.login">Connexion</a>
-                <a href="#app" class="btn-primary-nav" data-translate="nav.tryFree">Tester gratuitement</a>
+                <a href="app.html" class="btn-connexion" data-translate="nav.login">Connexion</a>
+                <a href="app.html" class="btn-primary-nav" data-translate="nav.tryFree">Tester gratuitement</a>
             </div>
 
             <!-- Mobile menu toggle -->
@@ -1394,8 +1374,8 @@
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-nav-actions">
                 <a href="https://www.teachinspire.me" class="nav-link" data-translate="nav.formation">Formation IA</a>
-                <a href="#" class="btn-connexion" onclick="scrollToApp()" data-translate="nav.login">Connexion</a>
-                <a href="#app" class="btn-primary-nav" data-translate="nav.tryFree">Tester gratuitement</a>
+                <a href="app.html" class="btn-connexion" data-translate="nav.login">Connexion</a>
+                <a href="app.html" class="btn-primary-nav" data-translate="nav.tryFree">Tester gratuitement</a>
             </div>
         </div>
     </nav>
@@ -1422,7 +1402,7 @@
                     Transformez vos idées en instructions précises compatibles avec n'importe quel outil d'intelligence artificielle
                 </p>
                 <div class="hero-cta-group">
-                    <a href="#app" class="cta-primary">
+                    <a href="app.html" class="cta-primary">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
                         </svg>
@@ -1435,7 +1415,7 @@
                 <div class="login-hint">
                     <div class="login-hint-text">
                         <span data-translate="hero.loginHint">Vous avez déjà un compte ?</span> 
-                        <a href="#" class="login-hint-link" onclick="scrollToApp()" data-translate="hero.loginLink">Connectez-vous ici</a> 
+                        <a href="app.html" class="login-hint-link" data-translate="hero.loginLink">Connectez-vous ici</a> 
                         <span data-translate="hero.orText">ou testez gratuitement en créant un compte</span>
                     </div>
                 </div>
@@ -1730,8 +1710,6 @@
         </div>
     </section>
 
-    <!-- Application Integration Point -->
-    <div id="app"></div>
 
     <!-- Enhanced Footer -->
     <footer class="footer">
@@ -1996,10 +1974,14 @@
             // Close dropdown
             document.getElementById('languageDropdown').classList.remove('active');
             
-            // Notify React app of language change
-            if (window.setAppLanguage) {
-                window.setAppLanguage(lang);
-            }
+            // Update all app.html links to include language parameter
+            updateAppLinks(lang);
+        }
+
+        function updateAppLinks(lang) {
+            document.querySelectorAll('a[href="app.html"]').forEach(link => {
+                link.href = `app.html?lang=${lang}`;
+            });
         }
 
         function updateLanguageUI() {
@@ -2053,6 +2035,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageUI();
             translatePage();
+            updateAppLinks(currentLanguage);
         });
 
         // Enhanced scroll reveal animation
@@ -2101,17 +2084,6 @@
             }
         });
 
-        // Function to scroll to app section
-        function scrollToApp() {
-            document.getElementById('app').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-            
-            // Close mobile menu if open
-            mobileMenu.classList.remove('active');
-            mobileMenuToggle.classList.remove('active');
-        }
 
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -2174,6 +2146,5 @@
         });
     </script>
     
-    <script type="module" src="index.js"></script>
 </body>
 </html>

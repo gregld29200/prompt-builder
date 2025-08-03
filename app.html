@@ -1,10 +1,11 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teachinspire Prompt Builder</title>
+  <title>Prompt Builder TeachInspire - Application</title>
+  <link rel="icon" type="image/png" href="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/134736d6-5e59-461d-8594-dbd8c8d6c400/public">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&family=Courier+New:wght@500&display=swap" rel="stylesheet">
   <script>
@@ -18,9 +19,9 @@
             'brand-secondary-accent': '#f1d263',
             'brand-card-bg': '#ffffff',
             'brand-muted-text': '#6b7280',
-            'brand-error': '#ef4444', // Red-500 for errors
-            'brand-success': '#10b981', // Green-500 for success
-            'brand-info': '#3b82f6', // Blue-500 for info
+            'brand-error': '#ef4444',
+            'brand-success': '#10b981',
+            'brand-info': '#3b82f6',
           },
           fontFamily: {
             'playfair': ['Playfair Display', 'serif'],
@@ -35,22 +36,22 @@
       }
     }
   </script>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@^19.0.0/client",
-    "react-dom/": "https://esm.sh/react-dom@^19.0.0/",
-    "react/": "https://esm.sh/react@^19.0.0/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.511.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.1.0",
-    "lucide": "https://esm.sh/lucide@^0.511.0"
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@^19.0.0",
+      "react-dom/client": "https://esm.sh/react-dom@^19.0.0/client",
+      "react-dom/": "https://esm.sh/react-dom@^19.0.0/",
+      "react/": "https://esm.sh/react@^19.0.0/",
+      "lucide-react": "https://esm.sh/lucide-react@^0.511.0",
+      "@google/genai": "https://esm.sh/@google/genai@^1.1.0",
+      "lucide": "https://esm.sh/lucide@^0.511.0"
+    }
   }
-}
-</script>
+  </script>
 </head>
 <body class="bg-brand-bg">
   <div id="root"></div>
-  <script type="module" src="index.js"></script>
+  <script type="module" src="app-entry.js"></script>
 </body>
 </html>

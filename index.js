@@ -14,13 +14,25 @@ window.setAppLanguage = (language) => {
 
 // Enhanced App wrapper to handle language synchronization
 const AppWithLanguageSync = () => {
-  const [initialLanguage, setInitialLanguage] = React.useState(
-    localStorage.getItem('preferred-language') || 'fr'
-  );
+  // Get current language from landing page or localStorage
+  const getCurrentLanguage = () => {
+    const urlLang = new URLSearchParams(window.location.search).get('lang');
+    const storedLang = localStorage.getItem('preferred-language');
+    const htmlLang = document.documentElement.lang;
+    return urlLang || storedLang || htmlLang || 'fr';
+  };
+
+  const [initialLanguage, setInitialLanguage] = React.useState(getCurrentLanguage());
 
   React.useEffect(() => {
     // Register callback for language changes from landing page
     appLanguageCallback = setInitialLanguage;
+    
+    // Sync with landing page language on mount
+    const currentLandingLang = getCurrentLanguage();
+    if (currentLandingLang !== initialLanguage) {
+      setInitialLanguage(currentLandingLang);
+    }
     
     // Clean up on unmount
     return () => {
@@ -33,6 +45,8 @@ const AppWithLanguageSync = () => {
     onLanguageChange: (newLang) => {
       setInitialLanguage(newLang);
       localStorage.setItem('preferred-language', newLang);
+      // Also update the HTML lang attribute
+      document.documentElement.lang = newLang;
     }
   });
 };
