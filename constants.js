@@ -173,6 +173,46 @@ export const translations = {
         networkError: "Erreur réseau. Vérifiez votre connexion.",
         serverError: "Erreur serveur. Veuillez réessayer plus tard."
       },
+      forgotPassword: {
+        title: "Mot de passe oublié",
+        subtitle: "Entrez votre adresse e-mail pour recevoir un lien de réinitialisation",
+        emailLabel: "Adresse e-mail",
+        emailPlaceholder: "votre@email.com",
+        emailRequired: "L'adresse e-mail est requise",
+        sendButton: "Envoyer le lien",
+        sending: "Envoi en cours...",
+        backToLogin: "Retour à la connexion",
+        successTitle: "E-mail envoyé !",
+        successMessage: "Si cette adresse e-mail existe dans notre système, vous recevrez un lien de réinitialisation dans quelques minutes.",
+        errorGeneric: "Une erreur s'est produite. Veuillez réessayer."
+      },
+      resetPassword: {
+        title: "Nouveau mot de passe",
+        subtitle: "Saisissez votre nouveau mot de passe",
+        passwordLabel: "Nouveau mot de passe",
+        passwordPlaceholder: "Votre nouveau mot de passe",
+        confirmPasswordLabel: "Confirmer le mot de passe",
+        confirmPasswordPlaceholder: "Confirmez votre nouveau mot de passe",
+        resetButton: "Réinitialiser le mot de passe",
+        resetting: "Réinitialisation...",
+        backToLogin: "Retour à la connexion",
+        successTitle: "Mot de passe réinitialisé !",
+        successMessage: "Votre mot de passe a été réinitialisé avec succès. Vous êtes maintenant connecté.",
+        redirecting: "Redirection en cours...",
+        noToken: "Lien de réinitialisation invalide ou expiré",
+        fieldsRequired: "Tous les champs sont requis",
+        passwordMismatch: "Les mots de passe ne correspondent pas",
+        weakPassword: "Le mot de passe ne respecte pas les exigences de sécurité",
+        passwordRequirements: "Exigences du mot de passe :",
+        errorGeneric: "Une erreur s'est produite. Veuillez réessayer.",
+        validation: {
+          minLength: "Au moins 12 caractères",
+          uppercase: "Une lettre majuscule",
+          lowercase: "Une lettre minuscule",
+          number: "Un chiffre",
+          special: "Un caractère spécial (!@#$%^&*)"
+        }
+      },
       user: {
         unknown: "Utilisateur",
         signedInAs: "Connecté en tant que",
@@ -357,6 +397,46 @@ export const translations = {
         registrationFailed: "Registration failed. Please try again.",
         networkError: "Network error. Check your connection.",
         serverError: "Server error. Please try again later."
+      },
+      forgotPassword: {
+        title: "Forgot Password",
+        subtitle: "Enter your email address to receive a reset link",
+        emailLabel: "Email Address",
+        emailPlaceholder: "your@email.com",
+        emailRequired: "Email address is required",
+        sendButton: "Send Reset Link",
+        sending: "Sending...",
+        backToLogin: "Back to Sign In",
+        successTitle: "Email Sent!",
+        successMessage: "If this email exists in our system, you will receive a reset link within a few minutes.",
+        errorGeneric: "An error occurred. Please try again."
+      },
+      resetPassword: {
+        title: "New Password",
+        subtitle: "Enter your new password",
+        passwordLabel: "New Password",
+        passwordPlaceholder: "Your new password",
+        confirmPasswordLabel: "Confirm Password",
+        confirmPasswordPlaceholder: "Confirm your new password",
+        resetButton: "Reset Password",
+        resetting: "Resetting...",
+        backToLogin: "Back to Sign In",
+        successTitle: "Password Reset!",
+        successMessage: "Your password has been reset successfully. You are now signed in.",
+        redirecting: "Redirecting...",
+        noToken: "Invalid or expired reset link",
+        fieldsRequired: "All fields are required",
+        passwordMismatch: "Passwords do not match",
+        weakPassword: "Password does not meet security requirements",
+        passwordRequirements: "Password requirements:",
+        errorGeneric: "An error occurred. Please try again.",
+        validation: {
+          minLength: "At least 12 characters",
+          uppercase: "One uppercase letter",
+          lowercase: "One lowercase letter",
+          number: "One number",
+          special: "One special character (!@#$%^&*)"
+        }
       },
       user: {
         unknown: "User",

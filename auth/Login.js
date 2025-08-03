@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from './AuthContext.js';
 
-const Login = ({ onSwitchToRegister, translations }) => {
+const Login = ({ onSwitchToRegister, onSwitchToForgotPassword, translations }) => {
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -160,7 +160,15 @@ const Login = ({ onSwitchToRegister, translations }) => {
                 })
               )
             ),
-            validationErrors.password && React.createElement("p", { className: "mt-1 text-sm text-brand-error" }, validationErrors.password)
+            validationErrors.password && React.createElement("p", { className: "mt-1 text-sm text-brand-error" }, validationErrors.password),
+            // Forgot password link
+            React.createElement("div", { className: "text-right mt-2" },
+              React.createElement("button", {
+                type: "button",
+                onClick: onSwitchToForgotPassword,
+                className: "text-sm text-brand-primary-accent hover:text-brand-primary-accent/80 underline focus:outline-none"
+              }, t.auth.forgotPassword.title)
+            )
           ),
 
           // General error message

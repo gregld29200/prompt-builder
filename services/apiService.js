@@ -92,6 +92,20 @@ class ApiService {
     });
   }
 
+  async forgotPassword(email, language = 'fr') {
+    return this.makeRequest('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, language }),
+    });
+  }
+
+  async resetPassword(token, password) {
+    return this.makeRequest('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    });
+  }
+
   // Prompts endpoints
   async getPrompts(page = 1, limit = 20, filters = {}) {
     const queryParams = new URLSearchParams({
