@@ -1,56 +1,1685 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teachinspire Prompt Builder</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&family=Courier+New:wght@500&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'brand-bg': '#f8f7f2',
-            'brand-text': '#2c3d57',
-            'brand-primary-accent': '#85a2a3',
-            'brand-secondary-accent': '#f1d263',
-            'brand-card-bg': '#ffffff',
-            'brand-muted-text': '#6b7280',
-            'brand-error': '#ef4444', // Red-500 for errors
-            'brand-success': '#10b981', // Green-500 for success
-            'brand-info': '#3b82f6', // Blue-500 for info
-          },
-          fontFamily: {
-            'playfair': ['Playfair Display', 'serif'],
-            'inter': ['Inter', 'sans-serif'],
-            'courier': ['Courier New', 'Courier', 'monospace'],
-          },
-          boxShadow: {
-            'brand': '0 4px 6px -1px rgba(44, 61, 87,0.07), 0 2px 4px -2px rgba(44, 61, 87,0.07)',
-            'brand-lg': '0 10px 15px -3px rgba(44, 61, 87, 0.1), 0 4px 6px -2px rgba(44, 61, 87, 0.05)'
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Builder TeachInspire - Générateur de prompts IA structurés</title>
+    <link rel="icon" type="image/png" href="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/134736d6-5e59-461d-8594-dbd8c8d6c400/public">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-bg': '#f8f7f2',
+                        'brand-text': '#2c3d57',
+                        'brand-primary-accent': '#85a2a3',
+                        'brand-secondary-accent': '#f1d263',
+                        'brand-card-bg': '#ffffff',
+                        'brand-muted-text': '#6b7280',
+                        'brand-error': '#ef4444',
+                        'brand-success': '#10b981',
+                        'brand-info': '#3b82f6',
+                    },
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                        'inter': ['Inter', 'sans-serif'],
+                        'courier': ['Courier New', 'Courier', 'monospace'],
+                    },
+                    boxShadow: {
+                        'brand': '0 4px 6px -1px rgba(44, 61, 87,0.07), 0 2px 4px -2px rgba(44, 61, 87,0.07)',
+                        'brand-lg': '0 10px 15px -3px rgba(44, 61, 87, 0.1), 0 4px 6px -2px rgba(44, 61, 87, 0.05)'
+                    }
+                }
+            }
         }
-      }
+    </script>
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@^19.0.0",
+            "react-dom/client": "https://esm.sh/react-dom@^19.0.0/client",
+            "react-dom/": "https://esm.sh/react-dom@^19.0.0/",
+            "react/": "https://esm.sh/react@^19.0.0/",
+            "lucide-react": "https://esm.sh/lucide-react@^0.511.0",
+            "@google/genai": "https://esm.sh/@google/genai@^1.1.0",
+            "lucide": "https://esm.sh/lucide@^0.511.0"
+        }
     }
-  </script>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@^19.0.0/client",
-    "react-dom/": "https://esm.sh/react-dom@^19.0.0/",
-    "react/": "https://esm.sh/react@^19.0.0/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.511.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.1.0",
-    "lucide": "https://esm.sh/lucide@^0.511.0"
-  }
-}
-</script>
+    </script>
+    
+    <style>
+        :root {
+            --brand-bg: #f8f7f2;
+            --brand-text: #2c3d57;
+            --brand-accent: #85a2a3;
+            --brand-gold: #f1d263;
+            --brand-white: #ffffff;
+            --brand-gold-light: #f5d563;
+            --brand-accent-light: #a8c5c6;
+            --brand-text-light: #405371;
+            
+            /* Enhanced shadow system */
+            --shadow-xs: 0 1px 3px rgba(44, 61, 87, 0.04);
+            --shadow-sm: 0 2px 8px rgba(44, 61, 87, 0.06);
+            --shadow-md: 0 8px 30px rgba(44, 61, 87, 0.08);
+            --shadow-lg: 0 20px 40px rgba(44, 61, 87, 0.12);
+            --shadow-xl: 0 25px 50px rgba(44, 61, 87, 0.15);
+            
+            /* Animation timing */
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--brand-bg);
+            color: var(--brand-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* ===== ENHANCED NAVBAR WITH LOGIN OPTIONS ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(248, 247, 242, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px 32px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(133, 162, 163, 0.1);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .navbar.scrolled {
+            background: rgba(248, 247, 242, 0.98);
+            box-shadow: var(--shadow-sm);
+            padding: 12px 32px;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 42px;
+            width: auto;
+            transition: transform 0.3s var(--ease-smooth);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--brand-text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.3s var(--ease-smooth);
+            position: relative;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .nav-link:hover {
+            color: var(--brand-accent);
+            background: rgba(133, 162, 163, 0.05);
+        }
+
+        .btn-connexion {
+            background: transparent;
+            border: 1.5px solid var(--brand-accent);
+            color: var(--brand-accent);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s var(--ease-smooth);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-connexion::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--brand-accent);
+            transition: left 0.3s var(--ease-smooth);
+            z-index: -1;
+        }
+
+        .btn-connexion:hover::before {
+            left: 0;
+        }
+
+        .btn-connexion:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary-nav {
+            background: linear-gradient(135deg, var(--brand-gold) 0%, var(--brand-gold-light) 100%);
+            color: var(--brand-text);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s var(--ease-smooth);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(241, 210, 99, 0.4);
+        }
+
+        /* Mobile menu */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.3s var(--ease-smooth);
+        }
+
+        .mobile-menu-toggle span {
+            width: 24px;
+            height: 3px;
+            background: var(--brand-text);
+            margin: 2px 0;
+            transition: 0.3s var(--ease-smooth);
+            border-radius: 2px;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(248, 247, 242, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(133, 162, 163, 0.1);
+            padding: 20px 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .mobile-menu.active {
+            display: block;
+            animation: slideDown 0.3s var(--ease-smooth);
+        }
+
+        .mobile-nav-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ===== ENHANCED HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 140px 32px 80px;
+            position: relative;
+            background: linear-gradient(135deg, var(--brand-bg) 0%, #f0efea 50%, #f8f7f2 100%);
+            overflow: hidden;
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+        }
+
+        .hero-badge {
+            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            animation: fadeInUp 0.8s var(--ease-smooth);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s var(--ease-smooth) 0.2s both;
+            background: linear-gradient(135deg, var(--brand-text) 0%, var(--brand-text-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--brand-accent);
+            margin-bottom: 32px;
+            animation: fadeInUp 0.8s var(--ease-smooth) 0.4s both;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            animation: fadeInUp 0.8s var(--ease-smooth) 0.6s both;
+            flex-wrap: wrap;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, var(--brand-gold) 0%, var(--brand-gold-light) 100%);
+            color: var(--brand-text);
+            padding: 18px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s var(--ease-smooth);
+            box-shadow: var(--shadow-md);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(241, 210, 99, 0.4);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: var(--brand-accent);
+            padding: 18px 24px;
+            border: 2px solid var(--brand-accent);
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s var(--ease-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-secondary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--brand-accent);
+            transition: left 0.3s var(--ease-smooth);
+            z-index: -1;
+        }
+
+        .cta-secondary:hover::before {
+            left: 0;
+        }
+
+        .cta-secondary:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Login hint section */
+        .login-hint {
+            background: linear-gradient(135deg, rgba(133, 162, 163, 0.1), rgba(133, 162, 163, 0.05));
+            border: 1px solid rgba(133, 162, 163, 0.2);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-top: 32px;
+            animation: fadeInUp 0.8s var(--ease-smooth) 0.8s both;
+            text-align: center;
+        }
+
+        .login-hint-text {
+            font-size: 14px;
+            color: var(--brand-text);
+            margin-bottom: 12px;
+        }
+
+        .login-hint-link {
+            color: var(--brand-accent);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s var(--ease-smooth);
+            cursor: pointer;
+        }
+
+        .login-hint-link:hover {
+            color: var(--brand-text);
+        }
+
+        /* Enhanced demo section */
+        .hero-demo {
+            position: relative;
+            background: var(--brand-white);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow-xl);
+            animation: fadeInUp 0.8s var(--ease-smooth) 0.8s both;
+            border: 1px solid rgba(133, 162, 163, 0.1);
+            transition: transform 0.3s var(--ease-smooth);
+        }
+
+        .hero-demo:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 60px rgba(44, 61, 87, 0.15);
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .demo-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--brand-text);
+            margin-bottom: 8px;
+        }
+
+        .demo-subtitle {
+            font-size: 14px;
+            color: var(--brand-accent);
+        }
+
+        .demo-before,
+        .demo-after {
+            margin-bottom: 20px;
+        }
+
+        .demo-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-before .demo-label {
+            color: #e74c3c;
+        }
+
+        .demo-after .demo-label {
+            color: var(--brand-accent);
+        }
+
+        .demo-text {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            border-left: 4px solid #e74c3c;
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .demo-after .demo-text {
+            border-left-color: var(--brand-accent);
+            background: linear-gradient(135deg, #f0f5f5 0%, #f8fafa 100%);
+        }
+
+        .demo-arrow {
+            text-align: center;
+            font-size: 28px;
+            color: var(--brand-gold);
+            margin: 20px 0;
+            font-weight: bold;
+            animation: bounce 2s infinite;
+        }
+
+        /* ===== ENHANCED FLOATING SHAPES ===== */
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.08;
+            animation: float 8s ease-in-out infinite;
+            filter: blur(1px);
+        }
+
+        .shape:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            top: 15%;
+            left: 8%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            top: 50%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
+            border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%;
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 4s;
+        }
+
+        .shape:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
+            border-radius: 50%;
+            top: 30%;
+            right: 25%;
+            animation-delay: 6s;
+        }
+
+        /* ===== SECTIONS COMMUNES ===== */
+        .section {
+            padding: 100px 32px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--brand-accent);
+            margin-bottom: 80px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 500;
+        }
+
+        /* ===== NEW APPROACHES SECTION ===== */
+        .approaches-section {
+            background: linear-gradient(135deg, var(--brand-white) 0%, #fafafa 100%);
+        }
+
+        .approaches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-top: 80px;
+        }
+
+        .approach-card {
+            background: var(--brand-white);
+            padding: 40px 32px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s var(--ease-smooth);
+            border: 1px solid rgba(133, 162, 163, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .approach-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--brand-gold), var(--brand-accent));
+            transform: scaleX(0);
+            transition: transform 0.3s var(--ease-smooth);
+        }
+
+        .approach-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .approach-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .approach-badge {
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
+            color: var(--brand-text);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .approach-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: var(--brand-text);
+        }
+
+        .approach-description {
+            color: var(--brand-accent);
+            line-height: 1.7;
+            font-size: 1rem;
+            margin-bottom: 24px;
+        }
+
+        .approach-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .approach-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--brand-text);
+        }
+
+        .approach-features li::before {
+            content: '✓';
+            color: var(--brand-accent);
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .approach-example {
+            background: linear-gradient(135deg, #f0f5f5 0%, #f8fafa 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 4px solid var(--brand-accent);
+        }
+
+        .approach-example-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--brand-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .approach-example-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--brand-text);
+        }
+
+        /* ===== ENHANCED PROCESS SECTION ===== */
+        .process-section {
+            background: var(--brand-bg);
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 32px;
+            margin-top: 80px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .process-step {
+            text-align: center;
+            position: relative;
+            padding: 40px 28px;
+            background: var(--brand-white);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s var(--ease-smooth);
+            border: 1px solid rgba(133, 162, 163, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+            aspect-ratio: 1;
+        }
+
+        .process-step:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Couleurs alternées pour les icônes */
+        .process-step:nth-child(1) .step-icon {
+            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
+        }
+
+        .process-step:nth-child(2) .step-icon {
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
+            color: var(--brand-text);
+        }
+
+        .process-step:nth-child(3) .step-icon {
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
+            color: var(--brand-text);
+        }
+
+        .process-step:nth-child(4) .step-icon {
+            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
+        }
+
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            transition: all 0.3s var(--ease-smooth);
+            flex-shrink: 0;
+        }
+
+        .process-step:hover .step-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .step-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .step-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            color: var(--brand-text);
+            line-height: 1.3;
+        }
+
+        .step-description {
+            color: var(--brand-accent);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* ===== ENHANCED FEATURES SECTION ===== */
+        .features-section {
+            background: linear-gradient(135deg, var(--brand-white) 0%, #fafafa 100%);
+        }
+
+        .features-intro {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(133, 162, 163, 0.1), rgba(133, 162, 163, 0.05));
+            border: 1px solid rgba(133, 162, 163, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 60px;
+        }
+
+        .features-intro-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--brand-text);
+            margin-bottom: 16px;
+        }
+
+        .features-intro-text {
+            color: var(--brand-accent);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 32px;
+            margin-top: 80px;
+        }
+
+        .feature-card {
+            background: var(--brand-white);
+            padding: 40px 32px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s var(--ease-smooth);
+            border: 1px solid rgba(133, 162, 163, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--brand-gold), var(--brand-accent));
+            transform: scaleX(0);
+            transition: transform 0.3s var(--ease-smooth);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: var(--brand-text);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .feature-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: var(--brand-text);
+        }
+
+        .feature-description {
+            color: var(--brand-accent);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
+            color: var(--brand-text);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* ===== ENHANCED CTA FORMATION ===== */
+        .cta-formation {
+            background: linear-gradient(135deg, var(--brand-text) 0%, #3a4b6d 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-formation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.05"/><circle cx="50" cy="10" r="1" fill="white" opacity="0.05"/><circle cx="10" cy="60" r="1" fill="white" opacity="0.05"/><circle cx="90" cy="40" r="1" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+            opacity: 0.3;
+        }
+
+        .cta-formation .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-formation .section-title {
+            color: var(--brand-gold);
+        }
+
+        .cta-formation .section-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-formation-secondary {
+            background: var(--brand-gold);
+            color: var(--brand-text);
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.125rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s var(--ease-smooth);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-formation-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(241, 210, 99, 0.4);
+        }
+
+        /* ===== ENHANCED FOOTER ===== */
+        .footer {
+            background: var(--brand-text);
+            color: white;
+            text-align: center;
+            padding: 60px 32px 40px;
+        }
+
+        .footer-logo {
+            height: 45px;
+            margin: 0 auto 20px;
+            filter: brightness(0) saturate(100%) invert(89%) sepia(23%) saturate(692%) hue-rotate(36deg) brightness(105%) contrast(86%);
+            transition: transform 0.3s var(--ease-smooth);
+        }
+
+        .footer-contact {
+            color: var(--brand-accent-light);
+            font-size: 1rem;
+        }
+
+        .footer-contact a {
+            color: var(--brand-gold);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s var(--ease-smooth);
+        }
+
+        .footer-contact a:hover {
+            color: var(--brand-gold-light);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-30px) rotate(120deg);
+            }
+            66% {
+                transform: translateY(-15px) rotate(240deg);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== SCROLL ANIMATIONS ===== */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1s var(--ease-smooth);
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        .cta-primary:focus,
+        .cta-secondary:focus,
+        .btn-connexion:focus,
+        .btn-primary-nav:focus,
+        .nav-link:focus {
+            outline: 3px solid var(--brand-gold);
+            outline-offset: 2px;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1024px) {
+            .hero-container {
+                gap: 60px;
+            }
+            
+            .features-grid,
+            .approaches-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .process-steps {
+                max-width: 700px;
+                gap: 24px;
+            }
+
+            .process-step {
+                min-height: 260px;
+                padding: 32px 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .nav-actions {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .hero {
+                padding: 120px 20px 60px;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .hero-cta-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .section {
+                padding: 80px 20px;
+            }
+
+            .process-steps {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 24px;
+                max-width: 100%;
+            }
+
+            .process-step {
+                aspect-ratio: auto;
+                min-height: auto;
+                padding: 32px 24px;
+            }
+
+            .approaches-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .approach-card {
+                padding: 32px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 1.9rem;
+            }
+
+            .demo-text {
+                font-size: 13px;
+            }
+
+            .cta-primary,
+            .cta-secondary {
+                padding: 16px 24px;
+                font-size: 15px;
+            }
+
+            .process-step {
+                padding: 28px 20px;
+            }
+
+            .step-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+
+            .step-title {
+                font-size: 1.1rem;
+            }
+
+            .step-description {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-brand-bg">
-  <div id="root"></div>
-  <script type="module" src="index.js"></script>
+<body>
+    <!-- Enhanced Navbar with Login Options -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-content">
+            <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/134736d6-5e59-461d-8594-dbd8c8d6c400/public" 
+                 alt="TeachInspire" 
+                 class="logo">
+            
+            <div class="nav-actions">
+                <a href="https://www.teachinspire.me" class="nav-link">Formation IA</a>
+                <a href="#" class="btn-connexion" onclick="scrollToApp()">Connexion</a>
+                <a href="#app" class="btn-primary-nav">Tester gratuitement</a>
+            </div>
+
+            <!-- Mobile menu toggle -->
+            <div class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-nav-actions">
+                <a href="https://www.teachinspire.me" class="nav-link">Formation IA</a>
+                <a href="#" class="btn-connexion" onclick="scrollToApp()">Connexion</a>
+                <a href="#app" class="btn-primary-nav">Tester gratuitement</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Enhanced Hero Section -->
+    <section class="hero">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+        
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                    </svg>
+                    Prompt Builder TeachInspire
+                </div>
+                <h1 class="hero-title">Créez des prompts IA structurés en quelques clics</h1>
+                <p class="hero-subtitle">
+                    Transformez vos idées en instructions précises compatibles avec n'importe quel outil d'intelligence artificielle
+                </p>
+                <div class="hero-cta-group">
+                    <a href="#app" class="cta-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                        </svg>
+                        <span>Générer mon prompt</span>
+                    </a>
+                    <a href="#approaches" class="cta-secondary">Découvrir les méthodes</a>
+                </div>
+                
+                <!-- Login hint -->
+                <div class="login-hint">
+                    <div class="login-hint-text">
+                        Vous avez déjà un compte ? 
+                        <a href="#" class="login-hint-link" onclick="scrollToApp()">Connectez-vous ici</a> 
+                        ou testez gratuitement en créant un compte
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-demo">
+                <div class="demo-header">
+                    <div class="demo-title">Transformation automatique</div>
+                    <div class="demo-subtitle">De l'idée au prompt professionnel</div>
+                </div>
+                
+                <div class="demo-before">
+                    <div class="demo-label">
+                        <span>❌</span>
+                        Demande imprécise
+                    </div>
+                    <div class="demo-text">"Crée-moi un exercice"</div>
+                </div>
+                
+                <div class="demo-arrow">↓</div>
+                
+                <div class="demo-after">
+                    <div class="demo-label">
+                        <span>✅</span>
+                        Prompt structuré
+                    </div>
+                    <div class="demo-text">
+                        <strong>Contexte:</strong> Tu es un expert en création d'exercices pédagogiques...<br>
+                        <strong>Objectif:</strong> Concevoir un QCM de 10 questions niveau B2...<br>
+                        <strong>Format:</strong> Questions + 4 options + justifications...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- New Approaches Section -->
+    <section class="section approaches-section" id="approaches">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Deux approches adaptées à vos besoins</h2>
+            <p class="section-subtitle scroll-reveal">
+                Notre outil analyse automatiquement votre demande et recommande l'approche la plus efficace
+            </p>
+            
+            <div class="approaches-grid">
+                <div class="approach-card scroll-reveal">
+                    <div class="approach-badge">Pour tâches ciblées</div>
+                    <h3 class="approach-title">Approche MVP (Minimum Viable Prompt)</h3>
+                    <p class="approach-description">
+                        Parfaite pour des tâches simples et directes. Cette méthode crée des prompts concis 
+                        mais structurés qui vous donnent des résultats immédiats et exploitables.
+                    </p>
+                    
+                    <ul class="approach-features">
+                        <li>Instructions claires et directes</li>
+                        <li>Format de réponse défini</li>
+                        <li>Contexte essentiel fourni</li>
+                        <li>Ideal pour tâches répétitives</li>
+                        <li>Résultats en moins de 30 secondes</li>
+                    </ul>
+                    
+                    <div class="approach-example">
+                        <div class="approach-example-title">Exemple d'usage</div>
+                        <div class="approach-example-text">
+                            Création de résumés, traductions, corrections, générations de listes, 
+                            reformulations de texte, création de questionnaires simples...
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="approach-card scroll-reveal">
+                    <div class="approach-badge">Pour projets avancés</div>
+                    <h3 class="approach-title">Approche Agentique</h3>
+                    <p class="approach-description">
+                         Une méthode intelligente qui ajoute des capacités d'auto-évaluation et d'amélioration continue. L'IA ne se contente pas de produire un résultat : elle l'analyse, propose des améliorations et peut itérer de manière autonome.
+                    </p>
+                    
+                    <ul class="approach-features">
+                        <li>Rôle d'expert défini précisément</li>
+                        <li>Méthodologie step-by-step</li>
+                        <li>Analyse approfondie du contexte</li>
+                        <li>Livrables multiples et structurés</li>
+                        <li>Qualité professionnelle garantie</li>
+                    </ul>
+                    
+                    <div class="approach-example">
+                        <div class="approach-example-title">Exemple d'usage</div>
+                        <div class="approach-example-text">
+                            Création de cours complets, développement de stratégies pédagogiques, 
+                            analyses détaillées, rapports professionnels, guides méthodologiques...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="section process-section">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Comment ça fonctionne ?</h2>
+            <p class="section-subtitle scroll-reveal">4 étapes simples pour transformer votre idée en prompt professionnel</p>
+            
+            <div class="process-steps">
+                <div class="process-step scroll-reveal">
+                    <div class="step-icon">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Décrivez votre objectif</h3>
+                        <p class="step-description">
+                            Exprimez simplement ce que vous voulez créer. 
+                            Notre IA comprend le langage naturel, pas besoin d'être technique !
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="process-step scroll-reveal">
+                    <div class="step-icon">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Analyse intelligente</h3>
+                        <p class="step-description">
+                            L'outil analyse votre demande et recommande automatiquement 
+                            l'approche optimale (MVP ou Agentique)
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="process-step scroll-reveal">
+                    <div class="step-icon">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Personnalisation</h3>
+                        <p class="step-description">
+                            Affinez les paramètres : niveau de détail, format de sortie, 
+                            contraintes spécifiques selon vos besoins
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="process-step scroll-reveal">
+                    <div class="step-icon">4</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Prompt prêt à l'emploi</h3>
+                        <p class="step-description">
+                            Récupérez votre prompt optimisé, testez-le et utilisez-le 
+                            avec ChatGPT, Claude, Gemini ou tout autre outil IA
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Features Section -->
+    <section class="section features-section">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Pourquoi choisir notre générateur ?</h2>
+            
+            <div class="features-intro scroll-reveal">
+                <h3 class="features-intro-title">
+                    Accessible à tous, <span class="feature-highlight">spécialement optimisé pour l'enseignement</span>
+                </h3>
+                <p class="features-intro-text">
+                    Bien que notre outil soit conçu pour tous les utilisateurs d'IA, nous avons développé des fonctionnalités 
+                    spécifiques pour les enseignants et formateurs, s'intégrant parfaitement dans l'écosystème de formation TeachInspire.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v1.2a1 1 0 0 0 1 1h2.3a1 1 0 0 0 1-1V4.5A2.5 2.5 0 0 1 18.5 2h0A2.5 2.5 0 0 1 21 4.5v15A2.5 2.5 0 0 1 18.5 22h-13A2.5 2.5 0 0 1 3 19.5v-15A2.5 2.5 0 0 1 5.5 2h0A2.5 2.5 0 0 1 8 4.5v1.2a1 1 0 0 0 1 1h.5"/>
+                            <path d="M12 10v4"/>
+                            <path d="M15 12h-6"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Bonus Enseignants</h3>
+                    <p class="feature-description">
+                        <span class="feature-highlight">Templates pédagogiques prêts</span> : création d'exercices, 
+                        évaluations, cours structurés. Niveaux CECRL intégrés pour les langues. 
+                        Méthodologies pédagogiques reconnues.
+                    </p>
+                </div>
+                
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Bibliothèque Personnelle</h3>
+                    <p class="feature-description">
+                        Sauvegardez et organisez vos prompts efficaces. 
+                        <span class="feature-highlight">Partagez avec votre équipe</span> pédagogique. 
+                        Construisez votre collection sur mesure.
+                    </p>
+                </div>
+                
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">IA qui Comprend l'IA</h3>
+                    <p class="feature-description">
+                        Méthode "méta" : notre IA vous aide à créer des prompts pour l'IA. 
+                        <span class="feature-highlight">Basé sur la recherche TeachInspire</span> 
+                        en prompt engineering pédagogique.
+                    </p>
+                </div>
+                
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.29,7 12,12 20.71,7"/>
+                            <line x1="12" y1="22" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Universellement Compatible</h3>
+                    <p class="feature-description">
+                        Fonctionne avec ChatGPT, Claude, Gemini, Copilot et tous les outils IA. 
+                        <span class="feature-highlight">Support français/anglais</span> automatique 
+                        selon vos préférences.
+                    </p>
+                </div>
+                
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 20V10"/>
+                            <path d="M18 20V4"/>
+                            <path d="M6 20v-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Gain de Temps Mesurable</h3>
+                    <p class="feature-description">
+                        Passez de 3 heures de préparation de cours à 30 minutes. 
+                        <span class="feature-highlight">Économisez 80% de votre temps</span> 
+                        tout en améliorant la qualité.
+                    </p>
+                </div>
+                
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Communauté Active</h3>
+                    <p class="feature-description">
+                        Rejoignez la communauté TeachInspire : 
+                        <span class="feature-highlight">échangez vos prompts</span>, 
+                        découvrez les meilleures pratiques, participez aux ateliers exclusifs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced CTA Formation Section -->
+    <section class="section cta-formation">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Prêt à maîtriser l'IA dans votre pratique ?</h2>
+            <p class="section-subtitle scroll-reveal">
+                Ce Prompt Builder fait partie de l'écosystème complet TeachInspire. 
+                Découvrez notre formation pour transformer votre approche pédagogique avec l'intelligence artificielle.
+            </p>
+            <a href="https://www.teachinspire.me" class="cta-formation-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20V10"/>
+                    <path d="M18 20V4"/>
+                    <path d="M6 20v-4"/>
+                </svg>
+                <span>Découvrir la Formation TeachInspire</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Application Integration Point -->
+    <div id="app"></div>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer">
+        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/134736d6-5e59-461d-8594-dbd8c8d6c400/public" 
+             alt="TeachInspire" 
+             class="footer-logo">
+        <div class="footer-contact">
+            Contact : <a href="mailto:greg@teachinspire.me">greg@teachinspire.me</a>
+        </div>
+    </footer>
+
+    <script>
+        // Enhanced scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -80px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all scroll-reveal elements
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+            }
+        });
+
+        // Function to scroll to app section
+        function scrollToApp() {
+            document.getElementById('app').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            // Close mobile menu if open
+            mobileMenu.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Close mobile menu if open
+                    mobileMenu.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                }
+            });
+        });
+
+        // Enhanced demo interaction
+        let demoToggle = false;
+        let demoInterval;
+
+        function startDemoAnimation() {
+            demoInterval = setInterval(() => {
+                const demoAfter = document.querySelector('.demo-after');
+                const demoBefore = document.querySelector('.demo-before');
+                
+                if (demoAfter && demoBefore) {
+                    demoToggle = !demoToggle;
+                    
+                    if (demoToggle) {
+                        demoAfter.style.transform = 'scale(1.02)';
+                        demoAfter.style.background = 'linear-gradient(135deg, #e8f4f4 0%, #f0f8f8 100%)';
+                        demoBefore.style.transform = 'scale(0.98)';
+                        demoBefore.style.opacity = '0.7';
+                    } else {
+                        demoAfter.style.transform = 'scale(1)';
+                        demoAfter.style.background = 'linear-gradient(135deg, #f0f5f5 0%, #f8fafa 100%)';
+                        demoBefore.style.transform = 'scale(1)';
+                        demoBefore.style.opacity = '1';
+                    }
+                    
+                    demoAfter.style.transition = 'all 0.5s var(--ease-smooth)';
+                    demoBefore.style.transition = 'all 0.5s var(--ease-smooth)';
+                }
+            }, 3000);
+        }
+
+        // Start demo animation when page loads
+        window.addEventListener('load', startDemoAnimation);
+
+        // Performance optimization: Pause animations when tab is not visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(demoInterval);
+            } else {
+                startDemoAnimation();
+            }
+        });
+    </script>
+    
+    <script type="module" src="index.js"></script>
 </body>
 </html>
