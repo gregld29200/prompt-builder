@@ -848,10 +848,24 @@
             position: relative;
             transition: all 0.3s var(--ease-smooth);
             flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .step-icon-image {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            filter: brightness(0) saturate(100%) invert(100%);
+            transition: all 0.3s var(--ease-smooth);
         }
 
         .process-step:hover .step-icon {
             transform: scale(1.1) rotate(5deg);
+        }
+
+        .process-step:hover .step-icon-image {
+            transform: scale(1.1);
+            filter: brightness(0) saturate(100%) invert(100%) drop-shadow(0 0 8px rgba(255,255,255,0.3));
         }
 
         .step-content {
@@ -1475,7 +1489,9 @@
             
             <div class="process-steps">
                 <div class="process-step scroll-reveal">
-                    <div class="step-icon">1</div>
+                    <div class="step-icon">
+                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/00bd03fa-47ee-4190-5f49-2dee0792b300/public" alt="Étape 1" class="step-icon-image" />
+                    </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.0.title">Décrivez votre objectif</h3>
                         <p class="step-description" data-translate="process.steps.0.description">
@@ -1486,7 +1502,9 @@
                 </div>
                 
                 <div class="process-step scroll-reveal">
-                    <div class="step-icon">2</div>
+                    <div class="step-icon">
+                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/619ec046-3e62-45c3-35fc-470a1f362900/public" alt="Étape 2" class="step-icon-image" />
+                    </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.1.title">Analyse intelligente</h3>
                         <p class="step-description" data-translate="process.steps.1.description">
@@ -1497,7 +1515,9 @@
                 </div>
                 
                 <div class="process-step scroll-reveal">
-                    <div class="step-icon">3</div>
+                    <div class="step-icon">
+                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/ca8ee87c-0562-429e-bd15-860431f2d100/public" alt="Étape 3" class="step-icon-image" />
+                    </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.2.title">Personnalisation</h3>
                         <p class="step-description" data-translate="process.steps.2.description">
@@ -1508,7 +1528,9 @@
                 </div>
                 
                 <div class="process-step scroll-reveal">
-                    <div class="step-icon">4</div>
+                    <div class="step-icon">
+                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/6ef30c17-41b2-4638-141a-b5ccdbcec400/public" alt="Étape 4" class="step-icon-image" />
+                    </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.3.title">Prompt prêt à l'emploi</h3>
                         <p class="step-description" data-translate="process.steps.3.description">
