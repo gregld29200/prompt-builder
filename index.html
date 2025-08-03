@@ -814,59 +814,76 @@
             box-shadow: var(--shadow-lg);
         }
 
-        /* Couleurs alternées pour les icônes */
-        .process-step:nth-child(1) .step-icon {
-            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
-        }
-
-        .process-step:nth-child(2) .step-icon {
-            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
-            color: var(--brand-text);
-        }
-
-        .process-step:nth-child(3) .step-icon {
-            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-light));
-            color: var(--brand-text);
-        }
-
-        .process-step:nth-child(4) .step-icon {
-            background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-light));
-        }
-
         .step-icon {
-            width: 85px;
-            height: 85px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            color: white;
-            font-size: 24px;
-            font-weight: 800;
             box-shadow: var(--shadow-md);
             position: relative;
             transition: all 0.3s var(--ease-smooth);
             flex-shrink: 0;
             overflow: hidden;
+            background: var(--brand-white);
+            padding: 5px;
+        }
+
+        /* Couleurs alternées pour les bordures */
+        .process-step:nth-child(1) .step-icon {
+            border: 3px solid var(--brand-accent);
+        }
+
+        .process-step:nth-child(2) .step-icon {
+            border: 3px solid var(--brand-gold);
+        }
+
+        .process-step:nth-child(3) .step-icon {
+            border: 3px solid var(--brand-gold);
+        }
+
+        .process-step:nth-child(4) .step-icon {
+            border: 3px solid var(--brand-accent);
         }
 
         .step-icon-image {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
             transition: all 0.3s var(--ease-smooth);
-            opacity: 0.95;
         }
 
         .process-step:hover .step-icon {
-            transform: scale(1.1) rotate(5deg);
+            transform: scale(1.08) rotate(3deg);
+            box-shadow: var(--shadow-lg);
         }
 
         .process-step:hover .step-icon-image {
-            transform: scale(1.1);
-            filter: brightness(0) saturate(100%) invert(100%) drop-shadow(0 0 8px rgba(255,255,255,0.3));
+            transform: scale(1.05);
+        }
+
+        /* Enhanced hover effects for borders */
+        .process-step:nth-child(1):hover .step-icon {
+            border-color: var(--brand-accent-light);
+            box-shadow: 0 8px 25px rgba(133, 162, 163, 0.3);
+        }
+
+        .process-step:nth-child(2):hover .step-icon {
+            border-color: var(--brand-gold-light);
+            box-shadow: 0 8px 25px rgba(241, 210, 99, 0.3);
+        }
+
+        .process-step:nth-child(3):hover .step-icon {
+            border-color: var(--brand-gold-light);
+            box-shadow: 0 8px 25px rgba(241, 210, 99, 0.3);
+        }
+
+        .process-step:nth-child(4):hover .step-icon {
+            border-color: var(--brand-accent-light);
+            box-shadow: 0 8px 25px rgba(133, 162, 163, 0.3);
         }
 
         .step-content {
@@ -1495,7 +1512,7 @@
             <div class="process-steps">
                 <div class="process-step scroll-reveal">
                     <div class="step-icon">
-                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/00bd03fa-47ee-4190-5f49-2dee0792b300/public" alt="Étape 1" class="step-icon-image" />
+                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/83df86f3-3278-4160-87cc-ddebab94ac00/public" alt="Étape 1" class="step-icon-image" />
                     </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.0.title">Décrivez votre objectif</h3>
@@ -1508,7 +1525,7 @@
                 
                 <div class="process-step scroll-reveal">
                     <div class="step-icon">
-                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/619ec046-3e62-45c3-35fc-470a1f362900/public" alt="Étape 2" class="step-icon-image" />
+                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/45b7d16c-8315-4b74-eb09-d171e5471700/public" alt="Étape 2" class="step-icon-image" />
                     </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.1.title">Analyse intelligente</h3>
@@ -1521,7 +1538,7 @@
                 
                 <div class="process-step scroll-reveal">
                     <div class="step-icon">
-                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/ca8ee87c-0562-429e-bd15-860431f2d100/public" alt="Étape 3" class="step-icon-image" />
+                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/c4522fa4-3291-4d0d-4ecf-1d36adffcd00/public" alt="Étape 3" class="step-icon-image" />
                     </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.2.title">Personnalisation</h3>
@@ -1534,7 +1551,7 @@
                 
                 <div class="process-step scroll-reveal">
                     <div class="step-icon">
-                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/6ef30c17-41b2-4638-141a-b5ccdbcec400/public" alt="Étape 4" class="step-icon-image" />
+                        <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/7024b639-ef35-4648-1bca-3a125c811900/public" alt="Étape 4" class="step-icon-image" />
                     </div>
                     <div class="step-content">
                         <h3 class="step-title" data-translate="process.steps.3.title">Prompt prêt à l'emploi</h3>
