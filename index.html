@@ -1360,17 +1360,17 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
                         </svg>
-                        <span>Générer mon prompt</span>
+                        <span data-translate="hero.generateBtn">Générer mon prompt</span>
                     </a>
-                    <a href="#approaches" class="cta-secondary">Découvrir les méthodes</a>
+                    <a href="#approaches" class="cta-secondary" data-translate="hero.discoverBtn">Découvrir les méthodes</a>
                 </div>
                 
                 <!-- Login hint -->
                 <div class="login-hint">
                     <div class="login-hint-text">
-                        Vous avez déjà un compte ? 
-                        <a href="#" class="login-hint-link" onclick="scrollToApp()">Connectez-vous ici</a> 
-                        ou testez gratuitement en créant un compte
+                        <span data-translate="hero.loginHint">Vous avez déjà un compte ?</span> 
+                        <a href="#" class="login-hint-link" onclick="scrollToApp()" data-translate="hero.loginLink">Connectez-vous ici</a> 
+                        <span data-translate="hero.orText">ou testez gratuitement en créant un compte</span>
                     </div>
                 </div>
             </div>
@@ -1670,6 +1670,313 @@
     </footer>
 
     <script>
+        // Landing page translations
+        const landingTranslations = {
+            fr: {
+                nav: {
+                    formation: "Formation IA",
+                    login: "Connexion",
+                    tryFree: "Tester gratuitement"
+                },
+                hero: {
+                    title: "Créez des prompts IA structurés en quelques clics",
+                    subtitle: "Transformez vos idées en instructions précises compatibles avec n'importe quel outil d'intelligence artificielle",
+                    generateBtn: "Générer mon prompt",
+                    discoverBtn: "Découvrir les méthodes",
+                    loginHint: "Vous avez déjà un compte ?",
+                    loginLink: "Connectez-vous ici",
+                    orText: "ou testez gratuitement en créant un compte"
+                },
+                demo: {
+                    title: "Transformation automatique",
+                    subtitle: "De l'idée au prompt professionnel",
+                    before: "Demande imprécise",
+                    after: "Prompt structuré"
+                },
+                approaches: {
+                    title: "Deux approches adaptées à vos besoins",
+                    subtitle: "Notre outil analyse automatiquement votre demande et recommande l'approche la plus efficace",
+                    mvp: {
+                        badge: "Pour tâches ciblées",
+                        title: "Approche MVP (Minimum Viable Prompt)",
+                        description: "Parfaite pour des tâches simples et directes. Cette méthode crée des prompts concis mais structurés qui vous donnent des résultats immédiats et exploitables.",
+                        features: [
+                            "Instructions claires et directes",
+                            "Format de réponse défini",
+                            "Contexte essentiel fourni",
+                            "Ideal pour tâches répétitives",
+                            "Résultats en moins de 30 secondes"
+                        ],
+                        exampleTitle: "Exemple d'usage",
+                        exampleText: "Création de résumés, traductions, corrections, générations de listes, reformulations de texte, création de questionnaires simples..."
+                    },
+                    agentic: {
+                        badge: "Pour projets avancés",
+                        title: "Approche Agentique",
+                        description: "Une méthode intelligente qui ajoute des capacités d'auto-évaluation et d'amélioration continue. L'IA ne se contente pas de produire un résultat : elle l'analyse, propose des améliorations et peut itérer de manière autonome.",
+                        features: [
+                            "Rôle d'expert défini précisément",
+                            "Méthodologie step-by-step",
+                            "Analyse approfondie du contexte",
+                            "Livrables multiples et structurés",
+                            "Qualité professionnelle garantie"
+                        ],
+                        exampleTitle: "Exemple d'usage",
+                        exampleText: "Création de cours complets, développement de stratégies pédagogiques, analyses détaillées, rapports professionnels, guides méthodologiques..."
+                    }
+                },
+                process: {
+                    title: "Comment ça fonctionne ?",
+                    subtitle: "4 étapes simples pour transformer votre idée en prompt professionnel",
+                    steps: [
+                        {
+                            title: "Décrivez votre objectif",
+                            description: "Exprimez simplement ce que vous voulez créer. Notre IA comprend le langage naturel, pas besoin d'être technique !"
+                        },
+                        {
+                            title: "Analyse intelligente",
+                            description: "L'outil analyse votre demande et recommande automatiquement l'approche optimale (MVP ou Agentique)"
+                        },
+                        {
+                            title: "Personnalisation",
+                            description: "Affinez les paramètres : niveau de détail, format de sortie, contraintes spécifiques selon vos besoins"
+                        },
+                        {
+                            title: "Prompt prêt à l'emploi",
+                            description: "Récupérez votre prompt optimisé, testez-le et utilisez-le avec ChatGPT, Claude, Gemini ou tout autre outil IA"
+                        }
+                    ]
+                },
+                features: {
+                    title: "Pourquoi choisir notre générateur ?",
+                    introTitle: "Accessible à tous, spécialement optimisé pour l'enseignement",
+                    introText: "Bien que notre outil soit conçu pour tous les utilisateurs d'IA, nous avons développé des fonctionnalités spécifiques pour les enseignants et formateurs, s'intégrant parfaitement dans l'écosystème de formation TeachInspire.",
+                    items: [
+                        {
+                            title: "Bonus Enseignants",
+                            description: "Templates pédagogiques prêts : création d'exercices, évaluations, cours structurés. Niveaux CECRL intégrés pour les langues. Méthodologies pédagogiques reconnues."
+                        },
+                        {
+                            title: "Bibliothèque Personnelle",
+                            description: "Sauvegardez et organisez vos prompts efficaces. Partagez avec votre équipe pédagogique. Construisez votre collection sur mesure."
+                        },
+                        {
+                            title: "IA qui Comprend l'IA",
+                            description: "Méthode \"méta\" : notre IA vous aide à créer des prompts pour l'IA. Basé sur la recherche TeachInspire en prompt engineering pédagogique."
+                        },
+                        {
+                            title: "Universellement Compatible",
+                            description: "Fonctionne avec ChatGPT, Claude, Gemini, Copilot et tous les outils IA. Support français/anglais automatique selon vos préférences."
+                        },
+                        {
+                            title: "Gain de Temps Mesurable",
+                            description: "Passez de 3 heures de préparation de cours à 30 minutes. Économisez 80% de votre temps tout en améliorant la qualité."
+                        },
+                        {
+                            title: "Communauté Active",
+                            description: "Rejoignez la communauté TeachInspire : échangez vos prompts, découvrez les meilleures pratiques, participez aux ateliers exclusifs."
+                        }
+                    ]
+                },
+                cta: {
+                    title: "Prêt à maîtriser l'IA dans votre pratique ?",
+                    subtitle: "Ce Prompt Builder fait partie de l'écosystème complet TeachInspire. Découvrez notre formation pour transformer votre approche pédagogique avec l'intelligence artificielle.",
+                    button: "Découvrir la Formation TeachInspire"
+                }
+            },
+            en: {
+                nav: {
+                    formation: "AI Training",
+                    login: "Sign In",
+                    tryFree: "Try for Free"
+                },
+                hero: {
+                    title: "Create structured AI prompts in just a few clicks",
+                    subtitle: "Transform your ideas into precise instructions compatible with any artificial intelligence tool",
+                    generateBtn: "Generate my prompt",
+                    discoverBtn: "Discover the methods",
+                    loginHint: "Already have an account?",
+                    loginLink: "Sign in here",
+                    orText: "or test for free by creating an account"
+                },
+                demo: {
+                    title: "Automatic transformation",
+                    subtitle: "From idea to professional prompt",
+                    before: "Vague request",
+                    after: "Structured prompt"
+                },
+                approaches: {
+                    title: "Two approaches tailored to your needs",
+                    subtitle: "Our tool automatically analyzes your request and recommends the most effective approach",
+                    mvp: {
+                        badge: "For focused tasks",
+                        title: "MVP Approach (Minimum Viable Prompt)",
+                        description: "Perfect for simple and direct tasks. This method creates concise but structured prompts that give you immediate and actionable results.",
+                        features: [
+                            "Clear and direct instructions",
+                            "Defined response format",
+                            "Essential context provided",
+                            "Ideal for repetitive tasks",
+                            "Results in less than 30 seconds"
+                        ],
+                        exampleTitle: "Usage example",
+                        exampleText: "Creating summaries, translations, corrections, list generation, text reformulation, simple quiz creation..."
+                    },
+                    agentic: {
+                        badge: "For advanced projects",
+                        title: "Agentic Approach",
+                        description: "An intelligent method that adds self-assessment and continuous improvement capabilities. The AI doesn't just produce a result: it analyzes it, suggests improvements, and can iterate autonomously.",
+                        features: [
+                            "Precisely defined expert role",
+                            "Step-by-step methodology",
+                            "In-depth context analysis",
+                            "Multiple structured deliverables",
+                            "Professional quality guaranteed"
+                        ],
+                        exampleTitle: "Usage example",
+                        exampleText: "Creating complete courses, developing pedagogical strategies, detailed analyses, professional reports, methodological guides..."
+                    }
+                },
+                process: {
+                    title: "How does it work?",
+                    subtitle: "4 simple steps to transform your idea into a professional prompt",
+                    steps: [
+                        {
+                            title: "Describe your goal",
+                            description: "Simply express what you want to create. Our AI understands natural language, no need to be technical!"
+                        },
+                        {
+                            title: "Intelligent analysis",
+                            description: "The tool analyzes your request and automatically recommends the optimal approach (MVP or Agentic)"
+                        },
+                        {
+                            title: "Customization",
+                            description: "Fine-tune the parameters: level of detail, output format, specific constraints according to your needs"
+                        },
+                        {
+                            title: "Ready-to-use prompt",
+                            description: "Get your optimized prompt, test it and use it with ChatGPT, Claude, Gemini or any other AI tool"
+                        }
+                    ]
+                },
+                features: {
+                    title: "Why choose our generator?",
+                    introTitle: "Accessible to all, specially optimized for education",
+                    introText: "While our tool is designed for all AI users, we have developed specific features for teachers and trainers, perfectly integrating into the TeachInspire training ecosystem.",
+                    items: [
+                        {
+                            title: "Teacher Bonus",
+                            description: "Ready pedagogical templates: exercise creation, assessments, structured courses. Integrated CEFR levels for languages. Recognized pedagogical methodologies."
+                        },
+                        {
+                            title: "Personal Library",
+                            description: "Save and organize your effective prompts. Share with your pedagogical team. Build your custom collection."
+                        },
+                        {
+                            title: "AI that Understands AI",
+                            description: "\"Meta\" method: our AI helps you create prompts for AI. Based on TeachInspire research in pedagogical prompt engineering."
+                        },
+                        {
+                            title: "Universally Compatible",
+                            description: "Works with ChatGPT, Claude, Gemini, Copilot and all AI tools. Automatic French/English support according to your preferences."
+                        },
+                        {
+                            title: "Measurable Time Savings",
+                            description: "Go from 3 hours of course preparation to 30 minutes. Save 80% of your time while improving quality."
+                        },
+                        {
+                            title: "Active Community",
+                            description: "Join the TeachInspire community: exchange your prompts, discover best practices, participate in exclusive workshops."
+                        }
+                    ]
+                },
+                cta: {
+                    title: "Ready to master AI in your practice?",
+                    subtitle: "This Prompt Builder is part of the complete TeachInspire ecosystem. Discover our training to transform your pedagogical approach with artificial intelligence.",
+                    button: "Discover TeachInspire Training"
+                }
+            }
+        };
+
+        // Current language state
+        let currentLanguage = localStorage.getItem('preferred-language') || 'fr';
+
+        // Language management functions
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('preferred-language', lang);
+            
+            // Update UI
+            updateLanguageUI();
+            translatePage();
+            
+            // Close dropdown
+            document.getElementById('languageDropdown').classList.remove('active');
+            
+            // Notify React app of language change
+            if (window.setAppLanguage) {
+                window.setAppLanguage(lang);
+            }
+        }
+
+        function updateLanguageUI() {
+            const currentFlag = document.getElementById('currentFlag');
+            const currentLang = document.getElementById('currentLang');
+            const options = document.querySelectorAll('.language-option');
+            
+            if (currentLanguage === 'fr') {
+                currentFlag.textContent = '🇫🇷';
+                currentLang.textContent = 'FR';
+                document.documentElement.lang = 'fr';
+            } else {
+                currentFlag.textContent = '🇺🇸';
+                currentLang.textContent = 'EN';
+                document.documentElement.lang = 'en';
+            }
+            
+            // Update active option
+            options.forEach(option => {
+                option.classList.toggle('active', option.dataset.lang === currentLanguage);
+            });
+        }
+
+        function translatePage() {
+            const translations = landingTranslations[currentLanguage];
+            
+            // Translate all elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                const translation = getNestedTranslation(translations, key);
+                if (translation) {
+                    element.textContent = translation;
+                }
+            });
+        }
+
+        function getNestedTranslation(obj, path) {
+            return path.split('.').reduce((o, p) => o && o[p], obj);
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            const langSelector = document.querySelector('.language-selector');
+            const dropdown = document.getElementById('languageDropdown');
+            if (!langSelector.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Initialize language on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLanguageUI();
+            translatePage();
+        });
+
         // Enhanced scroll reveal animation
         const observerOptions = {
             threshold: 0.1,
