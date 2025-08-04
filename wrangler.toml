@@ -26,6 +26,7 @@ ALLOWED_ORIGINS = "https://yourdomain.com,https://www.yourdomain.com" # Update w
 # Run these commands to set your secrets:
 # wrangler secret put JWT_SECRET
 # wrangler secret put API_KEY
+# wrangler secret put RESEND_API_KEY
 
 # Development database (optional - for local development)
 # Uncomment and configure for local testing

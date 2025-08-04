@@ -16,9 +16,27 @@ function generateResetToken(): string {
 // Send reset email using Resend
 async function sendResetEmail(email: string, token: string, language: string, env: any): Promise<boolean> {
   try {
-    const resetUrl = `${env.FRONTEND_URL || 'https://promptbuilder.teachinspire.com'}/reset-password?token=${token}&lang=${language}`;
+    // Check if RESEND_API_KEY is available
+    if (!env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY environment variable is not set');
+      return false;
+    }
+
+    const resetUrl = `${env.FRONTEND_URL || 'https://prompt.teachinspire.me'}/app?token=${token}&lang=${language}`;
+    console.log('Sending reset email with URL:', resetUrl);
     
     const emailTemplate = getEmailTemplate(resetUrl, language);
+    
+    const emailData = {
+      from: 'TeachInspire <noreply@teachinspire.com>',
+      to: [email],
+      subject: language === 'fr' 
+        ? 'Réinitialisation de votre mot de passe - TeachInspire'
+        : 'Reset your password - TeachInspire',
+      html: emailTemplate
+    };
+    
+    console.log('Sending email with data:', { ...emailData, html: '[HTML_TEMPLATE]' });
     
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -26,22 +44,22 @@ async function sendResetEmail(email: string, token: string, language: string, en
         'Authorization': `Bearer ${env.RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: 'TeachInspire <noreply@teachinspire.com>',
-        to: [email],
-        subject: language === 'fr' 
-          ? 'Réinitialisation de votre mot de passe - TeachInspire'
-          : 'Reset your password - TeachInspire',
-        html: emailTemplate
-      }),
+      body: JSON.stringify(emailData),
     });
 
+    const responseText = await response.text();
+    
     if (!response.ok) {
-      console.error('Resend API error:', await response.text());
+      console.error('Resend API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        response: responseText
+      });
       return false;
     }
 
     console.log('Reset email sent successfully to:', email);
+    console.log('Resend response:', responseText);
     return true;
   } catch (error) {
     console.error('Error sending reset email:', error);
