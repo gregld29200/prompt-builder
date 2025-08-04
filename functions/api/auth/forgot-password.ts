@@ -103,7 +103,6 @@ function getEmailTemplate(resetUrl: string, language: string): string {
     <body style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #2c3d57; background-color: #f8f7f2; margin: 0; padding: 0;">
       <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(44, 61, 87, 0.1); overflow: hidden;">
         <div style="background: linear-gradient(135deg, #85a2a3 0%, #f1d263 100%); padding: 40px; text-align: center;">
-          <img src="https://imagedelivery.net/BGb25Nzj8sQ1HtrebC39dQ/134736d6-5e59-461d-8594-dbd8c8d6c400/public" alt="TeachInspire Logo" style="height: 50px; width: auto; margin-bottom: 20px; filter: brightness(0) saturate(100%) invert(100%);">
           <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">${t.title}</h1>
         </div>
         <div style="padding: 40px;">
