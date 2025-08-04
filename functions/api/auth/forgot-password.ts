@@ -28,7 +28,7 @@ async function sendResetEmail(email: string, token: string, language: string, en
     const emailTemplate = getEmailTemplate(resetUrl, language);
     
     const emailData = {
-      from: 'TeachInspire <noreply@teachinspire.com>',
+      from: 'TeachInspire <noreply@teachinspire.me>',
       to: [email],
       subject: language === 'fr' 
         ? 'Réinitialisation de votre mot de passe - TeachInspire'

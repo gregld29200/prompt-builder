@@ -15,7 +15,7 @@ wrangler secret put RESEND_API_KEY
 
 ### 2. Domain Verification in Resend
 1. **Login to Resend Dashboard**: https://resend.com/domains
-2. **Add Domain**: `teachinspire.com`
+2. **Add Domain**: `teachinspire.me`
 3. **Verify DNS Records**: Add the required DNS records to your domain
 4. **Wait for Verification**: Domain must show "Verified" status
 
@@ -38,7 +38,7 @@ RESEND_API_KEY=your_resend_api_key_here
 ### ❌ **"Domain not verified" error from Resend**
 **Solution**: 
 1. Go to Resend dashboard
-2. Verify `teachinspire.com` domain
+2. Verify `teachinspire.me` domain
 3. Add required DNS records
 
 ### ❌ **403 Forbidden from Resend API**
@@ -67,7 +67,7 @@ wrangler tail --format pretty
 ### 3. Expected Log Output
 ```
 ✅ Sending reset email with URL: https://prompt.teachinspire.me/app?token=abc123&lang=fr
-✅ Sending email with data: { from: 'TeachInspire <noreply@teachinspire.com>', to: ['user@example.com'], subject: '...' }
+✅ Sending email with data: { from: 'TeachInspire <noreply@teachinspire.me>', to: ['user@example.com'], subject: '...' }
 ✅ Reset email sent successfully to: user@example.com
 ✅ Resend response: {"id":"abc123-def456"}
 ```
