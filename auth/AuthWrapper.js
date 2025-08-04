@@ -3,6 +3,8 @@ import { Loader2, Languages } from 'lucide-react';
 import { useAuth } from './AuthContext.js';
 import Login from './Login.js';
 import Register from './Register.js';
+import ForgotPassword from './ForgotPassword.js';
+import ResetPassword from './ResetPassword.js';
 import MigrationDialog from '../components/MigrationDialog.js';
 
 const AuthWrapper = ({ children, translations, language, onLanguageChange }) => {
@@ -14,7 +16,18 @@ const AuthWrapper = ({ children, translations, language, onLanguageChange }) => 
     skipMigration, 
     retryMigration 
   } = useAuth();
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
+  const [authMode, setAuthMode] = useState('login'); // 'login', 'register', 'forgot-password', or 'reset-password'
+  
+  // Check for reset password token in URL on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const resetToken = urlParams.get('token');
+      if (resetToken) {
+        setAuthMode('reset-password');
+      }
+    }
+  }, []);
   
   // Use the language from props instead of local state
   const currentLanguage = language || 'fr';
@@ -47,15 +60,48 @@ const AuthWrapper = ({ children, translations, language, onLanguageChange }) => 
 
   // Show authentication forms if not authenticated
   if (!isAuthenticated) {
-    const authComponent = authMode === 'login' 
-      ? React.createElement(Login, {
+    let authComponent;
+    
+    switch (authMode) {
+      case 'login':
+        authComponent = React.createElement(Login, {
           onSwitchToRegister: () => setAuthMode('register'),
+          onSwitchToForgotPassword: () => {
+            console.log('Switching to forgot password mode');
+            setAuthMode('forgot-password');
+          },
           translations: t
-        })
-      : React.createElement(Register, {
+        });
+        break;
+      case 'register':
+        authComponent = React.createElement(Register, {
           onSwitchToLogin: () => setAuthMode('login'),
           translations: t
         });
+        break;
+      case 'forgot-password':
+        console.log('Rendering ForgotPassword component', { translations: t });
+        authComponent = React.createElement(ForgotPassword, {
+          onBackToLogin: () => {
+            console.log('Going back to login');
+            setAuthMode('login');
+          },
+          translations: t
+        });
+        break;
+      case 'reset-password':
+        authComponent = React.createElement(ResetPassword, {
+          onBackToLogin: () => setAuthMode('login'),
+          translations: t
+        });
+        break;
+      default:
+        authComponent = React.createElement(Login, {
+          onSwitchToRegister: () => setAuthMode('register'),
+          onSwitchToForgotPassword: () => setAuthMode('forgot-password'),
+          translations: t
+        });
+    }
 
     return React.createElement("div", { className: "min-h-screen bg-brand-bg" },
       // Language toggle in top right corner

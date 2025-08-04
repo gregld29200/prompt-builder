@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useLanguage } from '../components/LanguageContext.js';
 import { useAuth } from './AuthContext.js';
 
-const ResetPassword = ({ onBackToLogin }) => {
-  const { translations } = useLanguage();
+const ResetPassword = ({ onBackToLogin, translations }) => {
   const { login } = useAuth();
   const [token, setToken] = useState('');
   const [password, setPassword] = useState('');
@@ -105,9 +103,9 @@ const ResetPassword = ({ onBackToLogin }) => {
         
         setIsSuccess(true);
         
-        // Redirect to app after 2 seconds
+        // Redirect to app after 2 seconds - the parent component will handle this
         setTimeout(() => {
-          window.location.href = `/app.html?lang=${translations.currentLanguage}`;
+          onBackToLogin();
         }, 2000);
       } else {
         setError(data.error?.message || translations.auth.resetPassword.errorGeneric);

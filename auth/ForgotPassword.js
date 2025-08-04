@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useLanguage } from '../components/LanguageContext.js';
 import apiService from '../services/apiService.js';
 
-const ForgotPassword = ({ onBackToLogin }) => {
-  const { translations } = useLanguage();
+const ForgotPassword = ({ onBackToLogin, translations }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -21,23 +19,12 @@ const ForgotPassword = ({ onBackToLogin }) => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email: email.trim(),
-          language: translations.currentLanguage
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      const result = await apiService.forgotPassword(email.trim());
+      
+      if (result.success) {
         setIsSuccess(true);
       } else {
-        setError(data.error?.message || translations.auth.forgotPassword.errorGeneric);
+        setError(result.error || translations.auth.forgotPassword.errorGeneric);
       }
     } catch (error) {
       console.error('Forgot password error:', error);
