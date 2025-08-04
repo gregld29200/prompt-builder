@@ -93,19 +93,89 @@ The forget password system is fully implemented with a comprehensive architectur
 1. **UI/UX Improvements**: Add loading states and better error messages
 2. **Rate Limit Customization**: Consider separate rate limits for password reset vs login
 
+## Issues Found & Resolved
+
+### 🚨 **Critical Issues Identified (August 4, 2025)**
+
+#### Issue #1: "Mot de passe oublié" Link Not Working
+**Problem**: The forgot password link in the login form was not navigating to the forgot password form.
+
+**Root Cause**: 
+- Missing component imports in `AuthWrapper.js`
+- No navigation state handling for forgot password flow
+- Missing URL token detection for reset password links
+
+**✅ Resolution** `/auth/AuthWrapper.js:6`:
+- Added `ForgotPassword` and `ResetPassword` component imports
+- Extended `authMode` state to handle `'forgot-password'` and `'reset-password'` modes
+- Added `onSwitchToForgotPassword` prop to Login component
+- Implemented URL token detection for reset password links
+- Fixed component prop passing and translation integration
+
+#### Issue #2: Emails Not Being Sent Despite "Email Sent" Message
+**Problem**: Users received success message but no reset emails were delivered.
+
+**Root Cause**:
+- Wrong email domain: `noreply@teachinspire.com` instead of `noreply@teachinspire.me`
+- Incorrect reset URL: `https://promptbuilder.teachinspire.com` instead of `https://prompt.teachinspire.me`
+- Missing enhanced error logging for Resend API issues
+
+**✅ Resolution** `/functions/api/auth/forgot-password.ts:31`:
+- Fixed sender domain from `teachinspire.com` to `teachinspire.me`
+- Corrected reset URL to `https://prompt.teachinspire.me/app?token=...`
+- Added comprehensive error logging and RESEND_API_KEY validation
+- Enhanced debugging with detailed response status tracking
+
+#### Issue #3: Component Translation Dependencies
+**Problem**: ForgotPassword and ResetPassword components were using missing LanguageContext.
+
+**✅ Resolution** `/auth/ForgotPassword.js:4` & `/auth/ResetPassword.js:4`:
+- Removed dependency on non-existent LanguageContext
+- Updated components to use translations prop from AuthWrapper
+- Fixed API integration to use apiService.js consistently
+
 ## Status
 ✅ **System is fully functional and secure**
 
-The forget password system is well-implemented with industry-standard security practices. The identified issues are minor optimizations rather than critical problems.
+**August 4, 2025 - RESOLVED**: All critical issues have been identified and fixed. The forget password system now works end-to-end:
+- ✅ "Mot de passe oublié" link navigates properly
+- ✅ Emails are successfully sent via Resend API
+- ✅ Reset password links work correctly
+- ✅ All components integrated with proper translation support
+
+## Deployment & Configuration
+
+### Required Secrets (via wrangler secret put)
+```bash
+wrangler secret put JWT_SECRET
+wrangler secret put API_KEY  
+wrangler secret put RESEND_API_KEY
+```
+
+### Domain Configuration
+- **Resend Domain**: `teachinspire.me` (must be verified in Resend dashboard)
+- **Reset URL**: `https://prompt.teachinspire.me/app?token={token}&lang={lang}`
+- **Sender Email**: `TeachInspire <noreply@teachinspire.me>`
+
+### Files Created/Modified
+- ✅ `/auth/AuthWrapper.js` - Added forgot password navigation
+- ✅ `/auth/ForgotPassword.js` - Fixed translations and API integration  
+- ✅ `/auth/ResetPassword.js` - Fixed translations and redirect behavior
+- ✅ `/functions/api/auth/forgot-password.ts` - Fixed domain and enhanced logging
+- ✅ `/wrangler.toml` - Added RESEND_API_KEY documentation
+- ✅ `/RESEND_SETUP.md` - Complete setup and troubleshooting guide
 
 ## Review Summary
 
-The forget password implementation is comprehensive and follows security best practices. The system includes:
-- Secure token generation and management
-- Email enumeration protection  
-- Strong password validation
-- Rate limiting
-- Bilingual support
-- Auto-login functionality
+The forget password implementation is now **fully functional** and follows security best practices:
+- ✅ Secure token generation and management
+- ✅ Email enumeration protection  
+- ✅ Strong password validation
+- ✅ Rate limiting protection
+- ✅ Bilingual support (FR/EN)
+- ✅ Auto-login functionality
+- ✅ End-to-end email delivery
+- ✅ Proper error handling and logging
+- ✅ React component integration
 
-Minor improvements could be made for maintainability and robustness, but the core functionality is solid and secure.
+**Test Results**: Successfully tested on `https://prompt.teachinspire.me/app?lang=fr` - forgot password flow works completely from link click to email delivery to password reset.
