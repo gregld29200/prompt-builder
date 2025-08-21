@@ -285,13 +285,24 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
     
     // ✅ Auto-suggestion intelligente du rôle d'expert
     if (!expertRole.trim() && rawRequest.trim()) {
+      console.log('🔍 DEBUG: Triggering role suggestion...', { rawRequest, analyzedDomain, analyzedComplexity, language });
       const suggestion = suggestExpertRole(rawRequest, analyzedDomain, analyzedComplexity, language);
+      console.log('🔍 DEBUG: Suggestion result:', suggestion);
       if (suggestion.role && suggestion.confidence >= 30) { // Seuil minimum de confiance
         setSuggestedRole(suggestion.role);
         setRoleSuggestionConfidence(suggestion.confidence);
         setShowRoleSuggestion(true);
         setRoleSuggestionAccepted(false);
+        console.log('✅ DEBUG: Role suggestion activated!');
+      } else {
+        console.log('❌ DEBUG: Role suggestion rejected (low confidence or no role)');
       }
+    } else {
+      console.log('🔍 DEBUG: Role suggestion skipped', { 
+        expertRoleEmpty: !expertRole.trim(), 
+        rawRequestExists: !!rawRequest.trim(),
+        expertRole: expertRole 
+      });
     }
     
     setStep(3);
