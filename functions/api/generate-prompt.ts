@@ -608,9 +608,13 @@ export const onRequestPost = async (context: any) => {
   
   try {
     console.log('=== GENERATE PROMPT ENDPOINT ===');
+    console.log('🔍 DEBUG: JWT_SECRET exists:', !!env.JWT_SECRET);
+    console.log('🔍 DEBUG: API_KEY exists:', !!env.API_KEY);
+    console.log('🔍 DEBUG: Available env vars:', Object.keys(env));
     
     // Basic environment check
     if (!env.JWT_SECRET) {
+      console.log('❌ ERROR: JWT_SECRET is missing!');
       const errorResponse = new Response(JSON.stringify({
         success: false,
         error: {
