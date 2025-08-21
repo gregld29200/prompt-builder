@@ -685,6 +685,8 @@ export const onRequestPost = async (context: any) => {
     const { systemInstruction, userQuery } = buildPromptQuery(params, tMeta);
 
     // Initialize Gemini AI
+    console.log('🔍 DEBUG: API_KEY exists:', !!env.API_KEY);
+    console.log('🔍 DEBUG: API_KEY prefix:', env.API_KEY ? env.API_KEY.substring(0, 10) + '...' : 'MISSING');
     const ai = new GoogleGenAI({ apiKey: env.API_KEY });
 
     // Call Gemini API
