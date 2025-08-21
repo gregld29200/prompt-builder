@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronRight, Copy, Save, Download, Languages, Sparkles, Brain, Check, X, AlertCircle, FileText, Clock, Star, Loader2, Trash2 } from 'lucide-react'; // Added Trash2
 // Removed type imports: PromptType, Language, Domain, Complexity, OutputLength, SavedPrompt, Translations
-import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS, CONTEXTUAL_HELPERS } from './constants.js';
+import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS, CONTEXTUAL_HELPERS, ROLE_SUGGESTION_DATABASE } from './constants.js';
 import { generateStructuredPromptWithGemini } from './services/geminiService.js';
 import { AuthProvider } from './auth/AuthContext.js';
 import AuthWrapper from './auth/AuthWrapper.js';
@@ -44,6 +44,12 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
   const [expertRole, setExpertRole] = useState('');
   const [mission, setMission] = useState('');
   const [constraints, setConstraints] = useState('');
+  
+  // ✅ AJOUT FONCTIONNALITÉ: États pour auto-suggestion de rôles d'expert
+  const [suggestedRole, setSuggestedRole] = useState('');
+  const [roleSuggestionConfidence, setRoleSuggestionConfidence] = useState(0);
+  const [showRoleSuggestion, setShowRoleSuggestion] = useState(false);
+  const [roleSuggestionAccepted, setRoleSuggestionAccepted] = useState(false);
   
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -96,6 +102,69 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
       domain: detectedDomain,
       complexity: isComplex ? 'complex' : 'simple',
       recommendedType: isComplex ? 'AGENTIC' : 'MVP'
+    };
+  }, []);
+
+  // ✅ AJOUT FONCTIONNALITÉ: Algorithme intelligent pour suggestion de rôles d'expert
+  const suggestExpertRole = useCallback((request, domain, complexity, language) => {
+    if (!request || request.length < MIN_RAW_REQUEST_LENGTH) {
+      return { role: '', confidence: 0 };
+    }
+
+    const requestLower = request.toLowerCase();
+    let bestMatch = { role: '', confidence: 0, source: 'fallback' };
+    
+    // 1. Analyse par mots-clés avec pondération
+    Object.entries(ROLE_SUGGESTION_DATABASE.keywords).forEach(([category, data]) => {
+      const matchingWords = data.words.filter(word => requestLower.includes(word.toLowerCase()));
+      if (matchingWords.length > 0) {
+        const confidence = Math.min((matchingWords.length / data.words.length * 100) * data.weight, 95);
+        if (confidence > bestMatch.confidence) {
+          const roles = data.roles[language] || data.roles.fr;
+          bestMatch = {
+            role: roles[Math.floor(Math.random() * roles.length)],
+            confidence: confidence,
+            source: 'keyword-' + category
+          };
+        }
+      }
+    });
+
+    // 2. Fallback par domaine + complexité si la confiance est faible
+    if (bestMatch.confidence < 30) {
+      const domainRoles = ROLE_SUGGESTION_DATABASE.domainRoles[domain];
+      if (domainRoles) {
+        const complexityRoles = domainRoles[complexity] || domainRoles.simple;
+        const roles = complexityRoles[language] || complexityRoles.fr;
+        if (roles && roles.length > 0) {
+          bestMatch = {
+            role: roles[Math.floor(Math.random() * roles.length)],
+            confidence: 40, // Confiance modérée pour les fallbacks par domaine
+            source: 'domain-fallback'
+          };
+        }
+      }
+    }
+
+    // 3. Boost de confiance si le domaine correspond aux mots-clés
+    if (bestMatch.source.includes('keyword') && bestMatch.confidence > 0) {
+      const domainKeywords = {
+        education: ['cours', 'élève', 'enseigner', 'formation'],
+        technical: ['code', 'système', 'technique', 'développement'],
+        creative: ['créer', 'design', 'artistique', 'visuel'],
+        analysis: ['analyser', 'données', 'évaluer', 'recherche']
+      };
+      
+      const relevantKeywords = domainKeywords[domain] || [];
+      const domainMatch = relevantKeywords.some(keyword => requestLower.includes(keyword));
+      if (domainMatch) {
+        bestMatch.confidence = Math.min(bestMatch.confidence * 1.2, 95);
+      }
+    }
+
+    return {
+      role: bestMatch.role,
+      confidence: Math.round(bestMatch.confidence)
     };
   }, []);
 
@@ -195,6 +264,11 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
     setConstraints('');
     setGeneratedPrompt('');
     setIsGenerating(false);
+    // ✅ Reset des états de suggestion de rôle
+    setSuggestedRole('');
+    setRoleSuggestionConfidence(0);
+    setShowRoleSuggestion(false);
+    setRoleSuggestionAccepted(false);
   };
 
   // Back to dashboard (same as reset but explicit)
@@ -202,15 +276,45 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
     resetForm();
   };
 
-  // Function to handle navigation to step 3 with auto-fill
+  // ✅ AJOUT FONCTIONNALITÉ: Navigation vers étape 3 avec auto-suggestions intelligentes
   const goToStep3WithAutoFill = () => {
     // Auto-fill mission with rawRequest if mission is empty
     if (!mission.trim() && rawRequest.trim()) {
       setMission(rawRequest);
     }
+    
+    // ✅ Auto-suggestion intelligente du rôle d'expert
+    if (!expertRole.trim() && rawRequest.trim()) {
+      const suggestion = suggestExpertRole(rawRequest, analyzedDomain, analyzedComplexity, language);
+      if (suggestion.role && suggestion.confidence >= 30) { // Seuil minimum de confiance
+        setSuggestedRole(suggestion.role);
+        setRoleSuggestionConfidence(suggestion.confidence);
+        setShowRoleSuggestion(true);
+        setRoleSuggestionAccepted(false);
+      }
+    }
+    
     setStep(3);
   };
 
+  // ✅ AJOUT FONCTIONNALITÉ: Fonctions pour gérer les suggestions de rôle
+  const acceptRoleSuggestion = () => {
+    setExpertRole(suggestedRole);
+    setRoleSuggestionAccepted(true);
+    setShowRoleSuggestion(false);
+  };
+
+  const declineRoleSuggestion = () => {
+    setShowRoleSuggestion(false);
+    setRoleSuggestionAccepted(false);
+  };
+
+  const editRoleSuggestion = () => {
+    setExpertRole(suggestedRole); // Pré-remplit avec la suggestion
+    setShowRoleSuggestion(false);
+    setRoleSuggestionAccepted(true);
+    // Focus sur le champ sera géré par React
+  };
 
   const loadPromptFromLibrary = (promptData) => {
     // Map API response fields to local state
@@ -456,6 +560,58 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
             item.descriptionToken && React.createElement("p", { 
               className: "text-sm text-brand-info italic -mt-1 mb-1.5" // Blue, italic, adjusted margin
             }, t.variables[item.descriptionToken]),
+            
+            // ✅ AJOUT FONCTIONNALITÉ: Interface de suggestion intelligente pour le rôle d'expert
+            item.id === 'expertRole' && showRoleSuggestion && !roleSuggestionAccepted && React.createElement("div", {
+              className: "mb-3 p-4 bg-gradient-to-r from-brand-primary-accent/5 to-brand-secondary-accent/5 border border-brand-primary-accent/20 rounded-lg"
+            },
+              React.createElement("div", { className: "flex items-start gap-3" },
+                React.createElement("div", { className: "flex-shrink-0" },
+                  React.createElement(Sparkles, { className: "w-5 h-5 text-brand-primary-accent mt-0.5" })
+                ),
+                React.createElement("div", { className: "flex-grow" },
+                  React.createElement("div", { className: "flex items-center gap-2 mb-2" },
+                    React.createElement("span", { className: "text-sm font-semibold text-brand-primary-accent" },
+                      language === 'fr' ? 'Suggestion IA' : 'AI Suggestion'
+                    ),
+                    roleSuggestionConfidence > 70 && React.createElement("span", { 
+                      className: "text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium" 
+                    }, `${roleSuggestionConfidence}%`),
+                    roleSuggestionConfidence <= 70 && roleSuggestionConfidence >= 50 && React.createElement("span", { 
+                      className: "text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full font-medium" 
+                    }, `${roleSuggestionConfidence}%`),
+                    roleSuggestionConfidence < 50 && React.createElement("span", { 
+                      className: "text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full font-medium" 
+                    }, `${roleSuggestionConfidence}%`)
+                  ),
+                  React.createElement("p", { className: "text-brand-text font-medium mb-3" },
+                    `"${suggestedRole}"`
+                  ),
+                  React.createElement("div", { className: "flex gap-2 flex-wrap" },
+                    React.createElement("button", {
+                      onClick: acceptRoleSuggestion,
+                      className: "px-3 py-1.5 bg-brand-primary-accent text-white rounded-md text-sm font-medium hover:bg-opacity-80 transition-colors flex items-center gap-1"
+                    },
+                      React.createElement(Check, { className: "w-4 h-4" }),
+                      language === 'fr' ? 'Accepter' : 'Accept'
+                    ),
+                    React.createElement("button", {
+                      onClick: editRoleSuggestion,
+                      className: "px-3 py-1.5 border border-brand-primary-accent text-brand-primary-accent rounded-md text-sm font-medium hover:bg-brand-primary-accent hover:text-white transition-colors"
+                    },
+                      language === 'fr' ? '✏️ Modifier' : '✏️ Edit'
+                    ),
+                    React.createElement("button", {
+                      onClick: declineRoleSuggestion,
+                      className: "px-3 py-1.5 border border-gray-300 text-gray-600 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors flex items-center gap-1"
+                    },
+                      React.createElement(X, { className: "w-4 h-4" }),
+                      language === 'fr' ? 'Ignorer' : 'Dismiss'
+                    )
+                  )
+                )
+              )
+            ),
             item.type === 'input' 
               ? React.createElement("input", { 
                   id: item.id,

@@ -595,3 +595,123 @@ export const CONTEXTUAL_HELPERS = {
     }
   }
 };
+
+// ✅ AJOUT FONCTIONNALITÉ: Base de données intelligente pour auto-suggestion de rôles d'expert
+export const ROLE_SUGGESTION_DATABASE = {
+  // Mots-clés avec scores de confiance pour détecter le type de tâche
+  keywords: {
+    // Actions pédagogiques
+    teaching: {
+      words: ['enseigner', 'teach', 'cours', 'lesson', 'élève', 'student', 'apprendre', 'learn', 'former', 'train', 'éduquer', 'educate', 'expliquer', 'explain', 'pédagogue', 'pedagogical'],
+      roles: {
+        fr: ['Enseignant expert', 'Concepteur pédagogique', 'Formateur professionnel', 'Professeur spécialisé'],
+        en: ['Expert Teacher', 'Instructional Designer', 'Professional Trainer', 'Specialized Professor']
+      },
+      weight: 2.0
+    },
+    
+    // Actions de création/développement
+    creating: {
+      words: ['créer', 'create', 'développer', 'develop', 'concevoir', 'design', 'produire', 'produce', 'construire', 'build', 'élaborer', 'elaborate', 'générer', 'generate'],
+      roles: {
+        fr: ['Concepteur créatif', 'Développeur de contenu', 'Designer expérimenté', 'Chef de projet'],
+        en: ['Creative Designer', 'Content Developer', 'Experienced Designer', 'Project Manager']
+      },
+      weight: 1.8
+    },
+    
+    // Actions d'analyse
+    analyzing: {
+      words: ['analyser', 'analyze', 'évaluer', 'evaluate', 'examiner', 'examine', 'étudier', 'study', 'diagnostiquer', 'diagnose', 'investiguer', 'investigate', 'recherche', 'research'],
+      roles: {
+        fr: ['Analyste expert', 'Consultant stratégique', 'Chercheur spécialisé', 'Évaluateur professionnel'],
+        en: ['Expert Analyst', 'Strategic Consultant', 'Specialized Researcher', 'Professional Evaluator']
+      },
+      weight: 1.9
+    },
+    
+    // Actions de leadership/management
+    managing: {
+      words: ['gérer', 'manage', 'diriger', 'lead', 'coordonner', 'coordinate', 'superviser', 'supervise', 'organiser', 'organize', 'planifier', 'plan', 'optimiser', 'optimize'],
+      roles: {
+        fr: ['Manager expérimenté', 'Directeur opérationnel', 'Chef d\'équipe', 'Coordinateur expert'],
+        en: ['Experienced Manager', 'Operations Director', 'Team Leader', 'Expert Coordinator']
+      },
+      weight: 1.7
+    },
+    
+    // Actions techniques
+    technical: {
+      words: ['programmer', 'program', 'coder', 'code', 'développement', 'development', 'technique', 'technical', 'algorithmique', 'algorithmic', 'système', 'system', 'architecture', 'software', 'logiciel'],
+      roles: {
+        fr: ['Développeur senior', 'Architecte logiciel', 'Tech lead', 'Ingénieur expert'],
+        en: ['Senior Developer', 'Software Architect', 'Tech Lead', 'Expert Engineer']
+      },
+      weight: 2.1
+    },
+    
+    // Actions créatives
+    creative: {
+      words: ['imaginer', 'imagine', 'inventer', 'invent', 'innover', 'innovate', 'créatif', 'creative', 'artistique', 'artistic', 'design', 'designer', 'visuel', 'visual'],
+      roles: {
+        fr: ['Créateur de contenu', 'Designer créatif', 'Directeur artistique', 'Concepteur visuel'],
+        en: ['Content Creator', 'Creative Designer', 'Art Director', 'Visual Designer']
+      },
+      weight: 1.8
+    }
+  },
+  
+  // Rôles par domaine avec niveaux de complexité
+  domainRoles: {
+    education: {
+      simple: {
+        fr: ['Enseignant', 'Formateur', 'Tuteur expert'],
+        en: ['Teacher', 'Trainer', 'Expert Tutor']
+      },
+      complex: {
+        fr: ['Concepteur pédagogique', 'Directeur de formation', 'Expert en ingénierie pédagogique'],
+        en: ['Instructional Designer', 'Training Director', 'Learning Engineering Expert']
+      }
+    },
+    technical: {
+      simple: {
+        fr: ['Développeur', 'Technicien expert', 'Consultant technique'],
+        en: ['Developer', 'Expert Technician', 'Technical Consultant']
+      },
+      complex: {
+        fr: ['Architecte logiciel', 'CTO', 'Directeur technique'],
+        en: ['Software Architect', 'CTO', 'Technical Director']
+      }
+    },
+    creative: {
+      simple: {
+        fr: ['Designer', 'Créatif', 'Rédacteur'],
+        en: ['Designer', 'Creative', 'Writer']
+      },
+      complex: {
+        fr: ['Directeur artistique', 'Creative Director', 'Chef de création'],
+        en: ['Art Director', 'Creative Director', 'Head of Creative']
+      }
+    },
+    analysis: {
+      simple: {
+        fr: ['Analyste', 'Consultant', 'Expert métier'],
+        en: ['Analyst', 'Consultant', 'Business Expert']
+      },
+      complex: {
+        fr: ['Directeur stratégique', 'Consultant senior', 'Analyste principal'],
+        en: ['Strategic Director', 'Senior Consultant', 'Principal Analyst']
+      }
+    },
+    other: {
+      simple: {
+        fr: ['Consultant expert', 'Spécialiste', 'Professionnel expérimenté'],
+        en: ['Expert Consultant', 'Specialist', 'Experienced Professional']
+      },
+      complex: {
+        fr: ['Directeur conseil', 'Expert senior', 'Consultant stratégique'],
+        en: ['Advisory Director', 'Senior Expert', 'Strategic Consultant']
+      }
+    }
+  }
+};
