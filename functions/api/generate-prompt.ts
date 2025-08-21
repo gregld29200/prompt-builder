@@ -608,13 +608,9 @@ export const onRequestPost = async (context: any) => {
   
   try {
     console.log('=== GENERATE PROMPT ENDPOINT ===');
-    console.log('🔍 DEBUG: JWT_SECRET exists:', !!env.JWT_SECRET);
-    console.log('🔍 DEBUG: API_KEY exists:', !!env.API_KEY);
-    console.log('🔍 DEBUG: Available env vars:', Object.keys(env));
     
     // Basic environment check
     if (!env.JWT_SECRET) {
-      console.log('❌ ERROR: JWT_SECRET is missing!');
       const errorResponse = new Response(JSON.stringify({
         success: false,
         error: {
@@ -628,12 +624,14 @@ export const onRequestPost = async (context: any) => {
       return SecurityHeadersManager.addSecurityHeaders(errorResponse);
     }
     
-    if (!env.API_KEY) {
+    // ✅ Support both API_KEY and GEMINI_API_KEY variable names
+    const apiKey = env.API_KEY || env.GEMINI_API_KEY;
+    if (!apiKey) {
       const errorResponse = new Response(JSON.stringify({
         success: false,
         error: {
           code: 'CONFIG_ERROR',
-          message: 'API key configuration missing'
+          message: 'Missing Gemini API Key (set API_KEY or GEMINI_API_KEY)'
         }
       }), {
         status: 503,
@@ -688,10 +686,8 @@ export const onRequestPost = async (context: any) => {
     // Build prompt query
     const { systemInstruction, userQuery } = buildPromptQuery(params, tMeta);
 
-    // Initialize Gemini AI
-    console.log('🔍 DEBUG: API_KEY exists:', !!env.API_KEY);
-    console.log('🔍 DEBUG: API_KEY prefix:', env.API_KEY ? env.API_KEY.substring(0, 10) + '...' : 'MISSING');
-    const ai = new GoogleGenAI({ apiKey: env.API_KEY });
+    // Initialize Gemini AI with fallback support
+    const ai = new GoogleGenAI({ apiKey });
 
     // Call Gemini API
     const result = await ai.models.generateContent({
