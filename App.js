@@ -268,6 +268,7 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
   };
 
   const getCurrentPromptText = () => (isEditing ? editorText : (generatedPrompt || ''));
+  const isDirty = history.length > 0 && getCurrentPromptText() && (getCurrentPromptText() !== history[0]);
 
   const showNotification = (message, type = 'success') => {
     setNotification(message);
@@ -748,7 +749,12 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
               onClick: revertToOriginal,
               disabled: history.length <= 1,
               className: `px-3 py-1.5 border ${history.length <= 1 ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-brand-text hover:bg-gray-100'} rounded-md text-sm font-medium transition-colors flex items-center gap-2`
-            }, React.createElement(RotateCcw, { className: "w-4 h-4" }), t.actions.revert)
+            }, React.createElement(RotateCcw, { className: "w-4 h-4" }), t.actions.revert),
+            React.createElement("span", { 
+              className: `ml-auto px-2.5 py-1 rounded-full text-xs font-medium border ${isDirty ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-green-100 text-green-700 border-green-200'}`
+            },
+              t.editor.localEdits, ' • ', (isDirty ? t.editor.modified : t.editor.notModified)
+            )
           ),
           isEditing
             ? React.createElement("textarea", {

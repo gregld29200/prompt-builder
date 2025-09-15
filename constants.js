@@ -75,6 +75,11 @@ export const translations = {
       error: "Erreur de génération. Veuillez réessayer.",
       empty: "Aucun prompt généré pour l'instant."
     },
+    editor: {
+      localEdits: "Éditions locales",
+      modified: "Modifié",
+      notModified: "Non modifié"
+    },
     actions: {
       copy: "Copier",
       save: "Sauvegarder",
@@ -307,6 +312,11 @@ export const translations = {
       title: "Your structured prompt",
       error: "Generation error. Please try again.",
       empty: "No prompt generated yet."
+    },
+    editor: {
+      localEdits: "Local edits",
+      modified: "Modified",
+      notModified: "Not modified"
     },
     actions: {
       copy: "Copy",
