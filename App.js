@@ -41,6 +41,7 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
 
   const [selectedDomain, setSelectedDomain] = useState('education');
   const [outputLength, setOutputLength] = useState('medium');
+  const [domainDetail, setDomainDetail] = useState('');
   const [expertRole, setExpertRole] = useState('');
   const [mission, setMission] = useState('');
   const [constraints, setConstraints] = useState('');
@@ -189,6 +190,7 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
         rawRequest,
         promptType,
         domain: selectedDomain,
+        domainDetail,
         language,
         outputLength,
         expertRole,
@@ -259,6 +261,7 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
     setRecommendedType('MVP');
     setSelectedDomain('education');
     setOutputLength('medium');
+    setDomainDetail('');
     setExpertRole('');
     setMission('');
     setConstraints('');
@@ -548,6 +551,16 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
               item.optionsSource.map(opt => React.createElement("option", { key: opt.value, value: opt.value }, t[item.optionsLabelNamespace][opt.labelToken]))
             )
           )),
+          selectedDomain === 'other' && React.createElement("div", { className: "-mt-2" },
+            React.createElement("label", { className: "block text-sm font-medium text-brand-text mb-1.5" }, t.variables.domainSpecify),
+            React.createElement("input", {
+              type: "text",
+              value: domainDetail,
+              onChange: (e) => setDomainDetail(e.target.value),
+              placeholder: t.variables.domainSpecifyPlaceholder,
+              className: "w-full p-3 border-2 border-gray-300 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none text-base"
+            })
+          ),
           variableFormFields.map(item => React.createElement("div", { key: item.id },
             // ✅ AJOUT UX: Label avec ContextualHelper intégré
             React.createElement("div", { className: "flex items-center gap-2 mb-1.5" },

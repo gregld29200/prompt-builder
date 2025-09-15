@@ -55,6 +55,8 @@ export const translations = {
     variables: {
       title: "Affiner votre prompt",
       domain: "Domaine",
+      domainSpecify: "Préciser (optionnel)",
+      domainSpecifyPlaceholder: "Ex: médical, juridique, RH...",
       outputLength: "Longueur de sortie",
       expertRole: "Rôle de l'expert",
       expertRoleDescription: "Préciser le rôle que vous voulez donner à l'IA pour cette tâche - sa fonction.",
@@ -280,6 +282,8 @@ export const translations = {
     variables: {
       title: "Refine your prompt",
       domain: "Domain",
+      domainSpecify: "Specify (optional)",
+      domainSpecifyPlaceholder: "E.g., medical, legal, HR...",
       outputLength: "Output length",
       expertRole: "Expert role",
       expertRoleDescription: "Specify the role you want the AI to play for this task - its function.",

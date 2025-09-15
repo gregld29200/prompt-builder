@@ -49,6 +49,7 @@ interface GeneratePromptParams {
   rawRequest: string;
   promptType: PromptType;
   domain: Domain;
+  domainDetail?: string;
   language: Language;
   outputLength: OutputLength;
   expertRole: string;
@@ -65,6 +66,7 @@ const metaPromptTranslations = {
     rawRequestLabel: "User's Goal / Raw Request:",
     promptTypeLabel: "Chosen Prompt Structure Type:",
     domainLabel: "Domain:",
+    domainDetailSuffix: " (details: {DETAIL})",
     outputLengthLabel: "Desired Output Length for the AI using the generated prompt:",
     expertRoleLabel: "Expert Role for the AI using the generated prompt:",
     missionLabel: "Main Mission for the AI using the generated prompt:",
@@ -180,6 +182,7 @@ const metaPromptTranslations = {
     rawRequestLabel: "Objectif / Demande brute de l'utilisateur :",
     promptTypeLabel: "Type de structure de prompt choisi :",
     domainLabel: "Domaine :",
+    domainDetailSuffix: " (précision : {DETAIL})",
     outputLengthLabel: "Longueur de sortie souhaitée pour l'IA utilisant le prompt généré :",
     expertRoleLabel: "Rôle d'expert pour l'IA utilisant le prompt généré :",
     missionLabel: "Mission principale pour l'IA utilisant le prompt généré :",
@@ -478,6 +481,7 @@ function buildPromptQuery(params: GeneratePromptParams, tMeta: any): { systemIns
     rawRequest,
     promptType,
     domain,
+    domainDetail,
     language,
     outputLength,
     expertRole,
@@ -499,7 +503,7 @@ ${tMeta.rawRequestLabel}
 "${rawRequest}"
 
 ${tMeta.promptTypeLabel} ${promptType}
-${tMeta.domainLabel} ${domain}
+${tMeta.domainLabel} ${domain}${domainDetail ? tMeta.domainDetailSuffix.replace('{DETAIL}', domainDetail) : ''}
 ${tMeta.outputLengthLabel} ${outputLength}
 ${tMeta.expertRoleLabel} ${expertRole || (promptType === 'MVP' ? tMeta.mvpExpertPlaceholder : tMeta.agenticExpertPlaceholder)}
 ${tMeta.missionLabel} ${mission || tMeta.mvpMissionPlaceholder}
