@@ -72,7 +72,8 @@ export const translations = {
     generation: {
       generating: "Génération en cours...",
       title: "Votre prompt structuré",
-      error: "Erreur de génération. Veuillez réessayer."
+      error: "Erreur de génération. Veuillez réessayer.",
+      empty: "Aucun prompt généré pour l'instant."
     },
     actions: {
       copy: "Copier",
@@ -88,7 +89,12 @@ export const translations = {
       usePrompt: "Utiliser",
       delete: "Supprimer",
       backToDashboard: "Tableau de bord",
-      backToDashboardFull: "Retour tableau de bord"
+      backToDashboardFull: "Retour tableau de bord",
+      editPrompt: "Éditer",
+      doneEditing: "Terminer",
+      undo: "Annuler",
+      redo: "Rétablir",
+      revert: "Revenir à l'original"
     },
     library: {
       title: "Bibliothèque de prompts",
@@ -299,7 +305,8 @@ export const translations = {
     generation: {
       generating: "Generating...",
       title: "Your structured prompt",
-      error: "Generation error. Please try again."
+      error: "Generation error. Please try again.",
+      empty: "No prompt generated yet."
     },
     actions: {
       copy: "Copy",
@@ -315,7 +322,12 @@ export const translations = {
       usePrompt: "Use",
       delete: "Delete",
       backToDashboard: "Dashboard",
-      backToDashboardFull: "Back to Dashboard"
+      backToDashboardFull: "Back to Dashboard",
+      editPrompt: "Edit",
+      doneEditing: "Done",
+      undo: "Undo",
+      redo: "Redo",
+      revert: "Revert to original"
     },
     library: {
       title: "Prompt Library",

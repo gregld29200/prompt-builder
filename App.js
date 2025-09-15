@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronRight, Copy, Save, Download, Languages, Sparkles, Brain, Check, X, AlertCircle, FileText, Clock, Star, Loader2, Trash2 } from 'lucide-react'; // Added Trash2
+import { ChevronRight, Copy, Save, Download, Languages, Sparkles, Brain, Check, X, AlertCircle, FileText, Clock, Star, Loader2, Trash2, Edit3, RotateCcw, RotateCw } from 'lucide-react'; // Added editor icons
 // Removed type imports: PromptType, Language, Domain, Complexity, OutputLength, SavedPrompt, Translations
 import { translations, DEFAULT_LANGUAGE, MIN_RAW_REQUEST_LENGTH, MAX_RAW_REQUEST_LENGTH, DOMAIN_OPTIONS, OUTPUT_LENGTH_OPTIONS, CONTEXTUAL_HELPERS, ROLE_SUGGESTION_DATABASE } from './constants.js';
 import { generateStructuredPromptWithGemini } from './services/geminiService.js';
@@ -54,6 +54,10 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
   
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editorText, setEditorText] = useState('');
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [showLibrary, setShowLibrary] = useState(false);
   const [showLibraryPage, setShowLibraryPage] = useState(false);
   const [savedPrompts, setSavedPrompts] = useState([]);
@@ -207,15 +211,74 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
     }
   };
 
+  // Initialize editor when a new prompt is generated or loaded
+  useEffect(() => {
+    if (generatedPrompt) {
+      setEditorText(generatedPrompt);
+      setHistory([generatedPrompt]);
+      setHistoryIndex(0);
+      setIsEditing(false);
+    } else {
+      setEditorText('');
+      setHistory([]);
+      setHistoryIndex(-1);
+    }
+  }, [generatedPrompt]);
+
+  const pushHistory = (text) => {
+    setHistory((prev) => {
+      const truncated = historyIndex < prev.length - 1 ? prev.slice(0, historyIndex + 1) : prev;
+      if (truncated[truncated.length - 1] === text) return truncated; // no-op if unchanged
+      const next = [...truncated, text];
+      // limit history size to 100 entries
+      const limited = next.length > 100 ? next.slice(next.length - 100) : next;
+      setHistoryIndex(limited.length - 1);
+      return limited;
+    });
+  };
+
+  const onEditorChange = (e) => {
+    const val = e.target.value;
+    setEditorText(val);
+    pushHistory(val);
+  };
+
+  const undoEdit = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setEditorText(history[newIndex]);
+    }
+  };
+
+  const redoEdit = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setEditorText(history[newIndex]);
+    }
+  };
+
+  const revertToOriginal = () => {
+    if (history.length > 0) {
+      const original = history[0];
+      setEditorText(original);
+      pushHistory(original);
+    }
+  };
+
+  const getCurrentPromptText = () => (isEditing ? editorText : (generatedPrompt || ''));
+
   const showNotification = (message, type = 'success') => {
     setNotification(message);
     setTimeout(() => setNotification(''), 3000);
   };
 
   const copyToClipboard = async () => {
-    if (!generatedPrompt) return;
+    const text = getCurrentPromptText();
+    if (!text) return;
     try {
-      await navigator.clipboard.writeText(generatedPrompt);
+      await navigator.clipboard.writeText(text);
       showNotification(t.notifications.copied, 'success');
     } catch (err) {
       console.error('Failed to copy text: ', err);
@@ -239,8 +302,9 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
   };
 
   const exportPrompt = () => {
-    if (!generatedPrompt) return;
-    const blob = new Blob([generatedPrompt], { type: 'text/plain;charset=utf-8' });
+    const text = getCurrentPromptText();
+    if (!text) return;
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -661,9 +725,47 @@ const MainApp = ({ initialLanguage, onLanguageChange }) => {
           React.createElement(Loader2, { className: "w-12 h-12 mx-auto animate-spin text-brand-primary-accent mb-4" }),
           React.createElement("p", { className: "text-brand-muted-text text-lg" }, t.generation.generating)
         ) : React.createElement(React.Fragment, null,
-          React.createElement("div", { className: "bg-brand-bg/50 rounded-lg border-l-4 border-brand-primary-accent p-4 font-courier text-sm text-brand-text whitespace-pre-wrap max-h-[500px] overflow-y-auto shadow-inner" },
-            generatedPrompt || "No prompt generated yet."
+          React.createElement("div", { className: "flex items-center gap-2 mb-3 flex-wrap" },
+            !isEditing && React.createElement("button", {
+              onClick: () => setIsEditing(true),
+              className: "px-3 py-1.5 bg-brand-secondary-accent text-brand-text rounded-md text-sm font-medium hover:bg-opacity-80 transition-colors flex items-center gap-2"
+            }, React.createElement(Edit3, { className: "w-4 h-4" }), t.actions.editPrompt),
+            isEditing && React.createElement("button", {
+              onClick: () => { setIsEditing(false); setGeneratedPrompt(editorText); },
+              className: "px-3 py-1.5 bg-brand-primary-accent text-white rounded-md text-sm font-medium hover:bg-opacity-80 transition-colors flex items-center gap-2"
+            }, React.createElement(Check, { className: "w-4 h-4" }), t.actions.doneEditing),
+            React.createElement("button", {
+              onClick: undoEdit,
+              disabled: historyIndex <= 0,
+              className: `px-3 py-1.5 border ${historyIndex <= 0 ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-brand-text hover:bg-gray-100'} rounded-md text-sm font-medium transition-colors flex items-center gap-2`
+            }, React.createElement(RotateCcw, { className: "w-4 h-4" }), t.actions.undo),
+            React.createElement("button", {
+              onClick: redoEdit,
+              disabled: historyIndex >= history.length - 1 || history.length === 0,
+              className: `px-3 py-1.5 border ${historyIndex >= history.length - 1 || history.length === 0 ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-brand-text hover:bg-gray-100'} rounded-md text-sm font-medium transition-colors flex items-center gap-2`
+            }, React.createElement(RotateCw, { className: "w-4 h-4" }), t.actions.redo),
+            React.createElement("button", {
+              onClick: revertToOriginal,
+              disabled: history.length <= 1,
+              className: `px-3 py-1.5 border ${history.length <= 1 ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-brand-text hover:bg-gray-100'} rounded-md text-sm font-medium transition-colors flex items-center gap-2`
+            }, React.createElement(RotateCcw, { className: "w-4 h-4" }), t.actions.revert)
           ),
+          isEditing
+            ? React.createElement("textarea", {
+                value: editorText,
+                onChange: onEditorChange,
+                onKeyDown: (e) => {
+                  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+                    e.preventDefault();
+                    if (e.shiftKey) redoEdit(); else undoEdit();
+                  }
+                },
+                className: "w-full h-[420px] p-4 border-2 border-brand-primary-accent/40 rounded-lg focus:border-brand-primary-accent focus:ring-1 focus:ring-brand-primary-accent outline-none font-mono text-sm whitespace-pre resize-none shadow-inner",
+                placeholder: t.generation.empty || 'No prompt generated yet.'
+              })
+            : React.createElement("div", { className: "bg-brand-bg/50 rounded-lg border-l-4 border-brand-primary-accent p-4 font-courier text-sm text-brand-text whitespace-pre-wrap max-h-[500px] overflow-y-auto shadow-inner" },
+                (generatedPrompt || '')
+              ),
           React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6" },
             React.createElement("button", { onClick: copyToClipboard, className: "w-full px-4 py-2.5 bg-brand-primary-accent text-white rounded-lg font-semibold hover:bg-opacity-80 transition-all flex items-center justify-center gap-2 text-sm" }, React.createElement(Copy, { className: "w-4 h-4" }), t.actions.copy),
             React.createElement("button", { onClick: savePrompt, className: "w-full px-4 py-2.5 border-2 border-brand-primary-accent text-brand-primary-accent rounded-lg font-semibold hover:bg-brand-primary-accent hover:text-white transition-colors flex items-center justify-center gap-2 text-sm" }, React.createElement(Save, { className: "w-4 h-4" }), t.actions.save),
