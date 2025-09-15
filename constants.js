@@ -78,6 +78,7 @@ export const translations = {
       export: "Exporter",
       generate: "Générer le prompt",
       newPrompt: "Nouveau prompt",
+      mainMenu: "Page principale",
       viewLibrary: "📚 Ma Bibliothèque",
       copiedSuccess: "Copié!",
       copyError: "Erreur de copie",
@@ -216,7 +217,6 @@ export const translations = {
       user: {
         unknown: "Utilisateur",
         signedInAs: "Connecté en tant que",
-        settings: "Paramètres",
         signOut: "Se déconnecter"
       },
       migration: {
@@ -303,6 +303,7 @@ export const translations = {
       export: "Export",
       generate: "Generate prompt",
       newPrompt: "New prompt",
+      mainMenu: "Main menu",
       viewLibrary: "📚 My Library",
       copiedSuccess: "Copied!",
       copyError: "Copy failed",
@@ -441,7 +442,6 @@ export const translations = {
       user: {
         unknown: "User",
         signedInAs: "Signed in as",
-        settings: "Settings",
         signOut: "Sign Out"
       },
       migration: {

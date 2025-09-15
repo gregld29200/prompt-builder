@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, LogOut, ChevronDown, Settings } from 'lucide-react';
+import { LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext.js';
 
 const UserMenu = ({ translations }) => {
@@ -112,19 +112,6 @@ const UserMenu = ({ translations }) => {
 
       // Menu items
       React.createElement("div", { className: "py-1" },
-        // Profile/Settings option (for future use)
-        React.createElement("button", {
-          className: "w-full px-4 py-2 text-left text-sm text-brand-text hover:bg-brand-bg/50 flex items-center gap-3",
-          role: "menuitem",
-          onClick: () => {
-            setIsOpen(false);
-            // TODO: Navigate to profile/settings
-          }
-        },
-          React.createElement(Settings, { className: "w-4 h-4 text-brand-muted-text" }),
-          t.auth.user.settings
-        ),
-
         // Logout option
         React.createElement("button", {
           className: "w-full px-4 py-2 text-left text-sm text-brand-error hover:bg-brand-error/5 flex items-center gap-3 border-t border-gray-200 mt-1 pt-3",
