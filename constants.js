@@ -64,7 +64,7 @@ export const translations = {
       mission: "Mission principale",
       missionDescription: "Préciser les tâches que vous voulez que l'IA exécute - sa mission.",
       missionPlaceholder: "Ex: créer des cours engageants",
-      constraints: "Contraintes (une par ligne)",
+      constraints: "Contraintes",
       next: "Suivant",
       back: "Retour",
       constraintsPlaceholder: "Ex:\nDurée: 50 minutes\nNiveau: B1\nGroupe: 12 élèves"
@@ -302,7 +302,7 @@ export const translations = {
       mission: "Main mission",
       missionDescription: "Specify the tasks you want the AI to perform - its mission.",
       missionPlaceholder: "Ex: create engaging courses",
-      constraints: "Constraints (one per line)",
+      constraints: "Constraints",
       next: "Next",
       back: "Back",
       constraintsPlaceholder: "Ex:\nDuration: 50 minutes\nLevel: B1\nGroup: 12 students"
